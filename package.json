@@ -1,29 +1,40 @@
 {
-  "name": "stellar-badges-discord-bot",
-  "version": "0.0.0",
-  "devDependencies": {
-    "@cloudflare/workers-types": "^4.20230115.0",
-    "@stellar/tsconfig": "^1.0.2",
-    "@types/cookie": "^0.5.1",
-    "joi": "^17.7.0",
-    "model-one": "^0.0.7",
-    "typescript": "^4.9.5",
-    "vitest": "^0.28.4",
-    "wrangler": "2.9.1"
-  },
   "private": true,
+  "sideEffects": false,
   "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler publish",
-    "db:create": "npx wrangler d1 create discord-stellar-roles",
-    "db:schema": "npx wrangler d1 execute discord-stellar-roles --file ./src/database/schema.sql",
-    "db:dump": "npx wrangler d1 execute discord-stellar-roles --file ./src/database/schema.sql",
-    "test": "vitest"
+    "build": "remix build",
+    "dev:remix": "remix watch",
+    "dev:wrangler": "cross-env NODE_ENV=development npm run wrangler",
+    "dev": "npm-run-all build --parallel \"dev:*\"",
+    "start": "cross-env NODE_ENV=production npm run wrangler",
+    "typecheck": "tsc",
+    "db:seeds": "npx wrangler d1 execute remixapptest --file ./db/schema.sql",
+    "db:seeds:local": "npx wrangler d1 execute remixapptest --file ./db/schema.sql --local",
+    "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist"
   },
   "dependencies": {
-    "discord.js": "^14.7.1",
-    "hono": "^2.7.6",
-    "stellar-base": "^8.2.2",
-    "stellar-wallets-kit": "github:Creit-Tech/Stellar-Wallets-Kit"
+    "@remix-run/cloudflare": "^1.13.0",
+    "@remix-run/cloudflare-pages": "^1.13.0",
+    "@remix-run/react": "^1.13.0",
+    "cross-env": "^7.0.3",
+    "joi": "^17.8.3",
+    "model-one": "^0.0.7",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^3.18.0",
+    "@remix-run/dev": "^1.13.0",
+    "@remix-run/eslint-config": "^1.13.0",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.8",
+    "better-sqlite3": "^8.1.0",
+    "eslint": "^8.27.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^4.8.4",
+    "wrangler": "^2.2.1"
+  },
+  "engines": {
+    "node": ">=16.13"
   }
 }

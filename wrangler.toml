@@ -1,10 +1,13 @@
-name = "stellar-badge-discord-bot"
-main = "src/index.ts"
-compatibility_date = "2023-02-08"
-NO_D1_WARNING=true
+name = "remix-cloudflare-pages"
+compatibility_date = "2023-02-23"
+
+kv_namespaces = [
+    { binding = "SESSION_STORAGE", id = "199c08f8b3ae456996d5da2aa854cbf5", preview_id = "199c08f8b3ae456996d5da2aa854cbf5" }
+]
+
 
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "discord-stellar-roles"
-database_id = "fb84e321-ab0e-4bd2-864e-75007649a9ef"
-preview_database_id = "fb84e321-ab0e-4bd2-864e-75007649a9ef"
+database_name = "remixapptest"
+database_id = "93e7e540-cfff-4a26-84d8-cfc8aff783e1"
+preview_database_id = "93e7e540-cfff-4a26-84d8-cfc8aff783e1"
