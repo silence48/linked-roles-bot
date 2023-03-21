@@ -1,0 +1,54 @@
+# UPDATE THE COMMENTED STUFF
+VERSION="2.0.0"
+
+NETWORK_PASSPHRASE="Public Global Stellar Network ; September 2015"
+FEDERATION_SERVER="https://stellar-discord-bot.pages.dev/federation"
+TRANSFER_SERVER="https://stellar-discord-bot.pages.dev"
+ASSET_METADATA_SERVER="https://stellar-discord-bot.pages.dev/assets"
+WEB_AUTH_ENDPOINT="https://stellar-discord-bot.pages.dev/stellarauth"
+SIGNING_KEY="GBBHQ7H4V6RRORKYLHTCAWP6MOHNORRFJSDPXDFYDGJB2LPZUFPXUEW3"
+HORIZON_URL="https://SDB-horizon.pages.dev"
+ACCOUNTS=[
+"GBDRAETLCUDDL24ZFEPAYWFZLLENWAZSGQV6WMCUII2TNUFUWU6ZSIDU"
+]
+
+[DOCUMENTATION]
+ORG_NAME="Stellar Dao Discord Bot"
+ORG_DBA="CommuniDAO"
+ORG_URL="https://stellar-discord-bot.pages.dev"
+ORG_LOGO="https://stellar-discord-bot.pages.dev/communidao.png"
+#ORG_DESCRIPTION="Description of issuer"
+#ORG_PHYSICAL_ADDRESS="123 Sesame Street, New York, NY 12345, United States"
+#ORG_PHYSICAL_ADDRESS_ATTESTATION="https://www.domain.com/address_attestation.jpg"
+#ORG_PHONE_NUMBER="1 (123)-456-7890"
+#ORG_PHONE_NUMBER_ATTESTATION="https://www.domain.com/phone_attestation.jpg"
+#ORG_KEYBASE="accountname"
+#ORG_TWITTER="orgtweet"
+ORG_GITHUB="CommuniDAO"
+#ORG_OFFICIAL_EMAIL="support@domain.com"
+
+[[PRINCIPALS]]
+name="Silence"
+#email="jane@domain.com"
+#keybase="crypto_jane"
+#twitter="crypto_jane"
+github="crypto_jane"
+#id_photo_hash="be688838ca8686e5c90689bf2ab585cef1137c999b48c70b92f67a5c34dc15697b5d11c982ed6d71be1e1e7f7b4e0733884aa97c3f7a339a8ed03577cf74be09"
+#verification_photo_hash="016ba8c4cfde65af99cb5fa8b8a37e2eb73f481b3ae34991666df2e04feb6c038666ebd1ec2b6f623967756033c702dde5f423f7d47ab6ed1827ff53783731f7"
+
+[[PRINCIPALS]]
+name="Julian"
+#email="jane@domain.com"
+#keybase="crypto_jane"
+#twitter="crypto_jane"
+github="crypto_jane"
+#id_photo_hash="be688838ca8686e5c90689bf2ab585cef1137c999b48c70b92f67a5c34dc15697b5d11c982ed6d71be1e1e7f7b4e0733884aa97c3f7a339a8ed03577cf74be09"
+#verification_photo_hash="016ba8c4cfde65af99cb5fa8b8a37e2eb73f481b3ae34991666df2e04feb6c038666ebd1ec2b6f623967756033c702dde5f423f7d47ab6ed1827ff53783731f7"
+
+
+[[VALIDATORS]]
+ALIAS="silence-us"
+DISPLAY_NAME="Silence Archiver 1"
+HOST="archive.thesilence.io:11625"
+PUBLIC_KEY="GD5DJQDDBKGAYNEAXU562HYGOOSYAEOO6AS53PZXBOZGCP5M2OPGMZV3"
+HISTORY="http://archive.thesilence.io/prd/core-live/core_live_001/"
