@@ -5,3 +5,4 @@ wrangler.toml
 /functions/\[\[path\]\].js.map
 /public/build
 .dev.vars
+keys
