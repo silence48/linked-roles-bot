@@ -1,7 +1,8 @@
-name = "remix-cloudflare-pages"
+name = "stellar-discord-bot"
 compatibility_date = "2023-02-23"
 kv_namespaces = [
-    { binding = "SESSION_STORAGE", id = "199c08f8b3ae456996d5da2aa854cbf5", preview_id = "199c08f8b3ae456996d5da2aa854cbf5" }
+    { binding = "SESSION_STORAGE", id = "3e72ac9816ab45909c493267dac88d1b" },
+    { binding = "TOMLKEYS", id = "20aae67ac807482098ad13f1ca7e4337" }
 ]
 [site]
   bucket = "./public"
@@ -9,6 +10,5 @@ kv_namespaces = [
   command = "npm run build"
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "remixapptest"
-database_id = "93e7e540-cfff-4a26-84d8-cfc8aff783e1"
-preview_database_id = "93e7e540-cfff-4a26-84d8-cfc8aff783e1"
+database_name = "SDBDATA"
+database_id = "8a4b3992-9618-4a2e-b948-c39b4290e922"
