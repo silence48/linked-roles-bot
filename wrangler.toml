@@ -1,6 +1,10 @@
 name = "remix-cloudflare-pages"
 compatibility_date = "2023-02-23"
+[site]
+  bucket = "./public"
 
+[build]
+  command = "npm run build"
 kv_namespaces = [
     { binding = "SESSION_STORAGE", id = "199c08f8b3ae456996d5da2aa854cbf5", preview_id = "199c08f8b3ae456996d5da2aa854cbf5" }
 ]
