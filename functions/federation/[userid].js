@@ -1,3 +1,3 @@
 export function onRequest(context) {
-    return new Response(context.params.user)
+    return new Response(context.params.userid)
   }
