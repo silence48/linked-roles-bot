@@ -1,8 +1,8 @@
 name = "stellar-discord-bot"
 compatibility_date = "2023-02-23"
 kv_namespaces = [
-    { binding = "SESSION_STORAGE", id = "3e72ac9816ab45909c493267dac88d1b" },
-    { binding = "TOMLKEYS", id = "20aae67ac807482098ad13f1ca7e4337" }
+    { binding = "SESSION_STORAGE", id = "3e72ac9816ab45909c493267dac88d1b", preview_id = "51bb79ab719b4271aedc5f9556beec8d" },
+    { binding = "TOMLKEYS", id = "20aae67ac807482098ad13f1ca7e4337", preview_id = "fb2d0cdb0c9c4f1986221338ece1b44d" }
 ]
 [site]
   bucket = "./public"
