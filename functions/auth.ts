@@ -50,10 +50,6 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
         "Access-Control-Allow-Origin": "*",
       },
     });
-    //this should succeed
-    //console.log(verifyTxSignedBy(transaction, pubkey));
-    //this should fail
-    //console.log(verifyTxSignedBy(transaction, failkey));
 }
 export const onRequestOptions: PagesFunction<Env> = async (context) => {
 
@@ -80,16 +76,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   let transaction = new TransactionBuilder.fromXDR(authjson.transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
   const valid = verifyTxSignedBy(transaction,transaction.source)
-
-  const token = {
-    "sub": transaction.source, //the pubkey of who it's for
-    "jti": transaction.operations[0].value, // the unique identifier for this tokencrypto.randomBytes(48).toString('base64') should be set by the challenge manage data...
-    "iss": context.request.url,//the issuer of the token
-    "iat": Date.now(), //the issued at timestamp
-    "exp": transaction.timeBounds.maxTime // the expiration timestamp
+  let token: any = "The challenge signature can't be verified";
+  if (valid){
+    token = {
+      "sub": transaction.source, //the pubkey of who it's for
+      "jti": transaction.operations[0].value, // the unique identifier for this tokencrypto.randomBytes(48).toString('base64') should be set by the challenge manage data...
+      "iss": context.request.url,//the issuer of the token
+      "iat": Date.now(), //the issued at timestamp
+      "exp": transaction.timeBounds.maxTime // the expiration timestamp
+    }
   }
 
-  const json = JSON.stringify(valid, null, 2);
+
+  const json = JSON.stringify(token, null, 2);
   return new Response(json, {
     headers: {
       "content-type": "application/json;charset=UTF-8",
