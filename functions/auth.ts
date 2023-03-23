@@ -33,13 +33,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
     let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
     
-    const token = await generateAuthToken(serverkeypair, userAccount, userID);
+    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID);
 
-    console.log("The token is", token);
+    console.log("The challenge is", Challenge);
 
     const data = {
-      "transaction": token,
-      "network_passphrase": network_pass
+      "Transaction": Challenge,
+      "Network_Passphrase": network_pass
     };
 
     const json = JSON.stringify(data, null, 2);
@@ -67,13 +67,28 @@ export const onRequestOptions: PagesFunction<Env> = async (context) => {
 }
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   type authrequest = {
-    transaction: string
+    transaction: string,
+    NETWORK_PASSPHRASE: string
   }
   const authjson: authrequest = await context.request.json()
   //todo: Set the network passphrase as a env var.
   //todo: build the jwt token
-  let transaction = new TransactionBuilder.fromXDR(authjson.transaction, Networks.TESTNET)
+  let passphrase = Networks.TESTNET
+  if (authjson.NETWORK_PASSPHRASE){
+    passphrase=authjson.NETWORK_PASSPHRASE
+  }
+  let transaction = new TransactionBuilder.fromXDR(authjson.transaction, passphrase)
+  //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
   const valid = verifyTxSignedBy(transaction,transaction.source)
+
+  const token = {
+    "sub": "GA6UIXXPEWYFILNUIWAC37Y4QPEZMQVDJHDKVWFZJ2KCWUBIU5IXZNDA", //the pubkey of who it's for
+    "jti": "144d367bcb0e72cabfdbde60eae0ad733cc65d2a6587083dab3d616f88519024", // the unique identifier for this tokencrypto.randomBytes(48).toString('base64') should be set by the challenge manage data...
+    "iss": context.request.url, //the issuer of the token
+    "iat": 1534257994, //the issued at timestamp
+    "exp": 1534344394 // the expiration timestamp
+  }
+
   const json = JSON.stringify(valid, null, 2);
   return new Response(json, {
     headers: {
@@ -88,10 +103,11 @@ async function verifyTxSignedBy(transaction, accountID) {
     return gatherTxSigners(transaction, [accountID]).length !== 0;
   }
 
-async function generateAuthToken(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
+async function generateAuthChallenge(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
     let tempAccount=new Account(pubkey,"-1");
     let transaction = new TransactionBuilder(tempAccount, {
             fee: BASE_FEE,
+            //todo: set the passphrase programatically based on an envvar
             networkPassphrase: Networks.TESTNET
         })
             // add a payment operation to the transaction
