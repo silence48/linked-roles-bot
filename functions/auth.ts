@@ -74,7 +74,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   //todo: build the jwt token
   let transaction = new TransactionBuilder.fromXDR(authjson.transaction, Networks.TESTNET)
   const valid = verifyTxSignedBy(transaction,transaction.source)
-  const json = JSON.stringify(transaction, null, 2);
+  const json = JSON.stringify(valid, null, 2);
   return new Response(json, {
     headers: {
       "content-type": "application/json;charset=UTF-8",
