@@ -7,24 +7,36 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const { searchParams } = new URL(request.url);
     const userAccount = searchParams.get('account');
     const userID = searchParams.get('userid');
-
+    const network_pass = StellarBase.Networks.TESTNET
     const testurl = 'https://horizon-testnet.stellar.org';
     const mainurl = 'https://horizon.stellar.org';
-    
-   
-
+  
     //let pubkey = 'GAJUGK5WKEF5GJ2DG7BZ4G52TXHMRYRAWL2DWYC2NYOO5V6FHJMIB7B2'
     //let failkey = 'GAJUGK5WKEF5GJ2DG7BZ4G52TXHMRYRAWL2DWYC2NYOO5V6FHJMIB7B3'
     //let userID = '12345678901'
     let keypair = StellarBase.Keypair.fromSecret(context.env.authsigningkey);
     const token = generateAuthToken(keypair, userAccount, userID);
 
-    
     console.log("The token is", token);
+
+    const data = {
+      "transaction": token,
+      "network_passphrase": network_pass
+    };
+
+    const json = JSON.stringify(data, null, 2);
+
+    return new Response(json, {
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
     //this should succeed
     //console.log(verifyTxSignedBy(transaction, pubkey));
     //this should fail
     //console.log(verifyTxSignedBy(transaction, failkey));
+
 
 async function generateAuthToken(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
     
@@ -78,22 +90,7 @@ function gatherTxSigners(transaction, signers) {
 }
 
 
-    let challenge = 
 
-
-    const data = {
-      
-    };
-
-    const json = JSON.stringify(data, null, 2);
-
-    return new Response(json, {
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-  };
 
 
   interface Env {
