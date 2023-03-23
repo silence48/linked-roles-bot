@@ -86,8 +86,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       "exp": transaction.timeBounds.maxTime // the expiration timestamp
     }
   }
-
-
   const json = JSON.stringify(token, null, 2);
   return new Response(json, {
     headers: {
