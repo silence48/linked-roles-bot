@@ -113,7 +113,8 @@ async function generateAuthChallenge(serverkey, pubkey, discordID, oururl): Prom
             // add a payment operation to the transaction
             .addOperation(Operation.manageData({
               name: `${oururl} auth`,
-              value: Buffer.from(crypto.randomUUID()).toString('base64')
+              value: Buffer.from(crypto.randomUUID()).toString('base64'),
+              source: serverkey.publicKey()
             }))
             .addOperation(Operation.manageData({
                 name: "DiscordID",
