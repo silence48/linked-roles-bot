@@ -1,5 +1,5 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx", "functions/*.ts"],
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "isolatedModules": true,
@@ -10,11 +10,11 @@
     "target": "ESNext",
     "strict": true,
     "allowJs": true,
-    "module": "CommonJS",
+    "module": "ESNext",
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*","./functions/*"]
+      "~/*": ["./app/*"]
     },
     "types": [
       "@cloudflare/workers-types",
