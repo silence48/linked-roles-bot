@@ -1,4 +1,3 @@
-//import type { TransactionBuilder } from "../node_modules/stellar-base/types/index";
 import {
   Keypair,
   TransactionBuilder,
@@ -8,10 +7,9 @@ import {
   Account,
 } from 'stellar-base';
 import { Buffer } from "buffer-polyfill";
-
+//found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
 globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
-//const StellarBase = require("stellar-base")
 interface Env {
   SESSION_STORAGE: KVNamespace;
   authsigningkey: any;
@@ -27,16 +25,12 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const network_pass = Networks.TESTNET;
     const testurl = 'https://horizon-testnet.stellar.org';
     const mainurl = 'https://horizon.stellar.org';
+    
     let thekeypair = Keypair.fromPublicKey(userAccount);
-    console.log(thekeypair)
     let tempAccount=new Account(userAccount,"-1");
-    console.log(tempAccount);
-    //let pubkey = 'GAJUGK5WKEF5GJ2DG7BZ4G52TXHMRYRAWL2DWYC2NYOO5V6FHJMIB7B2'
-    //let failkey = 'GAJUGK5WKEF5GJ2DG7BZ4G52TXHMRYRAWL2DWYC2NYOO5V6FHJMIB7B3'
-    //let userID = '12345678901'
-    //let keypair = StellarBase.Keypair.fromSecret(String(context.env.authsigningkey) );
-    //let keypair = StellarBase.Keypair.fromSecret("SAMT2BEUC5RKUDPZXSNEVKBX6NFVD75DZXHWYRKX7TDB2RGTXLEVRDV2");
-    const token = await generateAuthToken(userAccount, userID);
+    let serverkeypair = Keypair.fromSecret(context.env.authsigningkey);
+    
+    const token = await generateAuthToken(serverkeypair, userAccount, userID);
 
     console.log("The token is", token);
 
@@ -59,9 +53,9 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     //console.log(verifyTxSignedBy(transaction, failkey));
 }
 
-async function generateAuthToken(pubkey, discordID): Promise<TransactionBuilder>{
-    var tempAccount=new Account(pubkey,"-1");
-    var transaction = new TransactionBuilder(tempAccount, {
+async function generateAuthToken(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
+    let tempAccount=new Account(pubkey,"-1");
+    let transaction = new TransactionBuilder(tempAccount, {
             fee: BASE_FEE,
             networkPassphrase: Networks.TESTNET
         })
@@ -73,7 +67,7 @@ async function generateAuthToken(pubkey, discordID): Promise<TransactionBuilder>
             // mark this transaction as valid only for the next 30 days
             .setTimeout(60*60*24*30)
             .build();
-    //await transaction.sign(serverkey);
+    await transaction.sign(serverkey);
     const token = await transaction.toEnvelope().toXDR('base64');
     return token;
 }
