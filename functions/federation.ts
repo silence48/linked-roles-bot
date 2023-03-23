@@ -1,5 +1,5 @@
-const handler: ExportedHandler = {
-  async fetch(request: Request) {
+export const onRequest: PagesFunction<Env> = async (context) => {
+    const request = context.request
     const { searchParams } = new URL(request.url);
     let q = searchParams.get('q');
     let t = searchParams.get('type');
@@ -21,5 +21,9 @@ const handler: ExportedHandler = {
         "Access-Control-Allow-Origin": "*",
       },
     });
-  },
-};
+  };
+
+
+  interface Env {
+    SESSION_STORAGE: KVNamespace;
+  }
