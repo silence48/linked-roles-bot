@@ -1,4 +1,4 @@
-import { TransactionBuilder } from "../node_modules/stellar-base/types/index";
+import type { TransactionBuilder } from "../node_modules/stellar-base/types/index";
 
 const StellarBase = require("stellar-base")
 interface Env {
@@ -10,8 +10,10 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     const request = context.request
     const { searchParams } = new URL(request.url);
     const userAccount = searchParams.get('account');
+    console.log(userAccount);
     const userID = searchParams.get('userid');
-    const network_pass = StellarBase.Networks.TESTNET
+    console.log(userID);
+    const network_pass = StellarBase.Networks.TESTNET;
     const testurl = 'https://horizon-testnet.stellar.org';
     const mainurl = 'https://horizon.stellar.org';
   
