@@ -1,9 +1,9 @@
-import { Transaction, TransactionBuilder, TransactionI } from "../node_modules/stellar-base/types/index";
+import { TransactionBuilder } from "../node_modules/stellar-base/types/index";
 
 const StellarBase = require("stellar-base")
 interface Env {
   SESSION_STORAGE: KVNamespace;
-  authsigningkey: string;
+  authsigningkey: any;
 }
 
 export const onRequest: PagesFunction<Env> = async (context) => {
@@ -43,8 +43,6 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 }
 
 async function generateAuthToken(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
-    
-
     var tempAccount=new StellarBase.Account(pubkey,"-1");
     var transaction = new StellarBase.TransactionBuilder(tempAccount, {
             fee: StellarBase.BASE_FEE,
