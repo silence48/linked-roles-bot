@@ -28,6 +28,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     
     let thekeypair = Keypair.fromPublicKey(userAccount);
     let tempAccount=new Account(userAccount,"-1");
+    //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
     let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
     
     const token = await generateAuthToken(serverkeypair, userAccount, userID);
