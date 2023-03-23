@@ -28,7 +28,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     
     let thekeypair = Keypair.fromPublicKey(userAccount);
     let tempAccount=new Account(userAccount,"-1");
-    let serverkeypair = Keypair.fromSecret(context.env.authsigningkey);
+    let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
     
     const token = await generateAuthToken(serverkeypair, userAccount, userID);
 
