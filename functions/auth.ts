@@ -1,6 +1,10 @@
 import { Transaction, TransactionBuilder, TransactionI } from "../node_modules/stellar-base/types/index";
 
 const StellarBase = require("stellar-base")
+interface Env {
+  SESSION_STORAGE: KVNamespace;
+  authsigningkey: string;
+}
 
 export const onRequest: PagesFunction<Env> = async (context) => {
     const request = context.request
@@ -36,7 +40,7 @@ export const onRequest: PagesFunction<Env> = async (context) => {
     //console.log(verifyTxSignedBy(transaction, pubkey));
     //this should fail
     //console.log(verifyTxSignedBy(transaction, failkey));
-
+}
 
 async function generateAuthToken(serverkey, pubkey, discordID): Promise<TransactionBuilder>{
     
@@ -88,12 +92,3 @@ function gatherTxSigners(transaction, signers) {
   }
   return Array.from(signersFound);
 }
-
-
-
-
-
-  interface Env {
-    SESSION_STORAGE: KVNamespace;
-    authsigningkey: string;
-  }
