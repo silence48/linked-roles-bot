@@ -16,14 +16,15 @@
     "@remix-run/cloudflare": "^1.14.3",
     "@remix-run/cloudflare-pages": "^1.14.3",
     "@remix-run/react": "^1.14.3",
+    "@tsndr/cloudflare-worker-jwt": "^2.2.1",
+    "buffer-polyfill": "npm:buffer@^6.0.3",
     "cfw-easy-utils": "^1.0.3",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
     "model-one": "^0.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "stellar-base": "^8.2.2",
-    "buffer-polyfill": "npm:buffer@^6.0.3"
+    "stellar-base": "^8.2.2"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^3.19.0",

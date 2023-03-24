@@ -9,6 +9,8 @@ import {
 } from 'stellar-base';
 import { Buffer } from "buffer-polyfill";
 import { Transaction } from '../node_modules/stellar-base/types/index';
+import jwt from '@tsndr/cloudflare-worker-jwt'
+
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
 globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
@@ -21,21 +23,17 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const request = context.request
     const { searchParams } = new URL(request.url);
     const userAccount = searchParams.get('account');
-    console.log(userAccount);
     const userID = searchParams.get('userid');
-    console.log(userID);
+    
     const network_pass = Networks.TESTNET;
     const testurl = 'https://horizon-testnet.stellar.org';
     const mainurl = 'https://horizon.stellar.org';
-    
-    let thekeypair = Keypair.fromPublicKey(userAccount);
-    let tempAccount=new Account(userAccount,"-1");
+    const ourURL = new URL(request.url).origin
+
     //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
     let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
     
-    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, request.url);
-
-    console.log("The challenge is", Challenge);
+    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, ourURL);
 
     const data = {
       "Transaction": Challenge,
@@ -45,12 +43,14 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const json = JSON.stringify(data, null, 2);
 
     return new Response(json, {
+      status: 200,
       headers: {
         "content-type": "application/json;charset=UTF-8",
         "Access-Control-Allow-Origin": "*",
       },
     });
 }
+
 export const onRequestOptions: PagesFunction<Env> = async (context) => {
 
   return new Response("OK", {
@@ -61,6 +61,7 @@ export const onRequestOptions: PagesFunction<Env> = async (context) => {
     },
   })
 }
+
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   type authrequest = {
     transaction: string,
@@ -75,18 +76,21 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   let transaction = new TransactionBuilder.fromXDR(authjson.transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
-  
+  const ourURL = new URL(context.request.url).origin
+
   if ( verifyTxSignedBy(transaction,transaction.source) ){
-    let token = {
-      "sub": transaction.source, //the pubkey of who it's for
-      "jti": transaction.operations[0].value, // the unique identifier for this tokencrypto.randomBytes(48).toString('base64') should be set by the challenge manage data...
-      "iss": context.request.url,//the issuer of the token
-      "iat": Date.now(), //the issued at timestamp
-      "exp": transaction.timeBounds.maxTime // the expiration timestamp
-    }
-    const json = JSON.stringify(token, null, 2); 
-    let thetoken = btoa(json);
-    let responsetext = JSON.stringify({"token": thetoken});
+    let token = await jwt.sign(
+      {
+        "userid": transaction.operations[1].value,
+        "sub": transaction.source, //the pubkey of who it's for
+        "jti": transaction.operations[0].value, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
+        "iss": ourURL,//the issuer of the token
+        "iat": Date.now(), //the issued at timestamp
+        "exp": transaction.timeBounds.maxTime, // the expiration timestamp
+        "xdr": authjson.transaction
+      }, context.env.authsigningkey
+    ) 
+    let responsetext = JSON.stringify({"token": token});
     return new Response(responsetext, {
       status: 200,
       headers: {
