@@ -75,24 +75,35 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   let transaction = new TransactionBuilder.fromXDR(authjson.transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
-  const valid = verifyTxSignedBy(transaction,transaction.source)
-  let token: any = "The challenge signature can't be verified";
-  if (valid){
-    token = {
+  
+  if ( verifyTxSignedBy(transaction,transaction.source) ){
+    let token = {
       "sub": transaction.source, //the pubkey of who it's for
       "jti": transaction.operations[0].value, // the unique identifier for this tokencrypto.randomBytes(48).toString('base64') should be set by the challenge manage data...
       "iss": context.request.url,//the issuer of the token
       "iat": Date.now(), //the issued at timestamp
       "exp": transaction.timeBounds.maxTime // the expiration timestamp
     }
-  }
-  const json = JSON.stringify(token, null, 2);
-  return new Response(json, {
-    headers: {
-      "content-type": "application/json;charset=UTF-8",
-      "Access-Control-Allow-Origin": "*",
-    },
-  });
+    const json = JSON.stringify(token, null, 2); 
+    let thetoken = btoa(json);
+    let responsetext = JSON.stringify({"token": thetoken});
+    return new Response(responsetext, {
+      status: 200,
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  } else{
+    let errortext = JSON.stringify({"error": "The provided transaction is not valid"})
+    return new Response(errortext, {
+      status: 401,
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }  
 }
 
 async function verifyTxSignedBy(transaction, accountID) {
