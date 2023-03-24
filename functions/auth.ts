@@ -111,6 +111,28 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }  
 }
 
+async function getaccesstoken(refreshtoken, context){
+  let validity = jwt.verify(refreshtoken, context.env.authsigningkey)
+  if (!validity){
+    return false
+  }
+  const { payload } = jwt.decode(refreshtoken) // decode the refresh token
+  let passphrase = Networks.TESTNET
+  const transaction = new TransactionBuilder.fromXDR(payload.xdr, passphrase)
+  const ourURL = new URL(context.request.url).origin
+  const expiretime = Date.now() + (60 * 60)
+  let accesstoken = await jwt.sign(
+    {
+      "userid": transaction.operations[1].value,
+      "sub": transaction.source, //the pubkey of who it's for
+      "jti": transaction.operations[0].value, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
+      "iss": ourURL,//the issuer of the token
+      "iat": Date.now(), //the issued at timestamp
+      "exp": expiretime, // the expiration timestamp
+    }, context.env.authsigningkey
+  ) 
+};
+
 async function verifyTxSignedBy(transaction, accountID) {
  try{
   //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
