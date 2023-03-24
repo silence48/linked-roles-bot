@@ -64,7 +64,7 @@ export const onRequestOptions: PagesFunction<Env> = async (context) => {
 
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   type authrequest = {
-    transaction: string,
+    Transaction: string,
     NETWORK_PASSPHRASE: string
   }
   const authjson: authrequest = await context.request.json()
@@ -74,11 +74,11 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   if (authjson.NETWORK_PASSPHRASE){
     passphrase=authjson.NETWORK_PASSPHRASE
   }
-  let transaction = new TransactionBuilder.fromXDR(authjson.transaction, passphrase)
+  let transaction = new TransactionBuilder.fromXDR(authjson.Transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
   const ourURL = new URL(context.request.url).origin
-
-  if ( verifyTxSignedBy(transaction,transaction.source) ){
+  
+  if ( await verifyTxSignedBy(transaction,transaction.source) == true){
     let token = await jwt.sign(
       {
         "userid": transaction.operations[1].value,
@@ -87,9 +87,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         "iss": ourURL,//the issuer of the token
         "iat": Date.now(), //the issued at timestamp
         "exp": transaction.timeBounds.maxTime, // the expiration timestamp
-        "xdr": authjson.transaction
+        "xdr": authjson.Transaction
       }, context.env.authsigningkey
     ) 
+    //console.log(token)
     let responsetext = JSON.stringify({"token": token});
     return new Response(responsetext, {
       status: 200,
@@ -111,8 +112,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 }
 
 async function verifyTxSignedBy(transaction, accountID) {
-  console.log(transaction)
-    return gatherTxSigners(transaction, [accountID]).length !== 0;
+ try{
+  //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
+  const signedby = await gatherTxSigners(transaction, [accountID]) 
+  let comparelist = [accountID]
+  for (let n in comparelist){
+    for (let i in signedby){
+     if (signedby[i] == comparelist[n]){
+      return true
+     }else{
+      throw('that does not matchh');
+     }
+    }
+  }
+ } catch(err){
+  return false
+ }
   }
 
 async function generateAuthChallenge(serverkey, pubkey, discordID, oururl): Promise<TransactionBuilder>{
@@ -155,9 +170,11 @@ function gatherTxSigners(transaction, signers) {
     }
     for (let decSig of transaction.signatures) {
       if (!decSig.hint().equals(keypair.signatureHint())) {
+        console.log('nope')
         continue;
       }
       if (keypair.verify(hashedSignatureBase, decSig.signature())) {
+        console.log('yup')
         signersFound.add(signer);
         break;
       }
