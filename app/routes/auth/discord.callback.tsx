@@ -17,6 +17,7 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const discordState = url.searchParams.get("state");
+    
     console.log('Checkpoint 1', cookies, code, discordState)
 
     // const { DB } = context.env as any
