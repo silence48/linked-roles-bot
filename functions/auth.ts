@@ -76,9 +76,34 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   let transaction = new TransactionBuilder.fromXDR(authjson.Transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
-  const ourURL = new URL(context.request.url).origin
-  
+  const refreshtoken = await getrefreshtoken(transaction, context);
+  if (refreshtoken != false ) {
+    //todo: store the refresh token
+    const accesstoken = await getaccesstoken(refreshtoken, context);
+    if (accesstoken != false){
+      let responsetext = JSON.stringify({"token": accesstoken});
+      return new Response(responsetext, {
+        status: 200,
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }}else{
+    let errortext = JSON.stringify({"error": "The provided transaction is not valid"})
+    return new Response(errortext, {
+      status: 401,
+      headers: {
+        "content-type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }
+}
+
+async function getrefreshtoken(transaction, context){
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
+    const ourURL = new URL(context.request.url).origin
     let token = await jwt.sign(
       {
         "userid": transaction.operations[1].value,
@@ -87,27 +112,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         "iss": ourURL,//the issuer of the token
         "iat": Date.now(), //the issued at timestamp
         "exp": transaction.timeBounds.maxTime, // the expiration timestamp
-        "xdr": authjson.Transaction
+        "xdr": transaction
       }, context.env.authsigningkey
     ) 
-    //console.log(token)
-    let responsetext = JSON.stringify({"token": token});
-    return new Response(responsetext, {
-      status: 200,
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return token
   } else{
-    let errortext = JSON.stringify({"error": "The provided transaction is not valid"})
-    return new Response(errortext, {
-      status: 401,
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+    return false
   }  
 }
 
