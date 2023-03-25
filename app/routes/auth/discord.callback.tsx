@@ -94,7 +94,8 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       const challengetx = await fetch(url, init);
       const results = await gatherResponse(challengetx)
       console.log('the challenge transaction is', challengetx)
-      //nowsignthechallengetx, and post to the auth endpoint.
+      //nowsignthechallengetx, and post to the auth endpoint to get the access and refresh tokens.
+      //then store the tokens to the database.
     return null
        //return null
     
