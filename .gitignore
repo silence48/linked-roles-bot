@@ -6,3 +6,5 @@ wrangler.toml
 /public/build
 .dev.vars
 keys
+.wrangler/state/d1
+tunnle

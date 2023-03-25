@@ -28,6 +28,7 @@ export class Discord {
     });
   
     const response = await fetch(url, { method: 'POST', body: data, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
+    console.log("the response from oauth tokens", response)
     return response.json()
   }
   
