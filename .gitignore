@@ -8,3 +8,4 @@ wrangler.toml
 keys
 .wrangler/state/d1
 tunnle
+.wrangler/state/d1/DB.sqlite3

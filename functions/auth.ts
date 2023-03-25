@@ -10,6 +10,8 @@ import {
 import { Buffer } from "buffer-polyfill";
 import { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
+import { parse } from 'cookie';
+import { redirect } from "@remix-run/cloudflare";
 
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
 globalThis.Buffer = Buffer as unknown as BufferConstructor;
@@ -24,7 +26,13 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     const { searchParams } = new URL(request.url);
     const userAccount = searchParams.get('account');
     const userID = searchParams.get('userid');
-    
+    const state = searchParams.get('state')
+    const cookies = request.headers.get("Cookie")
+    const cookieHeader = parse(cookies);
+    const { clientState } = cookieHeader;
+    //todo:verify the states
+    console.log('Checkpoint 3', cookies, state, clientState)
+
     const network_pass = Networks.TESTNET;
     const testurl = 'https://horizon-testnet.stellar.org';
     const mainurl = 'https://horizon.stellar.org';
@@ -33,7 +41,7 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
     let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
     
-    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, ourURL);
+    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, ourURL, clientState);
 
     const data = {
       "Transaction": Challenge,
@@ -162,7 +170,7 @@ async function verifyTxSignedBy(transaction, accountID) {
  }
   }
 
-async function generateAuthChallenge(serverkey, pubkey, discordID, oururl): Promise<TransactionBuilder>{
+async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState): Promise<TransactionBuilder>{
     let tempAccount=new Account(pubkey,"-1");
     let transaction = new TransactionBuilder(tempAccount, {
             fee: BASE_FEE,
@@ -172,7 +180,7 @@ async function generateAuthChallenge(serverkey, pubkey, discordID, oururl): Prom
             // add a payment operation to the transaction
             .addOperation(Operation.manageData({
               name: `${oururl} auth`,
-              value: Buffer.from(crypto.randomUUID()).toString('base64'),
+              value: Buffer.from(clientState).toString('base64'),
               source: serverkey.publicKey()
             }))
             .addOperation(Operation.manageData({
@@ -214,3 +222,5 @@ function gatherTxSigners(transaction, signers) {
   }
   return Array.from(signersFound);
 }
+
+

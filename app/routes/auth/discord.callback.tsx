@@ -8,6 +8,8 @@ import {
 import { parse } from 'cookie';
 import { UserForm } from '~/forms';
 import { Discord, User } from '~/models'
+import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
+
 export interface Env {
   DB: D1Database;
 }
@@ -21,10 +23,10 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     const cookies = request.headers.get("Cookie") //the random id set on the first call to roles_link
     const url = new URL(request.url);
-    const code = url.searchParams.get("code");
+    let code = url.searchParams.get("code");
     // make sure the state parameter exists
-    const discordState = url.searchParams.get("state");
-
+    let discordState = url.searchParams.get("state");
+    
     console.log('Checkpoint 1', cookies, code, discordState)
 
     const { DB } = context.env as any
@@ -48,45 +50,53 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       });
     }
     console.log(code)
-    //const tokens: any = await Discord.getOAuthTokens(code, context.env)
-    //console.log('the token was', tokens1)
-    let tokens1 = {
-      access_token: 'eIkjLYBDKhcFyk09iQWS8ALVGL6Pds',
-      expires_in: 604800,
-      refresh_token: 'ggxjD1vEVQqTETPH7YnNux13ak7aNj',
-      scope: 'role_connections.write identify',
-      token_type: 'Bearer'
-    }
+    const discordTokens: any = await Discord.getOAuthTokens(code, context.env)
+
     // 2. Uses the Discord Access Token to fetch the user profile
     //let discord_user_id = '123456'
-    const meData: any = await Discord.getUserData(tokens1);
-    const discord_user_id = meData.user.id;
+    const discordData: any = await Discord.getUserData(discordTokens);
+    const discord_user_id = discordData.user.id;
     // store the user data on the db      
     //console.log(await User.findBy('discord_user_id', discord_user_id, DB))
     const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length
+    console.log('chk2')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
     // // If user does not exist, create it
     if (!userExists) {
        const userForm = new UserForm(new User({
          discord_user_id,
-         access_token: tokens1.access_token,
-         refresh_token: tokens1.refresh_token,
-         expires_at: (Date.now() + tokens1.expires_in * 1000).toString()
+         access_token: discordTokens.access_token,
+         refresh_token: discordTokens.refresh_token,
+         expires_at: (Date.now() + discordTokens.expires_in * 1000).toString()
        }))
        console.log(await User.create(userForm, DB))
       }else{
         const user = await User.findBy('discord_user_id', discord_user_id, DB)
         console.log(user, 'that was user')
         console.log(user[0].id)
-        user[0].access_token = tokens1.access_token;
-        user[0].access_token = tokens1.refresh_token;
-        user[0].expires_at = (Date.now() + tokens1.expires_in * 1000).toString();
+        user[0].access_token = discordTokens.access_token;
+        user[0].access_token = discordTokens.refresh_token;
+        user[0].expires_at = (Date.now() + discordTokens.expires_in * 1000).toString();
         console.log(await User.update(user[0], DB))
       }
       // start the stellar OAuth2 flow by generating a new OAuth2 Url
-    //const { url, codeVerifier, state } = generateStellarAuthURL();
-
-       return null
+      //todo: integrate a wallet!
+      const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
+      //secret for above is SADOTEVI7AMPGFAYUSNHTURERRC4J52M3IGIMVHLOKALU7JWW22GQUOE
+      //for testing only
+      const ChallengeURL = getChallengeURL(discord_user_id, stellaraccount, context, clientState)
+      const init:RequestInit = {
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+          "clientState": `${clientState}; Max-Age=300000`
+        },
+      };
+      const challengetx = await fetch(url, init);
+      const results = await gatherResponse(challengetx)
+      console.log('the challenge transaction is', challengetx)
+      //nowsignthechallengetx, and post to the auth endpoint.
+    return null
+       //return null
     
     // // TODO: Redirect with UUID so we can associate the user with the wallet
     
@@ -101,5 +111,43 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       return null
     }
 }
+export default function discordcallback(){
 
+  return (
+    <main>
+      Here is some text
+    </main>
+  );
+}
+/**
+ * Generate a url which users will use to approve the current bot for access to
+ * their Stellar account, along with the set of required scopes.
+ */
+export function getChallengeURL(discord_user_id, stellaraccount, context, state) {
+  //const { codeVerifier, codeChallenge } = generateCodeVerifier();
 
+  //const state = crypto.randomBytes(20).toString('hex');
+  const url = new URL('http://127.0.0.1:8788/auth');
+  url.searchParams.set('userid', discord_user_id);
+  url.searchParams.set('account', stellaraccount);
+  url.searchParams.set('redirect_uri', "http://127.0.0.1:8788");  //probably the user page
+  //url.searchParams.set('code_challenge', codeChallenge);
+  //url.searchParams.set('code_challenge_method', 'S256');
+  url.searchParams.set('state', state);
+  //url.searchParams.set('response_type', 'code');
+  //url.searchParams.set(
+//    'scope',
+    //'user'
+  //);
+  url.searchParams.set('prompt', 'consent');
+  return { state, url: url.toString() };
+}
+
+async function gatherResponse(response) {
+  const { headers } = response;
+  const contentType = headers.get("content-type") || "";
+  if (contentType.includes("application/json")) {
+    return JSON.stringify(await response.json());
+  }
+  return response.text();
+}

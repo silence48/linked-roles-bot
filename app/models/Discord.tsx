@@ -13,7 +13,7 @@ export class Discord {
     url.searchParams.set('prompt', 'consent');
     return { state, url: url.toString() };
   }
-  
+   
   static async getOAuthTokens(
     code: string,
     env: any
