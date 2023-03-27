@@ -1,6 +1,10 @@
 import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
 import { parse } from 'cookie';
-
+interface Env {
+  SESSION_STORAGE: KVNamespace;
+  authsigningkey: any;
+  DB: D1Database;
+}
   export const onRequestGet: PagesFunction<Env> = async (context) => {
     const cookies = context.request.headers.get("Cookie")
     const cookieHeader = parse(cookies);
@@ -46,7 +50,7 @@ import { parse } from 'cookie';
                     },
                     body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
                 }).then((tokens)=>{
-                  
+
                 })
                }
             }

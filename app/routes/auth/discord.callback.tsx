@@ -53,12 +53,9 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     const discordTokens: any = await Discord.getOAuthTokens(code, context.env)
 
     // 2. Uses the Discord Access Token to fetch the user profile
-    //let discord_user_id = '123456'
-    
     const discordData: any = await Discord.getUserData(discordTokens);
     const discord_user_id = discordData.user.id;
-    // store the user data on the db      
-    //console.log(await User.findBy('discord_user_id', discord_user_id, DB))
+    // store the user data on the db
     const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length
     console.log('chk2')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
@@ -80,14 +77,12 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
         user[0].discord_expires_at = (Date.now() + discordTokens.expires_in * 1000).toString();
         console.log(await User.update(user[0], DB))
       }
-      // start the stellar OAuth2 flow by generating a new OAuth2 Url
-      //todo: integrate a wallet!
       
-      //secret for above is SADOTEVI7AMPGFAYUSNHTURERRC4J52M3IGIMVHLOKALU7JWW22GQUOE
       //for testing only*/
-      const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
+      //secret for above is SADOTEVI7AMPGFAYUSNHTURERRC4J52M3IGIMVHLOKALU7JWW22GQUOE
+      //const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
       //let discord_user_id = 12345
-      const ChallengeURL = getChallengeURL(discord_user_id, stellaraccount, context, clientState)
+//      const ChallengeURL = getChallengeURL(discord_user_id, stellaraccount, context, clientState)
 
       return redirect(`http://127.0.0.1:8788/test`, {
         status: 301,
@@ -137,7 +132,7 @@ export default function discordcallback(){
  * Generate a url which users will use to approve the current bot for access to
  * their Stellar account, along with the set of required scopes.
  */
-export function getChallengeURL(discord_user_id, stellaraccount, context, state) {
+export function getChallengeURL(discord_user_id: string, stellaraccount: string, context: any, state: string) {
   //const { codeVerifier, codeChallenge } = generateCodeVerifier();
   //const state = crypto.randomBytes(20).toString('hex');
 
@@ -157,7 +152,7 @@ export function getChallengeURL(discord_user_id, stellaraccount, context, state)
   return { state, url: url.toString() };
 }
 
-async function gatherResponse(response) {
+async function gatherResponse(response: Response) {
 
   const { headers } = response;
   const contentType = headers.get("content-type") || "";

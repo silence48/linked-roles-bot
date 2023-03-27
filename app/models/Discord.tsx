@@ -1,4 +1,4 @@
-import type { Context } from 'hono';
+//import type { Context } from 'hono';
 import { User } from '.';
 
 export class Discord {
@@ -91,10 +91,7 @@ description_localizations?	dictionary with keys in available locales	translation
       console.log('Pushing successful')
 
     } catch (e) {
-      // const err = e as GaxiosError;
-      // console.error(e);
-      // console.log(util.inspect(err.response?.data, false, 12));
-      // throw e;
+    console.log(e)
     }
   }
 
@@ -108,13 +105,5 @@ description_localizations?	dictionary with keys in available locales	translation
       }
     })).json()
     return metadata;
-    // const accessToken = await getAccessToken(discord_user_id, data);
-    // const res = await request({
-    //   url,
-    //   headers: {
-    //     Authorization: `Bearer ${accessToken}`,
-    //   },
-    // });
-    // return res.data;
   }
 }
