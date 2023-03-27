@@ -22,17 +22,30 @@
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
     "model-one": "^0.0.7",
-    "react": "^17",
-    "react-dom": "^17",
-    "stellar-base": "^8.2.2",
-    "stellar-wallets-kit": "github:Creit-Tech/Stellar-Wallets-Kit"
+    "react": "latest",
+    "react-dom": "latest",
+    "stellar-base": "^8.2.2"
   },
   "devDependencies": {
+    "communi-design-system": "0.0.2",
+    "@headlessui/react": "latest",
+    "clsx": "latest",
+    "ahooks": "latest",
+    "@h6s/calendar": "latest",
+    "@heroicons/react": "1.0.6",
+    "qrcode-generator": "latest",
+    "date-fns": "latest",
+    "rci": "latest",
+    "luxon": "latest",
+    "framer-motion": "latest",
+    "@headlessui-float/react": "latest",
+    "use-is-focused": "latest",
+    "dayzed": "latest",
     "@cloudflare/workers-types": "^3.19.0",
     "@remix-run/dev": "^1.14.3",
     "@remix-run/eslint-config": "^1.14.3",
-    "@types/react": "^17",
-    "@types/react-dom": "^17",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
     "better-sqlite3": "^8.1.0",
     "eslint": "^8.36.0",
     "npm-run-all": "^4.1.5",
@@ -40,6 +53,9 @@
     "wrangler": "^2.13.0"
   },
   "engines": {
-    "node": ">=16.13.0"
+    "node": ">=16.15.0"
+  },
+  "volta": {
+    "node": "16.15.1"
   }
 }

@@ -1,6 +1,8 @@
+
 export default function Index() {
   return (
-    <div> Hello there traveler
+    <div>
+      <p>Hello there traveler</p>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { MetaFunction } from "@remix-run/cloudflare";
+import type { MetaFunction, LinksFunction } from "@remix-run/cloudflare";
 import {
   Links,
   LiveReload,
@@ -7,16 +7,21 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import designStyle from 'communi-design-system/styles/index.css';
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
-  title: "New Remix App",
+  title: "CommuniDAO",
   viewport: "width=device-width,initial-scale=1",
 });
 
+export const links: LinksFunction = () => ([
+  { rel: 'stylesheet', href: designStyle },
+]);
+
 export default function App() {
   return (
-    <html lang="en">
+    <html lang="en" className="light">
       <head>
         <Meta />
         <Links />
