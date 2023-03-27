@@ -83,8 +83,9 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       //const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
       //let discord_user_id = 12345
 //      const ChallengeURL = getChallengeURL(discord_user_id, stellaraccount, context, clientState)
-
-      return redirect(`http://127.0.0.1:8788/test`, {
+      const ourURL = new URL(request.url).origin;
+      const redirecturl = new URL('/test', ourURL);
+      return redirect(redirecturl.toString(), {
         status: 301,
         headers: {
           "Set-Cookie": `clientState=${clientState}; Max-Age=300000; discord_user_id=${discord_user_id};`,
@@ -135,11 +136,11 @@ export default function discordcallback(){
 export function getChallengeURL(discord_user_id: string, stellaraccount: string, context: any, state: string) {
   //const { codeVerifier, codeChallenge } = generateCodeVerifier();
   //const state = crypto.randomBytes(20).toString('hex');
-
-  const url = new URL('http://127.0.0.1:8788/auth');
+  const ourURL = new URL(context.request.url).origin
+  const url = new URL('/auth', ourURL);
   url.searchParams.set('userid', discord_user_id);
   url.searchParams.set('account', stellaraccount);
-  url.searchParams.set('redirect_uri', "http://127.0.0.1:8788");  //probably the user page
+  url.searchParams.set('redirect_uri', ourURL);  //probably the user page
   //url.searchParams.set('code_challenge', codeChallenge);
   //url.searchParams.set('code_challenge_method', 'S256');
   url.searchParams.set('state', state);

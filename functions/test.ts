@@ -8,6 +8,8 @@ interface Env {
   export const onRequestGet: PagesFunction<Env> = async (context) => {
     const cookies = context.request.headers.get("Cookie")
     const cookieHeader = parse(cookies);
+    const ourURL = new URL(context.request.url).origin
+    const posturl = new URL('/auth', ourURL).toString();
     // make sure the state parameter exists
     const { clientState, discord_user_id } = cookieHeader;
 
@@ -24,7 +26,7 @@ interface Env {
           window.freighterApi.getPublicKey().then(
             
             (public_key) => {
-            fetchurl=('http://127.0.0.1:8788/auth?userid='+discord_user_id + "&account=" + public_key)
+            fetchurl=(${posturl}+"?userid="+ discord_user_id + "&account=" + public_key)
             //    clientauth(public_key);
             fetch(fetchurl, {
             method: 'GET',
@@ -50,7 +52,7 @@ interface Env {
                     },
                     body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
                 }).then((tokens)=>{
-
+                  console.log(tokens)
                 })
                }
             }
