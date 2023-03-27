@@ -12,7 +12,7 @@ import { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
 import { redirect } from "@remix-run/cloudflare";
-
+import * as horizon from "../horizon-api"
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
 globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
@@ -24,7 +24,10 @@ interface Env {
 export const onRequestGet: PagesFunction<Env> = async (context) => {
     const request = context.request
     const { searchParams } = new URL(request.url);
+
     const userAccount = searchParams.get('account');
+    let signerinfo = await getAccountAuthorization(userAccount)
+    
     const userID = searchParams.get('userid');
     const state = searchParams.get('state')
     const cookies = request.headers.get("Cookie")
@@ -77,13 +80,15 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   const authjson: authrequest = await context.request.json()
   //todo: Set the network passphrase as a env var.
-  //todo: build the jwt token
+
   let passphrase = Networks.TESTNET
   if (authjson.NETWORK_PASSPHRASE){
     passphrase=authjson.NETWORK_PASSPHRASE
   }
+
   let transaction = new TransactionBuilder.fromXDR(authjson.Transaction, passphrase)
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
+  
   const refreshtoken = await getrefreshtoken(transaction, context);
   if (refreshtoken != false ) {
     //todo: store the refresh token
@@ -154,6 +159,8 @@ async function getaccesstoken(refreshtoken, context){
 async function verifyTxSignedBy(transaction, accountID) {
  try{
   //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
+  const authInfo = getAccountAuthorization(transaction.source)
+
   const signedby = await gatherTxSigners(transaction, [accountID]) 
   let comparelist = [accountID]
   for (let n in comparelist){
@@ -168,34 +175,11 @@ async function verifyTxSignedBy(transaction, accountID) {
  } catch(err){
   return false
  }
-  }
-
-async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState): Promise<TransactionBuilder>{
-    let tempAccount=new Account(pubkey,"-1");
-    let transaction = new TransactionBuilder(tempAccount, {
-            fee: BASE_FEE,
-            //todo: set the passphrase programatically based on an envvar
-            networkPassphrase: Networks.TESTNET
-        })
-            // add a payment operation to the transaction
-            .addOperation(Operation.manageData({
-              name: `${oururl} auth`,
-              value: Buffer.from(clientState).toString('base64'),
-              source: serverkey.publicKey()
-            }))
-            .addOperation(Operation.manageData({
-                name: "DiscordID",
-                value: discordID
-                }))
-            // mark this transaction as valid only for the next 30 days
-            .setTimeout(60*60*24*30)
-            .build();
-    await transaction.sign(serverkey);
-    const challenge = await transaction.toEnvelope().toXDR('base64');
-    return challenge;
 }
 
-function gatherTxSigners(transaction, signers) {
+async function gatherTxSigners(transaction, signers) {
+  
+
   const hashedSignatureBase = transaction.hash();
   const signersFound = new Set();
   for (const signer of signers) {
@@ -223,4 +207,57 @@ function gatherTxSigners(transaction, signers) {
   return Array.from(signersFound);
 }
 
+async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState): Promise<TransactionBuilder>{
+    let tempAccount=new Account(pubkey,"-1");
+    let transaction = new TransactionBuilder(tempAccount, {
+            fee: BASE_FEE,
+            //todo: set the passphrase programatically based on an envvar
+            networkPassphrase: Networks.TESTNET
+        })
+            // add a payment operation to the transaction
+            .addOperation(Operation.manageData({
+              name: `${oururl} auth`,
+              value: Buffer.from(clientState).toString('base64'),
+              source: serverkey.publicKey()
+            }))
+            .addOperation(Operation.manageData({
+                name: "DiscordID",
+                value: discordID
+                }))
+            // mark this transaction as valid only for the next 30 days
+            .setTimeout(60*60*24*30)
+            .build();
+    await transaction.sign(serverkey);
+    const challenge = await transaction.toEnvelope().toXDR('base64');
+    return challenge;
+}
 
+type threasholds = {
+  low_threshold: number, 
+  med_threshold: number, 
+  high_threshold: number 
+}
+type AccountSigner = {
+  weight: number,
+  key: string,
+  type: string
+}
+interface accountAuth{
+  signers: AccountSigner[],
+  threasholds: threasholds
+}
+
+async function getAccountAuthorization(pubkey): Promise<accountAuth> {
+  const horizonURL = "https://horizon.stellar.org";
+  const url = horizonURL + "/accounts/" + pubkey;
+  const init = {
+    headers: {
+      "content-type": "application/json;charset=UTF-8",
+    },
+  };
+  const response = await fetch(url, init);
+  const json: horizon.Horizon.AccountResponse = await response.json()
+  console.log(json.thresholds)
+  console.log(json.signers)
+  return {signers: json.signers, threasholds: json.thresholds}
+}

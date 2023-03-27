@@ -8,7 +8,7 @@ import {
 import { parse } from 'cookie';
 import { UserForm } from '~/forms';
 import { Discord, User } from '~/models'
-import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
+//import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
 
 export interface Env {
   DB: D1Database;
@@ -54,6 +54,7 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
 
     // 2. Uses the Discord Access Token to fetch the user profile
     //let discord_user_id = '123456'
+    
     const discordData: any = await Discord.getUserData(discordTokens);
     const discord_user_id = discordData.user.id;
     // store the user data on the db      
@@ -81,10 +82,21 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       }
       // start the stellar OAuth2 flow by generating a new OAuth2 Url
       //todo: integrate a wallet!
-      const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
+      
       //secret for above is SADOTEVI7AMPGFAYUSNHTURERRC4J52M3IGIMVHLOKALU7JWW22GQUOE
-      //for testing only
+      //for testing only*/
+      const stellaraccount = "GA7NSA7ELCFTVCBPMBBA77W442X6ZH4HHOYJHGAQEEN5FQB2GUUOFZEB"
+      //let discord_user_id = 12345
       const ChallengeURL = getChallengeURL(discord_user_id, stellaraccount, context, clientState)
+
+      return redirect(`http://127.0.0.1:8788/test`, {
+        status: 301,
+        headers: {
+          "Set-Cookie": `clientState=${clientState}; Max-Age=300000; discord_user_id=${discord_user_id};`,
+        },
+    });
+
+    /*
       const init:RequestInit = {
         headers: {
           "content-type": "application/json;charset=UTF-8",
@@ -96,13 +108,14 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       console.log('the challenge transaction is', challengetx)
       //nowsignthechallengetx, and post to the auth endpoint to get the access and refresh tokens.
       //then store the tokens to the database.
-    return null
+      
+    return null*/
        //return null
     
-    // // TODO: Redirect with UUID so we can associate the user with the wallet
+    // TODO: Redirect with UUID so we can associate the user with the wallet
     
-    // // send the user to the Wallet login dialog screen
-    // // return ctx.redirect(`/auth/wallet/${discord_user_id}`)
+    // send the user to the Wallet login dialog screen
+    // return ctx.redirect(`/auth/wallet/${discord_user_id}`)
     //   return redirect(`/auth/wallet/${discord_user_id}`, {
     //       status: 200,
     //   });
@@ -126,8 +139,8 @@ export default function discordcallback(){
  */
 export function getChallengeURL(discord_user_id, stellaraccount, context, state) {
   //const { codeVerifier, codeChallenge } = generateCodeVerifier();
-
   //const state = crypto.randomBytes(20).toString('hex');
+
   const url = new URL('http://127.0.0.1:8788/auth');
   url.searchParams.set('userid', discord_user_id);
   url.searchParams.set('account', stellaraccount);
@@ -145,6 +158,7 @@ export function getChallengeURL(discord_user_id, stellaraccount, context, state)
 }
 
 async function gatherResponse(response) {
+
   const { headers } = response;
   const contentType = headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
