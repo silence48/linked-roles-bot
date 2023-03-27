@@ -66,18 +66,18 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     if (!userExists) {
        const userForm = new UserForm(new User({
          discord_user_id,
-         access_token: discordTokens.access_token,
-         refresh_token: discordTokens.refresh_token,
-         expires_at: (Date.now() + discordTokens.expires_in * 1000).toString()
+         discord_access_token: discordTokens.access_token,
+         discord_refresh_token: discordTokens.refresh_token,
+         discord_expires_at: (Date.now() + discordTokens.expires_in * 1000).toString()
        }))
        console.log(await User.create(userForm, DB))
       }else{
         const user = await User.findBy('discord_user_id', discord_user_id, DB)
         console.log(user, 'that was user')
         console.log(user[0].id)
-        user[0].access_token = discordTokens.access_token;
-        user[0].access_token = discordTokens.refresh_token;
-        user[0].expires_at = (Date.now() + discordTokens.expires_in * 1000).toString();
+        user[0].discord_access_token = discordTokens.access_token;
+        user[0].discord_access_token = discordTokens.refresh_token;
+        user[0].discord_expires_at = (Date.now() + discordTokens.expires_in * 1000).toString();
         console.log(await User.update(user[0], DB))
       }
       // start the stellar OAuth2 flow by generating a new OAuth2 Url

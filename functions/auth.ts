@@ -11,14 +11,22 @@ import { Buffer } from "buffer-polyfill";
 import { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
+import { UserForm } from '../app/forms';
+import { Discord, User } from '../app/models';
+//import Discord from '../app/models/Discord';
 import { redirect } from "@remix-run/cloudflare";
+
+
+//const horizon = require('../horizon-api')
 import * as horizon from "../horizon-api"
+
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
 globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
 interface Env {
   SESSION_STORAGE: KVNamespace;
   authsigningkey: any;
+  DB: D1Database;
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
@@ -76,24 +84,71 @@ export const onRequestOptions: PagesFunction<Env> = async (context) => {
 export const onRequestPost: PagesFunction<Env> = async (context) => {
   type authrequest = {
     Transaction: string,
-    NETWORK_PASSPHRASE: string
+    NETWORK_PASSPHRASE: Networks,
+    discord_user_id: string
   }
   const authjson: authrequest = await context.request.json()
+  const discord_user_id = authjson.discord_user_id
   //todo: Set the network passphrase as a env var.
+  const cookies = context.request.headers.get("Cookie")
+  const cookieHeader = parse(cookies);
+  const { clientState } = cookieHeader;
 
-  let passphrase = Networks.TESTNET
+
+
+  let passphrase: Networks = Networks.TESTNET
   if (authjson.NETWORK_PASSPHRASE){
     passphrase=authjson.NETWORK_PASSPHRASE
   }
+  const { DB } = context.env as any
+  let transaction = new (TransactionBuilder.fromXDR as any) (authjson.Transaction, passphrase)
+  //verify the state.
+  let authedstate = transaction.operations[0].value
+  if (clientState !== authedstate) {
+    let errmsg = JSON.stringify('State verification failed.')
+    console.log(errmsg);
+    return new Response(errmsg, {
+      status: 403,
+      headers: {
+        "content-type": "application/json;charset=UTF-8",
+      },
+    });
+  }
 
-  let transaction = new TransactionBuilder.fromXDR(authjson.Transaction, passphrase)
+
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
   
   const refreshtoken = await getrefreshtoken(transaction, context);
+
   if (refreshtoken != false ) {
-    //todo: store the refresh token
+    const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length
     const accesstoken = await getaccesstoken(refreshtoken, context);
-    if (accesstoken != false){
+    if (accesstoken){
+    const { payload } = jwt.decode(refreshtoken)
+    console.log('chk2')
+    console.log(await User.findBy('discord_user_id', discord_user_id, DB))
+    // // If user does not exist, create it
+    if (!userExists) {//if the user does not exist here it should throw the error.
+       const userForm = new UserForm(new User({
+         discord_user_id,
+         stellar_access_token: accesstoken,
+         stellar_refresh_token: refreshtoken,
+         stellar_expires_at: (payload.exp).toString(),
+         public_key: transaction.source
+       }))
+       console.log(await User.create(userForm, DB))
+      }else{
+        const user = await User.findBy('discord_user_id', discord_user_id, DB)
+        console.log(user, 'that was user')
+        console.log(user[0].id)
+        user[0].stellar_access_token = accesstoken;
+        user[0].stellar_refresh_token = refreshtoken;
+        user[0].stellar_expires_at = (payload.exp).toString();
+        user[0].public_key = transaction.source
+        console.log(await User.update(user[0], DB))
+      }
+    
+    
       let responsetext = JSON.stringify({"token": accesstoken});
       return new Response(responsetext, {
         status: 200,
@@ -137,11 +192,11 @@ async function getrefreshtoken(transaction, context){
 async function getaccesstoken(refreshtoken, context){
   let validity = jwt.verify(refreshtoken, context.env.authsigningkey)
   if (!validity){
-    return false
+    throw('the token is not valid')
   }
   const { payload } = jwt.decode(refreshtoken) // decode the refresh token
   let passphrase = Networks.TESTNET
-  const transaction = new TransactionBuilder.fromXDR(payload.xdr, passphrase)
+  const transaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   const ourURL = new URL(context.request.url).origin
   const expiretime = Date.now() + (60 * 60)
   let accesstoken = await jwt.sign(
@@ -153,7 +208,8 @@ async function getaccesstoken(refreshtoken, context){
       "iat": Date.now(), //the issued at timestamp
       "exp": expiretime, // the expiration timestamp
     }, context.env.authsigningkey
-  ) 
+  )
+  return accesstoken
 };
 
 async function verifyTxSignedBy(transaction, accountID) {
@@ -207,7 +263,7 @@ async function gatherTxSigners(transaction, signers) {
   return Array.from(signersFound);
 }
 
-async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState): Promise<TransactionBuilder>{
+async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState) {
     let tempAccount=new Account(pubkey,"-1");
     let transaction = new TransactionBuilder(tempAccount, {
             fee: BASE_FEE,
@@ -261,3 +317,21 @@ async function getAccountAuthorization(pubkey): Promise<accountAuth> {
   console.log(json.signers)
   return {signers: json.signers, threasholds: json.thresholds}
 }
+
+/* sample accountauth:
+{
+  threasholds: { low_threshold: 1, med_threshold: 1, high_threshold: 1 },
+  signers: [
+    {
+      weight: 1,
+      key: 'GBBKODANH3RROGGDHDC6FLGY2P4Y2GKT53ULPW75ATCRJRGUKQIO7S7Z',
+      type: 'ed25519_public_key'
+    },
+    {
+      weight: 5,
+      key: 'GCV7P366FP6IX43MUHICPWFATGKYQTJPIZODISNWJD7KA6RKJLLA5JNU',
+      type: 'ed25519_public_key'
+    }
+  ]
+}
+*/

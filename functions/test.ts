@@ -44,7 +44,9 @@ import { parse } from 'cookie';
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015"}),
+                    body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
+                }).then((tokens)=>{
+                  
                 })
                }
             }
