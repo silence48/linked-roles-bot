@@ -1,8 +1,8 @@
-
+import { ImportAccount } from "~/templates/ImportAccount";
 export default function Index() {
   return (
     <div>
-      <p>Hello there traveler</p>
+      <ImportAccount />
     </div>
   );
 }
