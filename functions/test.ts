@@ -8,25 +8,29 @@ interface Env {
   export const onRequestGet: PagesFunction<Env> = async (context) => {
     const cookies = context.request.headers.get("Cookie")
     const cookieHeader = parse(cookies);
+    console.log(cookieHeader)
     const ourURL = new URL(context.request.url).origin
     const posturl = new URL('/auth', ourURL).toString();
     // make sure the state parameter exists
     const { clientState, discord_user_id } = cookieHeader;
-
+    console.log(discord_user_id)
      console.log("It's in the test")
-      const html = `<!DOCTYPE html>
+      const html = `
+      <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
       </head>
       <script>
         
-        function getPublicKey(discord_user_id) {
+      
+        function getPubKey(discord_user_id) {
           console.log('discord_user_id', discord_user_id)
 
           window.freighterApi.getPublicKey().then(
             
             (public_key) => {
-            fetchurl=(${posturl}+"?userid="+ discord_user_id + "&account=" + public_key)
+            fetchurl=(\"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key);
+            //\`${posturl}\`
             //    clientauth(public_key);
             fetch(fetchurl, {
             method: 'GET',
@@ -53,14 +57,22 @@ interface Env {
                     body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
                 }).then((tokens)=>{
                   console.log(tokens)
-                })
+                })})
                }
-            }
+            
         )
         }
+        /*
+
+       function getPubKey(input){
+        console.log(input)
+        window.freighterApi.getPublicKey(input).then(response => {console.log(response)})
+       }*/
       </script>
-      <button onclick="getPublicKey(${discord_user_id})">Connect with Freighter</button>`;
-  
+      <button onclick="getPubKey(${discord_user_id})">Connect with Freighter</button>
+      
+      `;
+
       return new Response(html, {
         headers: {
           "content-type": "text/html;charset=UTF-8",
@@ -68,10 +80,6 @@ interface Env {
       });
     }
 
-    //function clientauth(pubkey){
-      //  window.location.href="http://newurl"
-
-    //}
     function getChallengeURL(discord_user_id, stellaraccount, context, state) {
         //const { codeVerifier, codeChallenge } = generateCodeVerifier();
         //const state = crypto.randomBytes(20).toString('hex');

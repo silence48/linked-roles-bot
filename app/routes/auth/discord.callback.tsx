@@ -57,7 +57,7 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     const discord_user_id = discordData.user.id;
     // store the user data on the db
     const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length
-    console.log('chk2')
+    console.log('chk2 in discord.callback')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
     // // If user does not exist, create it
     if (!userExists) {
