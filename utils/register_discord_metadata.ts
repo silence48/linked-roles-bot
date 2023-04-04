@@ -10,10 +10,10 @@ const DISCORD_CLIENT_ID = env.DISCORD_CLIENT_ID;
  */
 const url = `https://discord.com/api/v10/applications/${DISCORD_CLIENT_ID}/role-connections/metadata`;
 // supported types: number_lt=1, number_gt=2, number_eq=3 number_neq=4, datetime_lt=5, datetime_gt=6, boolean_eq=7, boolean_neq=8
-let rolemetadata = []
-rolemetadata.push({
-    "key": 
-});
+//let rolemetadata = []
+//rolemetadata.push({
+//    "key": 
+//});
 
 
 const body = [
