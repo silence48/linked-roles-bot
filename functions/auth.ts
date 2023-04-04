@@ -125,7 +125,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const accesstoken = await getaccesstoken(refreshtoken, context);
     if (accesstoken){
     const { payload } = jwt.decode(refreshtoken)
-    console.log('chk2')
+    console.log('chk2 in auth.ts function')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
     // // If user does not exist, create it
     if (!userExists) {//if the user does not exist here it should throw the error.
@@ -171,7 +171,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
 async function getrefreshtoken(transaction, context){
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
-    const ourURL = new URL(context.request.url).origin
+    const ourURL = new URL(context.request.url).origin //https://127.0.0.1/ https://stellar-discord-bot.workers.dev/
     let token = await jwt.sign(
       {
         "userid": transaction.operations[1].value,

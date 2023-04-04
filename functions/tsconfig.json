@@ -8,6 +8,11 @@
     "types": [
       "@cloudflare/workers-types",
       "stellar-base"
+    ],
+    "plugins": [
+      {
+        "name": "typescript-lit-html-plugin"
+      }
     ]
   }
 }
