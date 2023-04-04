@@ -8,7 +8,7 @@ import {
   xdr
 } from 'stellar-base';
 import { Buffer } from "buffer-polyfill";
-import { Transaction } from '../node_modules/stellar-base/types/index';
+import type { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
 import { UserForm } from '../app/forms';
@@ -87,8 +87,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     NETWORK_PASSPHRASE: Networks,
     discord_user_id: string
   }
-  const authjson: authrequest = await context.request.json()
-  const discord_user_id = authjson.discord_user_id
+  //const authjson: authrequest = await context.request.json()
+
+  const { Transaction, NETWORK_PASSPHRASE, discord_user_id } = await context.request.json() as authrequest
+  //const discord_user_id = authjson.discord_user_id
   //todo: Set the network passphrase as a env var.
   const cookies = context.request.headers.get("Cookie")
   const cookieHeader = parse(cookies);
@@ -97,11 +99,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
 
   let passphrase: Networks = Networks.TESTNET
-  if (authjson.NETWORK_PASSPHRASE){
-    passphrase=authjson.NETWORK_PASSPHRASE
+  if (NETWORK_PASSPHRASE){
+    passphrase=NETWORK_PASSPHRASE
   }
   const { DB } = context.env as any
-  let transaction = new (TransactionBuilder.fromXDR as any) (authjson.Transaction, passphrase)
+  let transaction = new (TransactionBuilder.fromXDR as any) (Transaction, passphrase)
+  
   //verify the state.
   let authedstate = transaction.operations[0].value
   if (clientState !== authedstate) {
@@ -127,7 +130,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { payload } = jwt.decode(refreshtoken)
     console.log('chk2 in auth.ts function')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
-    // // If user does not exist, create it
+    // If user does not exist, create it
     if (!userExists) {//if the user does not exist here it should throw the error.
        const userForm = new UserForm(new User({
          discord_user_id,
