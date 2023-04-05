@@ -13,64 +13,91 @@ interface Env {
     const posturl = new URL('/auth', ourURL).toString();
     // make sure the state parameter exists
     const { clientState, discord_user_id } = cookieHeader;
-    console.log(discord_user_id)
+    console.log(`the discord_user_id is ${discord_user_id}`)
+
      console.log("It's in the test")
       const html = `
       <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
       </head>
+      <body>
+      <button id="connectButton">1: Connect Your Freighter</button>
+      <button id="getChallengeButton" style="display:none">2: Get the Challenge TX</button>
+      <button id="signButton" style="display:none">3: Sign the Challenge TX</button>
+  
       <script>
-        
+      var public_key;
+      var challengeXDR;
+      const discord_user_id = ${discord_user_id};
       
-        function getPubKey(discord_user_id) {
-          console.log('discord_user_id', discord_user_id)
-
-          window.freighterApi.getPublicKey().then(
-            
-            (public_key) => {
-            fetchurl=(\"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key);
-            //\`${posturl}\`
-            //    clientauth(public_key);
-            fetch(fetchurl, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-            })
-            .then(response => response.json())
-            .then((response) => {
-                console.log(response.Transaction);
-                console.log(response.Network_Passphrase);
-                console.log(public_key);
-                console.log("the type of response.transaction is:", typeof(response.Transaction));
-                console.log("the type of response.network_passphrase is:", typeof(response.Network_Passphrase));
-                const signedXDR = window.freighterApi.signTransaction(JSON.stringify(response.Transaction), "TESTNET", public_key);
-                
-               } ).then((signedXDR) =>{
-                fetch(fetchurl, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
-                }).then((tokens)=>{
-                  console.log(tokens)
-                })})
-               }
-            
-        )
+      const connectButton = document.getElementById('connectButton');
+      const getChallengeButton = document.getElementById('getChallengeButton');
+      const signButton = document.getElementById('signButton');
+      
+      connectButton.addEventListener('click', async () => {
+        console.log('discord_user_id', discord_user_id);
+        public_key = await window.freighterApi.getPublicKey();
+        console.log("the pubkey", public_key);
+        connectButton.style.display = 'none';
+        getChallengeButton.style.display = 'block';
+      });
+      
+      getChallengeButton.addEventListener('click', () => {
+        let fetchurl = \"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key;
+        getChallengeButton.style.display = 'none';
+        signButton.style.display = 'block';
+        console.log('fetching challenge tx from', fetchurl);
+        fetch(fetchurl, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+          },
+        }).then(response => response.json())
+          .then((response) => {
+            console.log("HERE IS THE RESPONSE", response);
+            console.log(response.Transaction);
+            console.log(response.Network_Passphrase);
+            console.log(public_key);
+            console.log("the type of response.transaction is:", typeof(response.Transaction));
+            console.log("the type of response.network_passphrase is:", typeof(response.Network_Passphrase));
+            challengeXDR = response;
+          }).catch((error) => {console.log(error)})
+      });
+      
+      const userSignTransaction = async (
+        xdr,
+        network,
+        signWith
+      ) => {
+        let signedTransaction = "";
+        let error = "";
+      
+        try {
+          signedTransaction = await window.freighterApi.signTransaction(xdr, {
+            network,
+            accountToSign: signWith,
+          });
+        } catch (e) {
+          error = e;
         }
-        /*
-
-       function getPubKey(input){
-        console.log(input)
-        window.freighterApi.getPublicKey(input).then(response => {console.log(response)})
-       }*/
-      </script>
-      <button onclick="getPubKey(${discord_user_id})">Connect with Freighter</button>
       
+        if (error) {
+          return error;
+        }
+      
+        return signedTransaction;
+      };
+
+
+      signButton.addEventListener('click', async () => {
+
+        const userSignedTransaction = userSignTransaction(challengeXDR.Transaction, "TESTNET");
+        console.log("the signed xdr", userSignedTransaction);
+      });
+    </script>
+      
+      </body>
       `;
 
       return new Response(html, {

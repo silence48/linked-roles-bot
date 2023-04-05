@@ -1,3 +1,4 @@
+
 import {
   Keypair,
   TransactionBuilder,
@@ -8,7 +9,7 @@ import {
   xdr
 } from 'stellar-base';
 import { Buffer } from "buffer-polyfill";
-import { Transaction } from '../node_modules/stellar-base/types/index';
+import type { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
 import { UserForm } from '../app/forms';
@@ -87,21 +88,22 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     NETWORK_PASSPHRASE: Networks,
     discord_user_id: string
   }
-  const authjson: authrequest = await context.request.json()
-  const discord_user_id = authjson.discord_user_id
+  //const authjson: authrequest = await context.request.json()
+
+  const { Transaction, NETWORK_PASSPHRASE, discord_user_id } = await context.request.json() as authrequest
+  //const discord_user_id = authjson.discord_user_id
   //todo: Set the network passphrase as a env var.
   const cookies = context.request.headers.get("Cookie")
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
 
-
-
   let passphrase: Networks = Networks.TESTNET
-  if (authjson.NETWORK_PASSPHRASE){
-    passphrase=authjson.NETWORK_PASSPHRASE
+  if (NETWORK_PASSPHRASE){
+    passphrase=NETWORK_PASSPHRASE
   }
   const { DB } = context.env as any
-  let transaction = new (TransactionBuilder.fromXDR as any) (authjson.Transaction, passphrase)
+  let transaction = new (TransactionBuilder.fromXDR as any) (Transaction, passphrase)
+  
   //verify the state.
   let authedstate = transaction.operations[0].value
   if (clientState !== authedstate) {
@@ -127,7 +129,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { payload } = jwt.decode(refreshtoken)
     console.log('chk2 in auth.ts function')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
-    // // If user does not exist, create it
+    // If user does not exist, create it
     if (!userExists) {//if the user does not exist here it should throw the error.
        const userForm = new UserForm(new User({
          discord_user_id,
@@ -147,8 +149,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         user[0].public_key = transaction.source
         console.log(await User.update(user[0], DB))
       }
-    
-    
+
       let responsetext = JSON.stringify({"token": accesstoken});
       return new Response(responsetext, {
         status: 200,
@@ -210,6 +211,31 @@ async function getaccesstoken(refreshtoken, context){
     }, context.env.authsigningkey
   )
   return accesstoken
+};
+
+export async function verifyAndRenewAccess(accesstoken, context){
+  let validity = jwt.verify(accesstoken, context.env.authsigningkey)
+  if (validity){
+    const { DB } = context.env as any
+    const { payload } = jwt.decode(accesstoken)
+    const user = await User.findBy('discord_user_id', payload.userid, DB)
+    const { lastaccesstoken } = user.stellar_access_token
+    if (lastaccesstoken == accesstoken){
+      if (payload.exp < Date.now()){
+        const refreshtoken = user.stellar_refresh_token
+        const newaccesstoken = await getaccesstoken(refreshtoken, context)
+        const { payload } = jwt.decode(refreshtoken)
+        user[0].stellar_expires_at = (payload.exp).toString()
+        user[0].stellar_access_token = newaccesstoken
+        await User.update(user[0], DB)     
+        return newaccesstoken
+      } else {
+        return accesstoken;
+      };
+  }; 
+  }else {
+    throw('the access token is not valid the user must reauthorize')
+  };
 };
 
 async function verifyTxSignedBy(transaction, accountID) {
