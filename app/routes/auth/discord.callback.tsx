@@ -23,6 +23,7 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     const cookies = request.headers.get("Cookie") //the random id set on the first call to roles_link
     const url = new URL(request.url);
+    console.log('url', url)
     let code = url.searchParams.get("code");
     // make sure the state parameter exists
     let discordState = url.searchParams.get("state");
@@ -88,7 +89,8 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
       return redirect(redirecturl.toString(), {
         status: 301,
         headers: {
-          "Set-Cookie": `clientState=${clientState}; Max-Age=300000; discord_user_id=${discord_user_id};`,
+          "Set-Cookie": `clientState=${clientState}; Max-Age=300000; path=/`,
+          "Set-Cookie": `discord_user_id=${discord_user_id}; Max-Age=300000; path=/`,
         },
     });
 
