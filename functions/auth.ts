@@ -1,3 +1,4 @@
+
 import {
   Keypair,
   TransactionBuilder,
@@ -96,8 +97,6 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
 
-
-
   let passphrase: Networks = Networks.TESTNET
   if (NETWORK_PASSPHRASE){
     passphrase=NETWORK_PASSPHRASE
@@ -150,8 +149,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
         user[0].public_key = transaction.source
         console.log(await User.update(user[0], DB))
       }
-    
-    
+
       let responsetext = JSON.stringify({"token": accesstoken});
       return new Response(responsetext, {
         status: 200,
@@ -213,6 +211,31 @@ async function getaccesstoken(refreshtoken, context){
     }, context.env.authsigningkey
   )
   return accesstoken
+};
+
+export async function verifyAndRenewAccess(accesstoken, context){
+  let validity = jwt.verify(accesstoken, context.env.authsigningkey)
+  if (validity){
+    const { DB } = context.env as any
+    const { payload } = jwt.decode(accesstoken)
+    const user = await User.findBy('discord_user_id', payload.userid, DB)
+    const { lastaccesstoken } = user.stellar_access_token
+    if (lastaccesstoken == accesstoken){
+      if (payload.exp < Date.now()){
+        const refreshtoken = user.stellar_refresh_token
+        const newaccesstoken = await getaccesstoken(refreshtoken, context)
+        const { payload } = jwt.decode(refreshtoken)
+        user[0].stellar_expires_at = (payload.exp).toString()
+        user[0].stellar_access_token = newaccesstoken
+        await User.update(user[0], DB)     
+        return newaccesstoken
+      } else {
+        return accesstoken;
+      };
+  }; 
+  }else {
+    throw('the access token is not valid the user must reauthorize')
+  };
 };
 
 async function verifyTxSignedBy(transaction, accountID) {

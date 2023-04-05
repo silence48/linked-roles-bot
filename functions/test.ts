@@ -57,6 +57,8 @@ interface Env {
                     body: JSON.stringify({"Transaction": signedXDR, "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015", "discord_user_id": discord_user_id}),
                 }).then((tokens)=>{
                   console.log(tokens)
+                  document.cookie = "access_token=" + tokens.access_token; path=/;
+                  window.location.replace("${ourURL}"+"/checkroles")
                 })})
                }
             

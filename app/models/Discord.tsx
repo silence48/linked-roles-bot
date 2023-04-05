@@ -64,8 +64,8 @@ description_localizations?	dictionary with keys in available locales	translation
 
   static async pushMetadata(
     discord_user_id: string,
-    data: any, // inside the data object goes the refresh_token, TODO
-    metadata: {pilot: number, captain: number, navigator: number},
+    //todo: define the roles using the kv data.
+    metadata: {defaultrole: number},
     env: any
   ) {
 
@@ -74,7 +74,7 @@ description_localizations?	dictionary with keys in available locales	translation
     // GET/PUT /users/@me/applications/:id/role-connection
     const url = `https://discord.com/api/v10/users/@me/applications/${env.DISCORD_CLIENT_ID}/role-connection`;
     // const accessToken = await getAccessToken(discord_user_id, data);
-    const { access_token: accessToken } = await User.findOne('discord_user_id', discord_user_id, env.DB)
+    const { discord_access_token: accessToken } = await User.findOne('discord_user_id', discord_user_id, env.DB)
     const body = {
       platform_name: 'Stellar Discord Bot',
       metadata,
