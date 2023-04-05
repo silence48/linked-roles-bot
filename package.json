@@ -42,7 +42,7 @@
     "ahooks": "latest",
     "better-sqlite3": "^8.1.0",
     "clsx": "latest",
-    "communi-design-system": "0.0.4",
+    "communi-design-system": "0.0.7",
     "date-fns": "latest",
     "dayzed": "latest",
     "eslint": "^8.36.0",

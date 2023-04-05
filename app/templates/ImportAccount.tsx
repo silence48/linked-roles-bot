@@ -1,11 +1,11 @@
 import React from 'react';
-import { RadioGroup, Button, Loader } from 'communi-design-system';
+import { RadioGroup, Button, Loader, Layout, Icon } from 'communi-design-system';
 import { isConnected } from '@stellar/freighter-api';
 import { useFetcher } from '@remix-run/react';
 import { WalletClient } from '~/actions/WalletClient';
 import { SignClient } from '@walletconnect/sign-client';
 import { isBrowser } from '~/utils/misc.client';
-// import { QRCode } from 'react-qrcode-logo';
+import { QRCode } from 'react-qrcode-logo';
 
 enum WalletConnectChains {
   PUBLIC = 'stellar:pubnet',
@@ -61,13 +61,13 @@ const WalletConnect = ({ connectWallet }: any) => {
       <div>
         <QRCode
           value={url}
-          logoImage="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/2a117e2f-1b05-4c19-b981-0a7b90b02f00/public"
+          logoImage="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/eee714c7-b85b-42cf-23f7-d986b99c1b00/public"
           logoHeight={48}
           logoWidth={48}
           eyeRadius={8}
           size={256}
-          bgColor="#1c181e"
-          fgColor="#f7f7f7"
+          bgColor="#C8D1E6"
+          fgColor="#03050B"
           removeQrCodeBehindLogo={true}
           qrStyle="dots"
         />
@@ -138,6 +138,14 @@ const walletAssert = (view: any, connectWallet: any) => {
   }
 };
 
+// Move to DS Headings.
+const IconHeading = ({ text, icon }: any) => {
+  return <div className="flex flex-row">
+    <Icon name={icon} size="large" />
+    <div className="text-h3-small-bold" style={{paddingLeft: '12px'}}>{text}</div>
+  </div>
+}
+
 export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   const [view, setView] = React.useState('');
   const [selected, Select] = React.useState(options[0]);
@@ -165,37 +173,80 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   };
 
   return (
-    <div className="flex flex-col space-y-4">
-      {payload.public_key === '' ? (
-        <>
-          <div>
-            <div className="text-subheading-bold text-neutral-800">Wallets</div>
+    <div>
 
-            <div className="text-paragraph-medium-medium text-neutral-800">Choose your favorite wallet to connect with.</div>
+<div
+      style={{
+        backgroundImage: "url('https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/cb3fca94-6358-47a3-6150-a10d0d7e1100/public')",
+        backgroundSize: 'cover',
+        height: '100vh',
+        width: '100%'
+      }}
+    >
+        <Layout
+          variant="large"
+        >
+          <div
+            className="flex items-center h-screen"
+          >
+            <div
+              className="bg-neutral-300 rounded-[20px] p-[40px] w-full "
+            >
+              <div className="flex flex-col">
+                <div className="flex flex-row w-full">
+                  <div className="flex-1">
+                    <IconHeading text="Wallet Connect" icon="walletConnect" />
+                    <div>Scan the QR with your phone from a wallet app</div>
+                    <div>
+                      <WalletConnect connectWallet={setPayload} />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <IconHeading text="Extensions" icon="extensions" />
+                  </div>
+                </div>
+                <div>
+                  <div>By Continue you accept our term of conditioons and our privacy policy</div>
+                </div>
+              </div>
+            </div>
           </div>
-          <div>
-            {view === '' ? (
-              <RadioGroup options={options} setValue={Select} />
-            ) : (
-              walletAssert(view, setPayload)
-            )}
-            <Button
-              text={button.text}
-              variant={button.variant}
-              onClick={() => setView(view === '' ? selected.name : '')}
-              customCss="w-full"
-            />
-          </div>
-          <div className="text-center text-caption-medium text-neutral-600">We use stellar base wallets, learn more about creating your first stellar account.</div>
-        </>
-      ) : 
-        <>
-          <div className="text-center">
-            <div className="text-subheading-bold text-neutral-800">Connecting ...</div>
-            <div className="text-paragraph-medium-medium text-neutral-800">You will be redirected soon.</div>
-          </div>
-        </>
-      }
+        </Layout>
+    </div>
+     {/* <div className="flex flex-col space-y-4">
+       <button onClick={() => console.log('hello')}>Clickme</button>
+       {payload.public_key === '' ? (
+         <>
+           <div>
+             <div className="text-subheading-bold text-neutral-800">Wallets</div>
+
+             <div className="text-paragraph-medium-medium text-neutral-800">Choose your favorite wallet to connect with.</div>
+           </div>
+           <div>
+             {view === '' ? (
+               <RadioGroup options={options} setValue={Select} />
+             ) : (
+               walletAssert(view, setPayload)
+             )}
+             <Button
+               text={button.text}
+               variant={button.variant}
+               onClick={() => setView(view === '' ? selected.name : '')}
+               customCss="w-full"
+             />
+           </div>
+           <div className="text-center text-caption-medium text-neutral-600">We use stellar base wallets, learn more about creating your first stellar account.</div>
+         </>
+       ) : 
+         <>
+           <div className="text-center">
+             <div className="text-subheading-bold text-neutral-800">Connecting ...</div>
+             <div className="text-paragraph-medium-medium text-neutral-800">You will be redirected soon.</div>
+           </div>
+         </>
+       }
+     </div> */}
+
     </div>
   );
 };
