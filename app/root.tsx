@@ -24,6 +24,8 @@ export default function App() {
   return (
     <html lang="en" className="light">
       <head>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.4/lottie.min.js" integrity="sha512-ilxj730331yM7NbrJAICVJcRmPFErDqQhXJcn+PLbkXdE031JJbcK87Wt4VbAK+YY6/67L+N8p7KdzGoaRjsTg==" crossOrigin="anonymous" referrerPolicy="no-referrer"></script>
+
         <Meta />
         <Links />
       </head>
@@ -33,7 +35,7 @@ export default function App() {
         </ModalProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        <LiveReload port={8002} />
       </body>
     </html>
   );

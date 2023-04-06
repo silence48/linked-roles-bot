@@ -72,8 +72,6 @@ const WalletConnect = ({ connectWallet, openModal }: any) => {
   return !url ? (
     <Loader />
   ) : (
-    <>
-      <div className="flex flex-col items-center mb-[40px]">
         <div>
           <QRCode
             value={url}
@@ -88,8 +86,6 @@ const WalletConnect = ({ connectWallet, openModal }: any) => {
             qrStyle="dots"
           />
         </div>
-      </div>
-    </>
   );
 };
 
@@ -222,7 +218,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     <div className="text-paragraph-medium-medium ">
                       Scan the QR with your phone from a wallet app
                     </div>
-                    <div>
+                    <div className="flex flex-col items-center my-8" style={{height: '300px'}}>
                       <WalletConnect connectWallet={setPayload} />
                     </div>
                   </div>
@@ -231,6 +227,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     <div className="text-paragraph-medium-medium ">
                       Other login options to login from your browser
                     </div>
+                    <div >
                     <div className="flex flex-col space-y-4">
                       {view === "" ? (
                         <>
@@ -251,7 +248,9 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                       ) : (
                         walletAssert(view, setPayload, openModal)
                       )}
+                    </div>  
                     </div>
+                    
                   </div>
                 </div>
                 <div>
@@ -271,39 +270,6 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
           </div>
         </Layout>
       </div>
-      {/* <div className="flex flex-col space-y-4">
-       <button onClick={() => console.log('hello')}>Clickme</button>
-       {payload.public_key === '' ? (
-         <>
-           <div>
-             <div className="text-subheading-bold text-neutral-800">Wallets</div>
-
-             <div className="text-paragraph-medium-medium text-neutral-800">Choose your favorite wallet to connect with.</div>
-           </div>
-           <div>
-             {view === '' ? (
-               <RadioGroup options={options} setValue={Select} />
-             ) : (
-               walletAssert(view, setPayload)
-             )}
-             <Button
-               text={button.text}
-               variant={button.variant}
-               onClick={() => setView(view === '' ? selected.name : '')}
-               customCss="w-full"
-             />
-           </div>
-           <div className="text-center text-caption-medium text-neutral-600">We use stellar base wallets, learn more about creating your first stellar account.</div>
-         </>
-       ) : 
-         <>
-           <div className="text-center">
-             <div className="text-subheading-bold text-neutral-800">Connecting ...</div>
-             <div className="text-paragraph-medium-medium text-neutral-800">You will be redirected soon.</div>
-           </div>
-         </>
-       }
-     </div> */}
     </div>
   );
 };
