@@ -8,7 +8,7 @@ import {
 } from "communi-design-system";
 import { isConnected } from "@stellar/freighter-api";
 import { useFetcher } from "@remix-run/react";
-import { WalletClient } from "~/actions/WalletClient";
+import { WalletClient } from "~/utils/WalletClient.client";
 import { SignClient } from "@walletconnect/sign-client";
 import { isBrowser } from "~/utils/misc.client";
 import { QRCode } from "react-qrcode-logo";

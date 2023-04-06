@@ -9,9 +9,7 @@ export const loader = async (
 
 export default function Index() {
   return (
-    <div>
       <ImportAccount />
-    </div>
   );
 }
 
