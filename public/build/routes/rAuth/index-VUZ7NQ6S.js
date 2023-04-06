@@ -1,0 +1,1 @@
+import{b as a}from"/build/_shared/chunk-YMPLZAAH.js";import{y as t}from"/build/_shared/chunk-MNTHBBYS.js";import{f as o}from"/build/_shared/chunk-ZSCMMWXX.js";var e=o(a()),r=o(t());function n(){return(0,r.jsx)("main",{children:(0,r.jsx)("h1",{children:"AccountID"})})}export{n as default};

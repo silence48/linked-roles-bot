@@ -3,7 +3,7 @@ wrangler.toml
 /.cache
 /functions/\[\[path\]\].js
 /functions/\[\[path\]\].js.map
-/public/build
+
 .dev.vars
 keys
 .wrangler/state/d1

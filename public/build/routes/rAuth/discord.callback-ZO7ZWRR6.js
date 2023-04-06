@@ -1,0 +1,1 @@
+import{a as r,b as n}from"/build/_shared/chunk-YMPLZAAH.js";import{y as o}from"/build/_shared/chunk-MNTHBBYS.js";import{f as e}from"/build/_shared/chunk-ZSCMMWXX.js";var a=e(n()),c=e(r());var s=e(o());function t(){return(0,s.jsx)("main",{children:"Here is some text"})}export{t as default};
