@@ -1,6 +1,7 @@
 import React, { type ReactElement, type FunctionComponent } from 'react';
 import { useTheme } from './Theme'
 import { Modal as ModalComponent } from 'communi-design-system';
+import { Challenge } from '~/templates/Challenge';
 
 type ModalProviderProps = { children: ReactElement }
 type ModalContextType = {
@@ -23,6 +24,8 @@ enum ModalTypeE {
 
 const modalAssert = (action: { type: string; content: any }) => {
   switch (action.type) {
+    case 'challenge':
+      return <Challenge public_key={action.content} />
     default:
       return <></>;
   }

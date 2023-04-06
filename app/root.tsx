@@ -8,6 +8,7 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 import designStyle from 'communi-design-system/styles/index.css';
+import { ModalProvider } from '~/context';
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
@@ -27,7 +28,9 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <ModalProvider>
         <Outlet />
+        </ModalProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
