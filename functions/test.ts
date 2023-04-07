@@ -140,7 +140,7 @@ interface Env {
             method: 'GET',
             headers: {
               'Accept': 'application/json',
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
               'set-cookie': 'accesstoken=accessToken.token; path=/;'
             },
             body: JSON.stringify({
