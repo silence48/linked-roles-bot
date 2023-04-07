@@ -30,7 +30,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
       console.log(roles);
       const ourURL = new URL(context.request.url).origin;
       const claimURL = new URL('/defaultclaim', ourURL).toString();
-     return Response.redirect(claimURL, 301);
+      return roles
+      //return Response.redirect(claimURL, 301);
 
   //    return redirect(claimURL, {
    //     status: 301,
@@ -82,7 +83,8 @@ async function checkRoles(context, publickey, discord_user_id){
         }
         });
         console.log(JSON.stringify(metadata))
-        await Discord.pushMetadata(discord_user_id, metadata, context)
+        return metadata
+        //await Discord.pushMetadata(discord_user_id, metadata, context)
       }
     catch(err: any){
       console.error('therewas an error\n', err)

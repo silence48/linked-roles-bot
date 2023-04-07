@@ -17,7 +17,7 @@ interface Env {
     console.log(`the discord_user_id is ${discord_user_id}`)
 
      console.log("It's in the test")
-      const html = `
+      const html = html`
       <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
@@ -27,13 +27,15 @@ interface Env {
       <button id="getChallengeButton" style="display:none">2: Get the Challenge TX</button>
       <button id="signButton" style="display:none">3: Sign the Challenge TX</button>
       <button id="submitButton" style="display:none">4: Submit the challenge TX and get the auth tokens</button>
-
+      <button id="checkRolesButton" style="display:none">5: Check your stellar account to see if you have any roles</button>
+      <button id="claimDefaultButton" style="display:none">6: Claim the default membership token</button>
 
 
       <script>
       var public_key;
       var challengeXDR;
       var signedXDR;
+      var accessToken
       const discord_user_id = "${discord_user_id}";
       
       const connectButton = document.getElementById('connectButton');
@@ -123,10 +125,33 @@ interface Env {
               discord_user_id: "${discord_user_id}"
             })
           });
-          const content = await rawResponse.json();
-        
-          console.log(content);
+          accessToken = await rawResponse.json();
+          submitButton.style.display = 'none';
+          checkRolesButton.style.display = 'block';
+          console.log(accessToken);
         })();
+      });
+
+      
+      checkRolesButton.addEventListener('click', async () => {
+        let fetchurl = "${ourURL}" + "/checkroles?userid="+ "${discord_user_id}" + "&account=" + public_key;
+        (async () => {
+          const rawResponse = await fetch(fetchurl, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+              'set-cookie': 'accesstoken=accessToken.token; path=/;'
+            },
+            body: JSON.stringify({
+              Transaction: signedXDR,
+              NETWORK_PASSPHRASE: challengeXDR.Network_Passphrase,
+              discord_user_id: "${discord_user_id}"
+            })
+          });
+        });
+          roles = await rawResponse.json();
+          console.log(roles);
       });
 
 
