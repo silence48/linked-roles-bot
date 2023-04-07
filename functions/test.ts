@@ -34,7 +34,7 @@ interface Env {
       var public_key;
       var challengeXDR;
       var signedXDR;
-      const discord_user_id = ${discord_user_id};
+      const discord_user_id = "${discord_user_id}";
       
       const connectButton = document.getElementById('connectButton');
       const getChallengeButton = document.getElementById('getChallengeButton');
