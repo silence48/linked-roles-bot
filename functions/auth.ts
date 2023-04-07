@@ -47,7 +47,8 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
             }))
             .addOperation(Operation.manageData({
                 name: "DiscordID",
-                value: discordID
+                value: discordID,
+                source: pubkey
                 }))
             // mark this transaction as valid only for the next 30 days
             .setTimeout(60*60*24*30)
@@ -124,7 +125,9 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
 
   const cookies = context.request.headers.get("Cookie")
   const cookieHeader = parse(cookies);
-  const { clientState } = cookieHeader;
+  let { clientState } = cookieHeader;
+  console.log('in the auth, clientstate:');
+  console.log(clientState);
 
   let passphrase: Networks = Networks.TESTNET
   if (NETWORK_PASSPHRASE){
@@ -132,9 +135,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   const { DB } = context.env as any
   let transaction = new (TransactionBuilder.fromXDR as any) (Transaction, passphrase)
-
+  console.log(transaction)
   //verify the state.
-  let authedstate = transaction.operations[0].value
+  const decoder = new TextDecoder();
+  let authedstate = decoder.decode(transaction.operations[0].value)
+  console.log(authedstate)
+  //let authedstate = transaction.operations[0].value
   if (clientState !== authedstate) {
     let errmsg = JSON.stringify('State verification failed.')
     console.log(errmsg);
@@ -251,19 +257,27 @@ async function verifyTxSignedBy(transaction, accountID) {
  }
 
 async function getrefreshtoken(transaction, context){
+  console.log('trying to make a refresh token')
+  console.log(transaction)
+  const decoder = new TextDecoder();
+  const userid =   decoder.decode(transaction.operations[1].value)
+  console.log('userid', userid)
+  const jti = decoder.decode(transaction.operations[0].value)
+  console.log(jti, 'JTI')
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
     const ourURL = new URL(context.request.url).origin //https://127.0.0.1/ https://stellar-discord-bot.workers.dev/
     let token = await jwt.sign(
       {
-        "userid": transaction.operations[1].value,
+        "userid": userid,
         "sub": transaction.source, //the pubkey of who it's for
-        "jti": transaction.operations[0].value, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
+        "jti": jti, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
         "iss": ourURL,//the issuer of the token
         "iat": Date.now(), //the issued at timestamp
         "exp": transaction.timeBounds.maxTime, // the expiration timestamp
-        "xdr": transaction
+        "xdr": transaction.toXDR()
       }, context.env.authsigningkey
     ) 
+    console.log(token, 'we got the refresh token')
     return token
   } else{
     return false
@@ -277,14 +291,22 @@ async function getaccesstoken(refreshtoken, context){
   }
   const { payload } = jwt.decode(refreshtoken) // decode the refresh token
   let passphrase = Networks.TESTNET
-  const transaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
+  console.log('trying to get an access token')
+  const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
+  //let transaction = payload.xdr
+  console.log(ntransaction)
+  const decoder = new TextDecoder();
+  console.log(ntransaction.operations[0].value)
+  const userid =   decoder.decode(ntransaction.operations[1].value)
+  const jti = decoder.decode(ntransaction.operations[0].value)
+  //
   const ourURL = new URL(context.request.url).origin
   const expiretime = Date.now() + (60 * 60)
   let accesstoken = await jwt.sign(
     {
-      "userid": transaction.operations[1].value,
-      "sub": transaction.source, //the pubkey of who it's for
-      "jti": transaction.operations[0].value, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
+      "userid": userid,
+      "sub": ntransaction.source, //the pubkey of who it's for
+      "jti": jti, // the unique identifier for this crypto.randomUUID()).toString('base64') should be set by the challenge manage data...
       "iss": ourURL,//the issuer of the token
       "iat": Date.now(), //the issued at timestamp
       "exp": expiretime, // the expiration timestamp
