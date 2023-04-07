@@ -120,7 +120,7 @@ interface Env {
             body: JSON.stringify({
               Transaction: signedXDR,
               NETWORK_PASSPHRASE: challengeXDR.Network_Passphrase,
-              discord_user_id: ${discord_user_id}
+              discord_user_id: "${discord_user_id}"
             })
           });
           const content = await rawResponse.json();
