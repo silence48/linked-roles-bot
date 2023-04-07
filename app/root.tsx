@@ -1,7 +1,7 @@
 import type { MetaFunction, LinksFunction } from "@remix-run/cloudflare";
 import {
   Links,
-  LiveReload,
+  //LiveReload,
   Meta,
   Outlet,
   Scripts,
