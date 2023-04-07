@@ -58,43 +58,43 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 }
 
   const request = context.request
-    const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
 
-    const userAccount = searchParams.get('account');
-    let signerinfo = await getAccountAuthorization(userAccount)
-    
-    const userID = searchParams.get('userid');
-    const state = searchParams.get('state')
-    const cookies = request.headers.get("Cookie")
-    const cookieHeader = parse(cookies);
-    const { clientState } = cookieHeader;
-    //todo:verify the states
-    console.log('Checkpoint 3', cookies, state, clientState)
+  const userAccount = searchParams.get('account');
+  let signerinfo = await getAccountAuthorization(userAccount)
+  
+  const userID = searchParams.get('userid');
+  const state = searchParams.get('state')
+  const cookies = request.headers.get("Cookie")
+  const cookieHeader = parse(cookies);
+  const { clientState } = cookieHeader;
+  //todo:verify the states
+  console.log('Checkpoint 3', cookies, state, clientState)
 
-    const network_pass = Networks.TESTNET;
-    const testurl = 'https://horizon-testnet.stellar.org';
-    const mainurl = 'https://horizon.stellar.org';
-    const ourURL = new URL(request.url).origin
+  const network_pass = Networks.TESTNET;
+  const testurl = 'https://horizon-testnet.stellar.org';
+  const mainurl = 'https://horizon.stellar.org';
+  const ourURL = new URL(request.url).origin
 
-    //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
-    let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
-    
-    const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, ourURL, clientState);
+  //for some reason the env var or wrangler secret, niether one is a string type at first so we need to convert it to a string using String()
+  let serverkeypair = Keypair.fromSecret(String(context.env.authsigningkey));
+  
+  const Challenge = await generateAuthChallenge(serverkeypair, userAccount, userID, ourURL, clientState);
 
-    const data = {
-      "Transaction": Challenge,
-      "Network_Passphrase": network_pass
-    };
+  const data = {
+    "Transaction": Challenge,
+    "Network_Passphrase": network_pass
+  };
 
-    const json = JSON.stringify(data, null, 2);
+  const json = JSON.stringify(data, null, 2);
 
-    return new Response(json, {
-      status: 200,
-      headers: {
-        "content-type": "application/json;charset=UTF-8",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
+  return new Response(json, {
+    status: 200,
+    headers: {
+      "content-type": "application/json;charset=UTF-8",
+      "Access-Control-Allow-Origin": "*",
+    },
+  });
 }
 
 export const onRequestOptions: PagesFunction<Env> = async (context) => {
@@ -160,6 +160,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     
     // If user does not exist, create it
     if (!userExists) {
+      const errmsg = JSON.stringify('User does not exist.')
       return new Response(errmsg, {
         status: 403,
         headers: {

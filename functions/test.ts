@@ -16,7 +16,7 @@ interface Env {
     console.log(`the discord_user_id is ${discord_user_id}`)
 
      console.log("It's in the test")
-      const html = `
+      const html = html`
       <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
@@ -25,16 +25,21 @@ interface Env {
       <button id="connectButton">1: Connect Your Freighter</button>
       <button id="getChallengeButton" style="display:none">2: Get the Challenge TX</button>
       <button id="signButton" style="display:none">3: Sign the Challenge TX</button>
-  
+      <button id="submitButton" style="display:none">4: Submit the challenge TX and get the auth tokens</button>
+
+
+
       <script>
       var public_key;
       var challengeXDR;
+      var signedXDR;
       const discord_user_id = ${discord_user_id};
       
       const connectButton = document.getElementById('connectButton');
       const getChallengeButton = document.getElementById('getChallengeButton');
       const signButton = document.getElementById('signButton');
-      
+      const submitButton = document.getElementById('submitButton');
+
       connectButton.addEventListener('click', async () => {
         console.log('discord_user_id', discord_user_id);
         public_key = await window.freighterApi.getPublicKey();
@@ -93,8 +98,31 @@ interface Env {
       signButton.addEventListener('click', async () => {
 
         const userSignedTransaction = userSignTransaction(challengeXDR.Transaction, "TESTNET");
+        signButton.style.display = 'none';
+        submitButton.style.display = 'block';
         console.log("the signed xdr", userSignedTransaction);
       });
+
+      submitButton.addEventListener('click', async () => {
+        let fetchurl = \"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key;
+        console.log('submitting challenge tx to', fetchurl);
+        fetch(fetchurl, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            Transaction: signedXDR,
+            NETWORK_PASSPHRASE: challengeXDR.Network_Passphrase,
+            discord_user_id: discord_user_id
+          }),
+        }).then(response => response.json())
+          .then((response) => {
+            console.log("HERE IS THE RESPONSE", response);
+          }).catch((error) => {console.log(error)})
+      });
+
+
     </script>
       
       </body>
