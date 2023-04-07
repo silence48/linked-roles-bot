@@ -183,10 +183,10 @@ interface Env {
         }
 
         const defaultClaimXDR = await response.text();
-        console.log("the default claim xdr is:", defaultClaimXDR;)
+        console.log("the default claim xdr is:", defaultClaimXDR);
         // Sign the transaction using Freighter
         const signedDefaultClaimXDR = await userSignTransaction(defaultClaimXDR, "TESTNET");
-        console.log('signedDefaultClaimXDR', signedDefaultClaimXDR')
+        console.log('signedDefaultClaimXDR', signedDefaultClaimXDR);
         // Do something with the signed transaction, e.g., submit it to the Stellar network
         // ...
       });
