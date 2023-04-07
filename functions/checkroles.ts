@@ -15,8 +15,7 @@ interface Env {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-
-
+console.log('in the role check function')
   async function checkRoles(context, publickey, discord_user_id){
     let server = context.env.horizonURL
     //const account: Horizon.AccountResponse = await (await fetch(`${server}/accounts/${publickey}`)).json()

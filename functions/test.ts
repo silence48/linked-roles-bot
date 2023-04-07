@@ -157,7 +157,7 @@ interface Env {
           
           console.log(roles);
           checkRolesButton.style.display = 'none';
-          if (!roles.length ){
+          if (typeof(roles) == 'undefined' ){
             claimDefaultButton.style.display = 'block';
           }
       });
