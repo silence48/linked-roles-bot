@@ -166,23 +166,3 @@ interface Env {
         },
       });
     }
-
-    function getChallengeURL(discord_user_id, stellaraccount, context, state) {
-        //const { codeVerifier, codeChallenge } = generateCodeVerifier();
-        //const state = crypto.randomBytes(20).toString('hex');
-      
-        const url = new URL('http://127.0.0.1:8788/auth');
-        url.searchParams.set('userid', discord_user_id);
-        url.searchParams.set('account', stellaraccount);
-        url.searchParams.set('redirect_uri', "http://127.0.0.1:8788");  //probably the user page
-        //url.searchParams.set('code_challenge', codeChallenge);
-        //url.searchParams.set('code_challenge_method', 'S256');
-        url.searchParams.set('state', state);
-        //url.searchParams.set('response_type', 'code');
-        //url.searchParams.set(
-      //    'scope',
-          //'user'
-        //);
-        url.searchParams.set('prompt', 'consent');
-        return { state, url: url.toString() };
-      }
