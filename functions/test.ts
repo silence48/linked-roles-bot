@@ -98,8 +98,7 @@ interface Env {
 
       signButton.addEventListener('click', async () => {
 
-        const userSignedTransaction = await userSignTransaction(challengeXDR.Transaction, "TESTNET");
-        userSignedTransaction.then((result) => {
+        const userSignedTransaction = await userSignTransaction(challengeXDR.Transaction, "TESTNET").then((result) => {
           signedXDR = result;
         });
 
