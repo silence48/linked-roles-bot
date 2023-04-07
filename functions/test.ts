@@ -17,7 +17,7 @@ interface Env {
     console.log(`the discord_user_id is ${discord_user_id}`)
 
      console.log("It's in the test")
-      const html = html`
+      const html = `
       <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
