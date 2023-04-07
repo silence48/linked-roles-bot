@@ -14,8 +14,8 @@ import type { Transaction } from '../node_modules/stellar-base/types/index';
 
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
-import { UserForm } from '../app/forms/UserForm';
-import { User } from '../app/models/User';
+import { UserForm } from '../app/forms';
+import { User } from '../app/models';
 //import Discord from '../app/models/Discord';
 //import { redirect } from "@remix-run/cloudflare";
 import * as horizon from "../horizon-api"
@@ -117,7 +117,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   //const authjson: authrequest = await context.request.json()
 
-
+  //const authjson = await context.request.json();
+  //console.log(authjson)
   const { Transaction, NETWORK_PASSPHRASE, discord_user_id } = await context.request.json() as authrequest
   //const discord_user_id = authjson.discord_user_id
   //todo: Set the network passphrase as a env var.
@@ -128,14 +129,14 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   let { clientState } = cookieHeader;
   console.log('in the auth, clientstate:');
   console.log(clientState);
-
+  console.log(`${discord_user_id} discord user id`)
   let passphrase: Networks = Networks.TESTNET
   if (NETWORK_PASSPHRASE){
     passphrase=NETWORK_PASSPHRASE
   }
   const { DB } = context.env as any
   let transaction = new (TransactionBuilder.fromXDR as any) (Transaction, passphrase)
-  console.log(transaction)
+  //console.log(transaction)
   //verify the state.
   const decoder = new TextDecoder();
   let authedstate = decoder.decode(transaction.operations[0].value)
@@ -157,7 +158,10 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   const refreshtoken = await getrefreshtoken(transaction, context);
 
   if (refreshtoken != false ) {
+    console.log(discord_user_id)
+    console.log(await User.findBy('discord_user_id', discord_user_id, DB))
     const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length
+    console.log(userExists, 'user exists')
     const accesstoken = await getaccesstoken(refreshtoken, context);
     if (accesstoken){
     const { payload } = jwt.decode(refreshtoken)
@@ -258,7 +262,7 @@ async function verifyTxSignedBy(transaction, accountID) {
 
 async function getrefreshtoken(transaction, context){
   console.log('trying to make a refresh token')
-  console.log(transaction)
+ // console.log(transaction)
   const decoder = new TextDecoder();
   const userid =   decoder.decode(transaction.operations[1].value)
   console.log('userid', userid)
@@ -294,7 +298,7 @@ async function getaccesstoken(refreshtoken, context){
   console.log('trying to get an access token')
   const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   //let transaction = payload.xdr
-  console.log(ntransaction)
+ // console.log(ntransaction)
   const decoder = new TextDecoder();
   console.log(ntransaction.operations[0].value)
   const userid =   decoder.decode(ntransaction.operations[1].value)

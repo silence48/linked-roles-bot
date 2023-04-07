@@ -34,7 +34,7 @@ interface Env {
       var public_key;
       var challengeXDR;
       var signedXDR;
-      const discord_user_id = ${discord_user_id};
+      //const discord_user_id = ${discord_user_id};
       
       const connectButton = document.getElementById('connectButton');
       const getChallengeButton = document.getElementById('getChallengeButton');
@@ -42,7 +42,7 @@ interface Env {
       const submitButton = document.getElementById('submitButton');
 
       connectButton.addEventListener('click', async () => {
-        console.log('discord_user_id', discord_user_id);
+        console.log('discord_user_id', ${discord_user_id});
         public_key = await window.freighterApi.getPublicKey();
         console.log("the pubkey", public_key);
         connectButton.style.display = 'none';
@@ -50,7 +50,7 @@ interface Env {
       });
       
       getChallengeButton.addEventListener('click', () => {
-        let fetchurl = \"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key;
+        let fetchurl = "${posturl}"+"?userid="+ "${discord_user_id}" + "&account=" + public_key;
         getChallengeButton.style.display = 'none';
         signButton.style.display = 'block';
         console.log('fetching challenge tx from', fetchurl);
@@ -108,7 +108,7 @@ interface Env {
       });
 
       submitButton.addEventListener('click', async () => {
-        let fetchurl = "${posturl}"+"?userid="+ discord_user_id + "&account=" + public_key;
+        let fetchurl = "${posturl}"+"?userid="+ "${discord_user_id}" + "&account=" + public_key;
 
         (async () => {
           const rawResponse = await fetch(fetchurl, {

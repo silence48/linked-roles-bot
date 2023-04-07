@@ -92,7 +92,7 @@ export const loader: LoaderFunction = async ({ context, request, params }: Loade
         status: 301,
         headers: {
           "Set-Cookie": `clientState=${clientState}; Max-Age=300000; path=/`,
-          "Set-Cookie": `discord_user_id=${discord_user_id}; Max-Age=300000; path=/`,
+          "Set-Cookie": `discord_user_id="${discord_user_id}"; Max-Age=300000; path=/`,
         },
     });
 
