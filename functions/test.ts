@@ -36,6 +36,7 @@ interface Env {
       var challengeXDR;
       var signedXDR;
       var accessToken
+      var roles
       const discord_user_id = "${discord_user_id}";
       
       const connectButton = document.getElementById('connectButton');
@@ -149,8 +150,9 @@ interface Env {
               discord_user_id: "${discord_user_id}"
             })
           });
-        });
           roles = await rawResponse.json();
+        });
+          
           console.log(roles);
       });
 
