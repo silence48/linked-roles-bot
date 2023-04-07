@@ -11,6 +11,8 @@ import { Discord, User } from '~/models'
 //import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
 
 export interface Env {
+  SESSION_STORAGE: KVNamespace;
+  authsigningkey: any;
   DB: D1Database;
 }
 
