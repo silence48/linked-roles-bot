@@ -42,7 +42,7 @@ interface Env {
       const submitButton = document.getElementById('submitButton');
 
       connectButton.addEventListener('click', async () => {
-        console.log('discord_user_id', ${discord_user_id});
+        console.log('discord_user_id', ${discord_user_id.toString()});
         public_key = await window.freighterApi.getPublicKey();
         console.log("the pubkey", public_key);
         connectButton.style.display = 'none';
