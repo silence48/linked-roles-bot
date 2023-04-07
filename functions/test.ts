@@ -17,7 +17,7 @@ interface Env {
     console.log(`the discord_user_id is ${discord_user_id}`)
 
      console.log("It's in the test")
-      const html = `
+      const html = html`
       <!DOCTYPE html>
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/stellar-freighter-api/1.3.1/index.min.js"></script>
@@ -43,6 +43,8 @@ interface Env {
       const getChallengeButton = document.getElementById('getChallengeButton');
       const signButton = document.getElementById('signButton');
       const submitButton = document.getElementById('submitButton');
+      const checkRolesButton = document.getElementById('checkRolesButton');
+      const claimDefaultButton = document.getElementById('claimDefaultButton');
 
       connectButton.addEventListener('click', async () => {
         console.log('discord_user_id', ${discord_user_id.toString()});
@@ -154,8 +156,40 @@ interface Env {
         });
           
           console.log(roles);
+          checkRolesButton.style.display = 'none';
+          if (!roles.length ){
+            claimDefaultButton.style.display = 'block';
+          }
       });
 
+      
+
+      claimDefaultButton.addEventListener('click', async () => {
+        const defaultClaimURL = ( "${ourURL}" + "/defaultclaim" );
+
+        // Fetch the transaction XDR from the 'defaultclaim' endpoint
+        const response = await fetch(defaultClaimURL, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'set-cookie': 'accesstoken=accessToken.token; path=/;'
+          },
+        });
+
+        if (!response.ok) {
+          console.error('Failed to fetch the default claim transaction XDR');
+          return;
+        }
+
+        const defaultClaimXDR = await response.text();
+        console.log("the default claim xdr is:", defaultClaimXDR;)
+        // Sign the transaction using Freighter
+        const signedDefaultClaimXDR = await userSignTransaction(defaultClaimXDR, "TESTNET");
+        console.log('signedDefaultClaimXDR', signedDefaultClaimXDR')
+        // Do something with the signed transaction, e.g., submit it to the Stellar network
+        // ...
+      });
 
     </script>
       
