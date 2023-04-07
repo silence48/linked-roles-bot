@@ -98,7 +98,7 @@ interface Env {
 
       signButton.addEventListener('click', async () => {
 
-        const userSignedTransaction = userSignTransaction(challengeXDR.Transaction, "TESTNET");
+        const userSignedTransaction = await userSignTransaction(challengeXDR.Transaction, "TESTNET");
         signButton.style.display = 'none';
         submitButton.style.display = 'block';
         console.log("the signed xdr", userSignedTransaction);
