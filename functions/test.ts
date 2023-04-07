@@ -13,6 +13,46 @@ interface Env {
     const posturl = new URL('/auth', ourURL).toString();
     // make sure the state parameter exists
     const { clientState, discord_user_id } = cookieHeader;
+
+    function submitChallenge(signedXDR, public_key){
+      console.log("submitting challenge tx");
+      let fetchurl = posturl+"?userid="+ discord_user_id + "&account=" + public_key + "&signedxdr=" + signedXDR;
+      console.log("fetching challenge tx from", fetchurl);
+      const body = {
+        "Transaction": signedXDR,
+        "NETWORK_PASSPHRASE": "Test SDF Network ; September 2015",
+        "discord_user_id": discord_user_id
+      };
+      async function gatherResponse(response) {
+        const { headers } = response;
+        const contentType = headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          return JSON.stringify(await response.json());
+        } else if (contentType.includes("application/text")) {
+          return response.text();
+        } else if (contentType.includes("text/html")) {
+          return response.text();
+        } else {
+          return response.text();
+        }
+      }
+      const init = {
+        body: JSON.stringify(body),
+        method: "POST",
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+        },
+      };
+      const response = await fetch(fetchurl, init);
+      const results = await gatherResponse(response);
+      return results;
+    }
+
+
+
+
+    }
+
     console.log(`the discord_user_id is ${discord_user_id}`)
 
      console.log("It's in the test")
@@ -104,22 +144,25 @@ interface Env {
       });
 
       submitButton.addEventListener('click', async () => {
-        let fetchurl = \"${posturl}\"+"?userid="+ discord_user_id + "&account=" + public_key;
-        console.log('submitting challenge tx to', fetchurl);
-        fetch(fetchurl, {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-          },
-          body: JSON.stringify({
-            Transaction: signedXDR,
-            NETWORK_PASSPHRASE: challengeXDR.Network_Passphrase,
-            discord_user_id: discord_user_id
-          }),
-        }).then(response => response.json())
-          .then((response) => {
-            console.log("HERE IS THE RESPONSE", response);
-          }).catch((error) => {console.log(error)})
+        let fetchurl = "${posturl}"+"?userid="+ discord_user_id + "&account=" + public_key;
+
+        (async () => {
+          const rawResponse = await fetch(fetchurl, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              Transaction: signedXDR,
+              NETWORK_PASSPHRASE: challengeXDR.Network_Passphrase,
+              discord_user_id: discord_user_id
+            })
+          });
+          const content = await rawResponse.json();
+        
+          console.log(content);
+        })();
       });
 
 
