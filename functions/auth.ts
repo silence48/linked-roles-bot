@@ -9,19 +9,20 @@ import {
   Account,
   xdr
 } from 'stellar-base';
-//import { Buffer } from "buffer-polyfill";
-//import type { Transaction } from '../node_modules/stellar-base/types/index';
+import Buffer from "buffer-polyfill";
+import type { Transaction } from '../node_modules/stellar-base/types/index';
+
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
 import { UserForm } from '../app/forms/UserForm';
 import { User } from '../app/models/User';
 //import Discord from '../app/models/Discord';
 //import { redirect } from "@remix-run/cloudflare";
-
+import * as horizon from "../horizon-api"
 //import * as horizon from "../horizon-api"
 
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
-//globalThis.Buffer = Buffer as unknown as BufferConstructor;
+globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
 interface Env {
   SESSION_STORAGE: KVNamespace;
