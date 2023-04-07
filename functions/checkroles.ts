@@ -15,6 +15,52 @@ interface Env {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
+
+
+  async function checkRoles(context, publickey, discord_user_id){
+    let server = context.env.horizonURL
+    //const account: Horizon.AccountResponse = await (await fetch(`${server}/accounts/${publickey}`)).json()
+    const account: any = await (await fetch(`${server}/accounts/${publickey}`)).json()
+    //const balances: Horizon.BalanceLine[] = account.balances
+    const balances: any = account.balances
+    
+    console.log(JSON.stringify(account.balances));
+    //todo: get the roles and assets from the kv store
+    let theAssets: Array<Array<string>> = [
+      ["DefaultRole", context.env.botpubkey],
+    ]
+    var metadata = {
+      defaultrole: 0,
+    }
+  
+    function updateMetadata(role: string){
+      switch(role){
+        case 'defaultrole':
+        console.log('found defaultrole')
+        metadata.defaultrole = 1
+      }}
+      
+      try{
+        balances.map(async(balance)=>{
+          for (let asset in theAssets){
+            let AssetCode: string = theAssets[asset][0];
+            let AssetIssuer: string = theAssets[asset][1];
+            console.log(`the asset ${AssetCode}:${AssetIssuer} is being checked against ${JSON.stringify(balance)}\n`)
+            if( balance.asset_code == AssetCode && balance.asset_issuer == AssetIssuer ){
+              console.log(`i found the ${AssetCode}:${AssetIssuer} in account ${publickey}`)
+              updateMetadata(AssetCode)
+            }
+          }
+          });
+          console.log(JSON.stringify(metadata))
+          return metadata
+          //await Discord.pushMetadata(discord_user_id, metadata, context)
+        }
+      catch(err: any){
+        console.error('therewas an error\n', err)
+      }
+    }
+
     const cookies = context.request.headers.get("Cookie")
     const cookieHeader = parse(cookies);
     const { clientState, accesstoken } = cookieHeader;
@@ -44,49 +90,5 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     
     } catch{
       return new Response("You are not logged in", {status: 401})
-    }
-  }
-
-async function checkRoles(context, publickey, discord_user_id){
-  let server = context.env.horizonURL
-  //const account: Horizon.AccountResponse = await (await fetch(`${server}/accounts/${publickey}`)).json()
-  const account: any = await (await fetch(`${server}/accounts/${publickey}`)).json()
-  //const balances: Horizon.BalanceLine[] = account.balances
-  const balances: any = account.balances
-  
-  console.log(JSON.stringify(account.balances));
-  //todo: get the roles and assets from the kv store
-  let theAssets: Array<Array<string>> = [
-    ["DefaultRole", context.env.botpubkey],
-  ]
-  var metadata = {
-    defaultrole: 0,
-  }
-
-  function updateMetadata(role: string){
-    switch(role){
-      case 'defaultrole':
-      console.log('found defaultrole')
-      metadata.defaultrole = 1
-    }}
-    
-    try{
-      balances.map(async(balance)=>{
-        for (let asset in theAssets){
-          let AssetCode: string = theAssets[asset][0];
-          let AssetIssuer: string = theAssets[asset][1];
-          console.log(`the asset ${AssetCode}:${AssetIssuer} is being checked against ${JSON.stringify(balance)}\n`)
-          if( balance.asset_code == AssetCode && balance.asset_issuer == AssetIssuer ){
-            console.log(`i found the ${AssetCode}:${AssetIssuer} in account ${publickey}`)
-            updateMetadata(AssetCode)
-          }
-        }
-        });
-        console.log(JSON.stringify(metadata))
-        return metadata
-        //await Discord.pushMetadata(discord_user_id, metadata, context)
-      }
-    catch(err: any){
-      console.error('therewas an error\n', err)
     }
   }
