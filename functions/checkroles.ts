@@ -1,10 +1,11 @@
+
 import { parse } from 'cookie';
 import { verifyAndRenewAccess } from './auth';
 import { Discord, User } from '../app/models';
-import { UserForm } from '../app/forms/UserForm';
+//import { UserForm } from '../app/forms/UserForm';
 import jwt from '@tsndr/cloudflare-worker-jwt'
-import { Horizon } from '../horizon-api'
-import { redirect } from "@remix-run/cloudflare";
+//import { Horizon } from '../horizon-api'
+//import { redirect } from "@remix-run/cloudflare";
 
 interface Env {
   SESSION_STORAGE: KVNamespace;
@@ -23,18 +24,23 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
     console.log(`checking role asset ownership for: ${public_key}`);
     try{
       verifyAndRenewAccess(accesstoken, context);
-      const user = await User.findOne('discord_user_id', discord_user_id, context.env.DB)
-      console.log(user)
-      const roles = await checkRoles(context, public_key, discord_user_id)
-      console.log(roles)
-      const ourURL = new URL(context.request.url).origin
+      const user = await User.findOne('discord_user_id', discord_user_id, context.env.DB);
+      console.log(user);
+      const roles = await checkRoles(context, public_key, discord_user_id);
+      console.log(roles);
+      const ourURL = new URL(context.request.url).origin;
       const claimURL = new URL('/defaultclaim', ourURL).toString();
-      return redirect(claimURL, {
-        status: 301,
-        headers: {
+     return Response.redirect(claimURL, 301);
+
+  //    return redirect(claimURL, {
+   //     status: 301,
+    //    headers: {
           //"Set-Cookie": `clientState=${state}; Max-Age=300000;}`,
-        },
-    });
+  //      },
+ //   }
+    
+
+    
     } catch{
       return new Response("You are not logged in", {status: 401})
     }
@@ -42,8 +48,10 @@ export const onRequestGet: PagesFunction<Env> = async (context) => {
 
 async function checkRoles(context, publickey, discord_user_id){
   let server = context.env.horizonURL
-  const account: Horizon.AccountResponse = await (await fetch(`${server}/accounts/${publickey}`)).json()
-  const balances: Horizon.BalanceLine[] = account.balances
+  //const account: Horizon.AccountResponse = await (await fetch(`${server}/accounts/${publickey}`)).json()
+  const account: any = await (await fetch(`${server}/accounts/${publickey}`)).json()
+  //const balances: Horizon.BalanceLine[] = account.balances
+  const balances: any = account.balances
   
   console.log(JSON.stringify(account.balances));
   //todo: get the roles and assets from the kv store
@@ -80,4 +88,3 @@ async function checkRoles(context, publickey, discord_user_id){
       console.error('therewas an error\n', err)
     }
   }
-

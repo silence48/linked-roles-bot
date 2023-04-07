@@ -1,3 +1,4 @@
+
 export const onRequest: PagesFunction<Env> = async (context) => {
     const request = context.request
     const { searchParams } = new URL(request.url);
@@ -27,3 +28,4 @@ export const onRequest: PagesFunction<Env> = async (context) => {
   interface Env {
     SESSION_STORAGE: KVNamespace;
   }
+  

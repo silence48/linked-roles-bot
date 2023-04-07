@@ -1,4 +1,5 @@
 
+
 import {
   Keypair,
   TransactionBuilder,
@@ -8,21 +9,19 @@ import {
   Account,
   xdr
 } from 'stellar-base';
-import { Buffer } from "buffer-polyfill";
-import type { Transaction } from '../node_modules/stellar-base/types/index';
+//import { Buffer } from "buffer-polyfill";
+//import type { Transaction } from '../node_modules/stellar-base/types/index';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 import { parse } from 'cookie';
-import { UserForm } from '../app/forms';
-import { Discord, User } from '../app/models';
+import { UserForm } from '../app/forms/UserForm';
+import { User } from '../app/models/User';
 //import Discord from '../app/models/Discord';
-import { redirect } from "@remix-run/cloudflare";
+//import { redirect } from "@remix-run/cloudflare";
 
-
-//const horizon = require('../horizon-api')
-import * as horizon from "../horizon-api"
+//import * as horizon from "../horizon-api"
 
 //found the fix for polyfilling buffer like this from https://github.com/remix-run/remix/issues/2813
-globalThis.Buffer = Buffer as unknown as BufferConstructor;
+//globalThis.Buffer = Buffer as unknown as BufferConstructor;
 
 interface Env {
   SESSION_STORAGE: KVNamespace;
@@ -31,7 +30,33 @@ interface Env {
 }
 
 export const onRequestGet: PagesFunction<Env> = async (context) => {
-    const request = context.request
+  async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState) {
+    let tempAccount=new Account(pubkey,"-1");
+    let transaction = new TransactionBuilder(tempAccount, {
+            fee: BASE_FEE,
+            //todo: set the passphrase programatically based on an envvar
+            networkPassphrase: Networks.TESTNET
+        })
+            // add a payment operation to the transaction
+            .addOperation(Operation.manageData({
+              name: `${oururl} auth`,
+              value: clientState, //btoa(clientState).toString(),
+
+              source: serverkey.publicKey()
+            }))
+            .addOperation(Operation.manageData({
+                name: "DiscordID",
+                value: discordID
+                }))
+            // mark this transaction as valid only for the next 30 days
+            .setTimeout(60*60*24*30)
+            .build();
+    await transaction.sign(serverkey);
+    const challenge = await transaction.toEnvelope().toXDR('base64');
+    return challenge;
+}
+
+  const request = context.request
     const { searchParams } = new URL(request.url);
 
     const userAccount = searchParams.get('account');
@@ -90,9 +115,12 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   //const authjson: authrequest = await context.request.json()
 
+
   const { Transaction, NETWORK_PASSPHRASE, discord_user_id } = await context.request.json() as authrequest
   //const discord_user_id = authjson.discord_user_id
   //todo: Set the network passphrase as a env var.
+
+
   const cookies = context.request.headers.get("Cookie")
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
@@ -103,7 +131,7 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
   }
   const { DB } = context.env as any
   let transaction = new (TransactionBuilder.fromXDR as any) (Transaction, passphrase)
-  
+
   //verify the state.
   let authedstate = transaction.operations[0].value
   if (clientState !== authedstate) {
@@ -117,9 +145,8 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     });
   }
 
-
   //todo: verify the signer is authorized to sign for the source, for now just accept the source signature
-  
+
   const refreshtoken = await getrefreshtoken(transaction, context);
 
   if (refreshtoken != false ) {
@@ -129,18 +156,19 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
     const { payload } = jwt.decode(refreshtoken)
     console.log('chk2 in auth.ts function')
     console.log(await User.findBy('discord_user_id', discord_user_id, DB))
+    
     // If user does not exist, create it
-    if (!userExists) {//if the user does not exist here it should throw the error.
-       const userForm = new UserForm(new User({
-         discord_user_id,
-         stellar_access_token: accesstoken,
-         stellar_refresh_token: refreshtoken,
-         stellar_expires_at: (payload.exp).toString(),
-         public_key: transaction.source
-       }))
-       console.log(await User.create(userForm, DB))
-      }else{
-        const user = await User.findBy('discord_user_id', discord_user_id, DB)
+    if (!userExists) {
+      return new Response(errmsg, {
+        status: 403,
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+        },
+      });
+    }
+      else{
+
+      const user = await User.findBy('discord_user_id', discord_user_id, DB)
         console.log(user, 'that was user')
         console.log(user[0].id)
         user[0].stellar_access_token = accesstoken;
@@ -168,7 +196,57 @@ export const onRequestPost: PagesFunction<Env> = async (context) => {
       },
     });
   }
+};
+
+
+async function gatherTxSigners(transaction, signers) {
+  const hashedSignatureBase = transaction.hash();
+  const signersFound = new Set();
+  for (const signer of signers) {
+    if (transaction.signatures.length === 0) {
+      break;
+    }
+    let keypair;
+    try {
+      keypair = Keypair.fromPublicKey(signer); // This can throw a few different errors
+    } catch (err) {
+      throw new Error('Signer is not a valid address: ' + err.message);
+    }
+    for (let decSig of transaction.signatures) {
+      if (!decSig.hint().equals(keypair.signatureHint())) {
+        console.log('nope')
+        continue;
+      }
+      if (keypair.verify(hashedSignatureBase, decSig.signature())) {
+        console.log('yup')
+        signersFound.add(signer);
+        break;
+      }
+    }
+  }
+  return Array.from(signersFound);
 }
+
+async function verifyTxSignedBy(transaction, accountID) {
+  try{
+   //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
+   const authInfo = getAccountAuthorization(transaction.source)
+ 
+   const signedby = await gatherTxSigners(transaction, [accountID]) 
+   let comparelist = [accountID]
+   for (let n in comparelist){
+     for (let i in signedby){
+      if (signedby[i] == comparelist[n]){
+       return true
+      }else{
+       throw('that does not matchh');
+      }
+     }
+   }
+  } catch(err){
+   return false
+  }
+ }
 
 async function getrefreshtoken(transaction, context){
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
@@ -238,82 +316,6 @@ export async function verifyAndRenewAccess(accesstoken, context){
   };
 };
 
-async function verifyTxSignedBy(transaction, accountID) {
- try{
-  //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
-  const authInfo = getAccountAuthorization(transaction.source)
-
-  const signedby = await gatherTxSigners(transaction, [accountID]) 
-  let comparelist = [accountID]
-  for (let n in comparelist){
-    for (let i in signedby){
-     if (signedby[i] == comparelist[n]){
-      return true
-     }else{
-      throw('that does not matchh');
-     }
-    }
-  }
- } catch(err){
-  return false
- }
-}
-
-async function gatherTxSigners(transaction, signers) {
-  
-
-  const hashedSignatureBase = transaction.hash();
-  const signersFound = new Set();
-  for (const signer of signers) {
-    if (transaction.signatures.length === 0) {
-      break;
-    }
-    let keypair;
-    try {
-      keypair = Keypair.fromPublicKey(signer); // This can throw a few different errors
-    } catch (err) {
-      throw new Error('Signer is not a valid address: ' + err.message);
-    }
-    for (let decSig of transaction.signatures) {
-      if (!decSig.hint().equals(keypair.signatureHint())) {
-        console.log('nope')
-        continue;
-      }
-      if (keypair.verify(hashedSignatureBase, decSig.signature())) {
-        console.log('yup')
-        signersFound.add(signer);
-        break;
-      }
-    }
-  }
-  return Array.from(signersFound);
-}
-
-async function generateAuthChallenge(serverkey, pubkey, discordID, oururl, clientState) {
-    let tempAccount=new Account(pubkey,"-1");
-    let transaction = new TransactionBuilder(tempAccount, {
-            fee: BASE_FEE,
-            //todo: set the passphrase programatically based on an envvar
-            networkPassphrase: Networks.TESTNET
-        })
-            // add a payment operation to the transaction
-            .addOperation(Operation.manageData({
-              name: `${oururl} auth`,
-              value: Buffer.from(clientState).toString('base64'),
-              source: serverkey.publicKey()
-            }))
-            .addOperation(Operation.manageData({
-                name: "DiscordID",
-                value: discordID
-                }))
-            // mark this transaction as valid only for the next 30 days
-            .setTimeout(60*60*24*30)
-            .build();
-    await transaction.sign(serverkey);
-    const challenge = await transaction.toEnvelope().toXDR('base64');
-    return challenge;
-}
-
 type threasholds = {
   low_threshold: number, 
   med_threshold: number, 
@@ -338,7 +340,7 @@ async function getAccountAuthorization(pubkey): Promise<accountAuth> {
     },
   };
   const response = await fetch(url, init);
-  const json: horizon.Horizon.AccountResponse = await response.json()
+  const json: any = await response.json()
   console.log(json.thresholds)
   console.log(json.signers)
   return {signers: json.signers, threasholds: json.thresholds}

@@ -5,6 +5,8 @@ import { hydrate } from "react-dom";
 hydrate(<RemixBrowser />, document);
 
 
+// 05/2023:  React 18.2 is not currently stable
+//
 // REACT 18
 // import { RemixBrowser } from "@remix-run/react";
 // import { startTransition, StrictMode } from "react";

@@ -1,3 +1,4 @@
+import { ImportAccount } from "~/templates/ImportAccount";
 import { json } from "@remix-run/cloudflare";
 
 export const loader = async (
@@ -8,8 +9,7 @@ export const loader = async (
 
 export default function Index() {
   return (
-    <div>
-    </div>
+      <ImportAccount />
   );
 }
 

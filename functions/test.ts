@@ -1,4 +1,4 @@
-import { StellarWalletsKit, WalletNetwork, WalletType } from 'stellar-wallets-kit';
+
 import { parse } from 'cookie';
 interface Env {
   SESSION_STORAGE: KVNamespace;
