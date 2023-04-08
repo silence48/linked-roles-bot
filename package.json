@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "better-sqlite3": "latest",
-    "communi-design-system": "0.0.14",
+    "communi-design-system": "0.0.16",
     "@stellar/freighter-api": "latest",
     "@walletconnect/sign-client": "latest",
     "react-qrcode-logo": "latest",
