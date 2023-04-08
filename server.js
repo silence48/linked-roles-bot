@@ -10,7 +10,6 @@ const handleRequest = createPagesFunctionHandler({
   build,
   mode: process.env.NODE_ENV,
   getLoadContext: (context) => {
-    console.log('context.env', context.env)
     const sessionStorage = createWorkersKVSessionStorage({
       kv: context.env.SESSION_STORAGE,
       cookie: createCookie("__session", {
