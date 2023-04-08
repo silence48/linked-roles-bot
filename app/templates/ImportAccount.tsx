@@ -103,6 +103,7 @@ const Freighter = ({ connectWallet, openModal }: any) => {
       const wc = new WalletClient("freighter", "TESTNET");
       wc.getPublicKey().then(async (value: any) => {
         const public_key = await value();
+        
         console.log('public_key', public_key)
         openModal({ type: 'challenge', content: public_key})
         // await connectWallet({ public_key, provider: 'freighter' })

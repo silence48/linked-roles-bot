@@ -35,7 +35,8 @@ export default function App() {
         </ModalProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload port={8002} />
+        {/* {process.env.NODE_ENV === 'development' && <LiveReload port={8002} />} */}
+        
       </body>
     </html>
   );

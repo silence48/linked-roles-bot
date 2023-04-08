@@ -17,6 +17,6 @@ module.exports = {
     v2_errorBoundary: false,
     v2_meta: false,
     v2_normalizeFormMethod: false,
-    v2_routeConvention: false,
+    v2_routeConvention: true,
   },
 };
