@@ -18,15 +18,15 @@ interface RespI {
 export async function createUserSession(
   sessionStorage: Storage,
   sessionData: SessionI,
-  { redirectTo, message }: RespI
+  resp?: RespI
 ) {
   const session = await sessionStorage.getSession();
   session.set("data", {
     ...sessionData,
   });
   
-  if (!redirectTo) return;
-  return redirect(redirectTo, {
+  if (!resp?.redirectTo) return;
+  return redirect(resp.redirectTo, {
     headers: {
       "Set-Cookie": await sessionStorage.commitSession(session),
     },

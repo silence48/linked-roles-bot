@@ -1,7 +1,7 @@
 import type { MetaFunction, LinksFunction } from "@remix-run/cloudflare";
 import {
   Links,
-  LiveReload,
+  //LiveReload,
   Meta,
   Outlet,
   Scripts,
@@ -36,7 +36,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         {/* {process.env.NODE_ENV === 'development' && <LiveReload port={8002} />} */}
-        <LiveReload port={8002} />
+        
       </body>
     </html>
   );

@@ -2,7 +2,9 @@ import { Discord } from '~/models';
 import type { Horizon } from '~/types';
 
 export async function checkRoles(context: any, publickey: string, discord_user_id: string) {
+  console.log('excessively logging the flow and now were in the role check function');
   let server = context.env.horizonURL;
+  console.log(`${server}/accounts/${publickey}`)
   const account: Horizon.AccountResponse = await (
     await fetch(`${server}/accounts/${publickey}`)
   ).json();
@@ -11,11 +13,13 @@ export async function checkRoles(context: any, publickey: string, discord_user_i
   console.log(JSON.stringify(account.balances));
   //todo: get the roles and assets from the kv store
   let theAssets: Array<Array<string>> = [
-    ["DefaultRole", context.env.botpubkey],
+    //todo: store this as an envvar
+    ["defaultrole", context.env.botpubkey],
   ];
   var metadata = {
     defaultrole: 0,
   };
+  //
 
   function updateMetadata(role: string) {
     switch (role) {
@@ -47,7 +51,8 @@ export async function checkRoles(context: any, publickey: string, discord_user_i
       }
     });
     console.log(JSON.stringify(metadata));
-    await Discord.pushMetadata(discord_user_id, metadata, context);
+   return metadata; 
+
   } catch (err: any) {
     console.error("therewas an error\n", err);
   }
