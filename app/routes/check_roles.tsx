@@ -16,6 +16,5 @@ export const loader = async ({ context, request }: LoaderArgs) => {
   }catch{
     return json({ ok: false, error: "something is borked with the discord api" });
   }
-  
  
 };

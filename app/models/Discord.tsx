@@ -81,7 +81,7 @@ description_localizations?	dictionary with keys in available locales	translation
       metadata,
     };
     try {
-      await fetch(url, {
+      const pushed = await fetch(url, {
         method: 'PUT',
         body: JSON.stringify(body),
         headers: {
@@ -89,8 +89,9 @@ description_localizations?	dictionary with keys in available locales	translation
           'Content-Type': 'application/json',
         },
       });
-      console.log('Pushing successful')
-
+      
+      console.log('Pushing successful ', pushed)
+      return pushed
     } catch (e) {
     console.log(e)
     }

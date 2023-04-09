@@ -52,6 +52,7 @@ export async function checkRoles(context: any, publickey: string, discord_user_i
     });
     console.log(JSON.stringify(metadata));
     const pushed = await Discord.pushMetadata(discord_user_id, metadata, context.env);
+    console.log(pushed, "PUSHED")
     return pushed
     //return metadata; 
 

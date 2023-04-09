@@ -76,14 +76,14 @@ export const loader: LoaderFunction = async ({
       const user = await User.findOne("discord_user_id", discord_user_id, DB);
       // Compare discord_expires_at / user.discord_expires_at
       //
-      // await user.update(
-      //   {
-      //     discord_access_token,
-      //     discord_refresh_token,
-      //     discord_expires_at,
-      //   },
-      //   DB
-      // );
+       await user.update(
+         {
+           discord_access_token,
+           discord_refresh_token,
+           discord_expires_at,
+         },
+         DB
+       );
     }
 
     return await createUserSession(
