@@ -7,8 +7,6 @@ import { Keypair } from "stellar-base";
 export const loader = async ({ request, context, params }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const { publicKey } = params
-  console.log('publicKey', publicKey)
-  console.log('we at the challenge')
   // Check if publicKey is a valid ED25519 address
   if (!publicKey) return;
   const { discord_user_id, clientState } = await getUser(request, sessionStorage)

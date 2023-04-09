@@ -28,7 +28,6 @@ export class Discord {
     });
   
     const response = await fetch(url, { method: 'POST', body: data, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
-    console.log("the response from oauth tokens", response)
     return response.json()
   }
   
@@ -69,8 +68,6 @@ description_localizations?	dictionary with keys in available locales	translation
     env: any
   ) {
 
-    console.log('Pushing metadata to discord')
-    console.log(metadata)
     // GET/PUT /users/@me/applications/:id/role-connection
     const url = `https://discord.com/api/v10/users/@me/applications/${env.DISCORD_CLIENT_ID}/role-connection`;
     // const accessToken = await getAccessToken(discord_user_id, data);

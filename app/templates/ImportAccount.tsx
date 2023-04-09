@@ -24,7 +24,7 @@ enum WalletConnectMethods {
   SIGN_AND_SUBMIT = "stellar_signAndSubmitXDR",
 }
 
-const WalletConnect = ({ connectWallet, openModal }: any) => {
+const WalletConnect = ({ openModal }: any) => {
   const [url, setUrl] = React.useState("");
   React.useEffect(() => {
     if (isBrowser) {
@@ -57,10 +57,9 @@ const WalletConnect = ({ connectWallet, openModal }: any) => {
               "stellar:pubnet:",
               ""
             );
-            await connectWallet({
-              public_key: publicKey,
-              provider: "wallet_connect",
-            });
+            console.log("allNamespaceChains", allNamespaceChains)
+            openModal({ type: 'challenge', content: { public_key: publicKey, provider: "wallet_connect", padding: 'large' }});
+
           })
           .catch((error: any) => {
             console.log("APPROVAL ERROR", error);
@@ -72,54 +71,49 @@ const WalletConnect = ({ connectWallet, openModal }: any) => {
   return !url ? (
     <Loader />
   ) : (
-        <div>
-          <QRCode
-            value={url}
-            logoImage="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/eee714c7-b85b-42cf-23f7-d986b99c1b00/public"
-            logoHeight={48}
-            logoWidth={48}
-            eyeRadius={8}
-            size={256}
-            bgColor="#C8D1E6"
-            fgColor="#03050B"
-            removeQrCodeBehindLogo={true}
-            qrStyle="dots"
-          />
-        </div>
+    <div>
+      <QRCode
+        value={url}
+        logoImage="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/eee714c7-b85b-42cf-23f7-d986b99c1b00/public"
+        logoHeight={48}
+        logoWidth={48}
+        eyeRadius={8}
+        size={256}
+        bgColor="#C8D1E6"
+        fgColor="#03050B"
+        removeQrCodeBehindLogo={true}
+        qrStyle="dots"
+      />
+    </div>
   );
 };
 
-const Albedo = ({ connectWallet, openModal }: any) => {
+const Albedo = ({ openModal }: any) => {
   const wc = new WalletClient("albedo", "TESTNET");
   wc.getPublicKey().then(async (account: any) => {
-    await connectWallet({ public_key: account.pubkey, provider: "albedo" });
+    openModal({ type: 'challenge', content: { public_key: account.pubkey, provider: "albedo", padding: 'large' }});
   });
   return <Loader />;
 };
 
-const Freighter = ({ connectWallet, openModal }: any) => {
+const Freighter = ({ openModal }: any) => {
   React.useEffect(() => {
     if (isConnected()) {
       const wc = new WalletClient("freighter", "TESTNET");
       wc.getPublicKey().then(async (value: any) => {
         const public_key = await value();
-        
-        console.log('public_key', public_key)
-        openModal({ type: 'challenge', content: public_key})
-        // await connectWallet({ public_key, provider: 'freighter' })
+        openModal({ type: 'challenge', content: { public_key, provider: "freighter", padding: 'large' }})
       });
     }
   }, []);
   return <Loader />;
 };
 
-const Rabet = ({ connectWalle, openModal }: any) => {
+const Rabet = ({ openModal }: any) => {
   const wc = new WalletClient("rabet", "TESTNET");
   wc.getPublicKey().then(
     async ({ publicKey }: any) => {
-
-      // await connectWallet({ public_key: publicKey, provider: "rabet" })
-
+      openModal({ type: 'challenge', content: { public_key: publicKey, provider: "rabet", padding: 'large' }})
     }
   );
   return <Loader />;
@@ -142,16 +136,16 @@ const options = [
 
 type ImportAccountProps = {};
 
-const walletAssert = (view: any, connectWallet: any, openModal: any) => {
+const walletAssert = (view: any, openModal: any) => {
   switch (view) {
     case "Rabet":
-      return <Rabet connectWallet={connectWallet} openModal={openModal} />;
+      return <Rabet openModal={openModal} />;
     case "Freighter":
-      return <Freighter connectWallet={connectWallet} openModal={openModal}  />;
+      return <Freighter openModal={openModal}  />;
     case "Albedo":
-      return <Albedo connectWallet={connectWallet} openModal={openModal}  />;
+      return <Albedo openModal={openModal}  />;
     case "Wallet Connect":
-      return <WalletConnect connectWallet={connectWallet} />;
+      return <WalletConnect openModal={openModal}  />;
     default:
       return <></>;
   }
@@ -171,32 +165,7 @@ const IconHeading = ({ text, icon }: any) => {
 
 export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   const [view, setView] = React.useState("");
-  const [selected, Select] = React.useState(options[0]);
-  const [payload, setPayload] = React.useState({
-    public_key: "",
-    provider: "",
-  });
-  const fetcher = useFetcher();
-  const { closeModal, openModal } = useModal();
-
-  React.useEffect(() => {
-    const { public_key, provider } = payload;
-    if (public_key && fetcher.type === "init") {
-      fetcher.submit(
-        { public_key, provider },
-        { method: "post", action: "/auth_wallet" }
-      );
-    }
-    if (fetcher.type === "done") {
-      console.log("closing window ...", fetcher.data);
-      // closeModal();
-    }
-  }, [payload.public_key, fetcher]);
-
-  const button = {
-    text: `${view === "" ? `Continue with ${selected.name}` : "Cancel"}`,
-    variant: `${view === "" ? "primary" : "warning"}`,
-  };
+  const { openModal } = useModal();
 
   return (
     <div>
@@ -221,7 +190,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                       ** WALLET CONNECT IS STILL BEING DEBUGGED USE A DIFFERENT WALLET**
                     </div>
                     <div className="flex flex-col items-center my-8" style={{height: '300px'}}>
-                      <WalletConnect connectWallet={setPayload} />
+                      <WalletConnect openModal={openModal} />
                     </div>
                   </div>
                   <div className="flex-1">
@@ -248,7 +217,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                           })}
                         </>
                       ) : (
-                        walletAssert(view, setPayload, openModal)
+                        walletAssert(view, openModal)
                       )}
                     </div>  
                     </div>

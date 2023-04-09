@@ -4,6 +4,9 @@ import { getPublicKey, signTransaction as signTx } from '@stellar/freighter-api'
 type Client = 'albedo' | 'rabet' | 'freighter' | 'wallet_connect'
 type Network = 'TESTNET'
 
+// Wallet Connect
+// Every ACTION means print a QR
+
 class WalletClient {
   name: Client
   network: Network
