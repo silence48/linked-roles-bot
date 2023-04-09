@@ -35,13 +35,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   var roles = await checkRoles(context, public_key, discord_user_id )
   if (roles?.defaultrole == 0 ) {
     claim = await generateDefaultClaimTransaction(context, public_key) ?? ''
-    //how do i submit to the wallet to sign??
-    //how to submit the tx after that?
   }
-  roles = await checkRoles(context, public_key, discord_user_id )
-  // checkRoles(context, )
-  // Generate xdr for claiming the Asset
-
   return json({ xdr: claim, isClaimed });
 
   // Redirect if user has Asset
@@ -62,6 +56,12 @@ export default function Claim() {
     const wc = new WalletClient("freighter", "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
     console.log("horizonResult", horizonResult);
+    if (horizonResult.success) {
+      if (fetcher.state === "idle" && fetcher.data == null) {
+        fetcher.load(`/check_roles`);
+      }
+    }
+    // CHECK ROLES AGAIN
     // IF OK, FETCH CHECK_ROLES.
   };
 
