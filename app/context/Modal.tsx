@@ -25,7 +25,7 @@ enum ModalTypeE {
 const modalAssert = (action: { type: string; content: any }) => {
   switch (action.type) {
     case 'challenge':
-      return <Challenge public_key={action.content} />
+      return <Challenge content={action.content} />
     default:
       return <></>;
   }

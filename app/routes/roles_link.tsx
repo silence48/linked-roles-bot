@@ -9,8 +9,6 @@ export let loader: LoaderFunction = async ({
   }) => {
     const discord = await Discord.getOAuthUrl(context.env);
     const { url, state } = discord
-    console.log('theenv', context.env)
-    console.log('discord', discord)
     return redirect(url, {
         status: 301,
         headers: {

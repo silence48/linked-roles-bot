@@ -36,14 +36,14 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   if (roles?.defaultrole == 0 ) {
     claim = await generateDefaultClaimTransaction(context, public_key) ?? ''
   }
-  return json({ xdr: claim, isClaimed });
+  return json({ xdr: claim, isClaimed, provider });
 
   // Redirect if user has Asset
 };
 
 export default function Claim() {
   const { closeModal, isOpen } = useModal();
-  const { xdr, isClaimed } = useLoaderData() ?? {};
+  const { xdr, isClaimed, provider } = useLoaderData() ?? {};
   const fetcher = useFetcher();
 
   React.useEffect(() => {
@@ -53,9 +53,8 @@ export default function Claim() {
   }, []);
 
   const claimKey = async ({ xdr }: any) => {
-    const wc = new WalletClient("freighter", "TESTNET");
+    const wc = new WalletClient(provider, "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
-    console.log("horizonResult", horizonResult);
     if (horizonResult.success) {
       if (fetcher.state === "idle" && fetcher.data == null) {
         fetcher.load(`/check_roles`);

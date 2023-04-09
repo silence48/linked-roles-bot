@@ -45,7 +45,6 @@ export async function generateAuthChallenge(
 }
 
 export async function generateDefaultClaimTransaction(context, userPublicKey) {
-  console.log("IT CALLED THE FUNCTION YES")
   try{
       let serverseqnumber = await getSequenceNumber(context, context.env.botpubkey);    
       let serverAccount = new Account(context.env.botpubkey, serverseqnumber);
@@ -53,7 +52,6 @@ export async function generateDefaultClaimTransaction(context, userPublicKey) {
       const serverSecretKey = context.env.authsigningkey;
       const serverKeypair = Keypair.fromSecret(serverSecretKey);
       const defaultRole = new Asset("defaultrole", serverPublicKey);
-      console.log('it set the other shit too.')
   const transaction = new TransactionBuilder(serverAccount, {
     fee: BASE_FEE,
     networkPassphrase: Networks.TESTNET, // Use Networks.PUBLIC for the mainnet
@@ -77,7 +75,6 @@ export async function generateDefaultClaimTransaction(context, userPublicKey) {
   transaction.sign(serverKeypair);
 
   const xdr = transaction.toXDR();
-  console.log(xdr);
   return xdr;
 
   }catch(err){

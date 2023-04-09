@@ -14,18 +14,15 @@ export const loader: LoaderFunction = async ({
   request,
   params,
 }: LoaderArgs) => {
-  console.log("Hello");
 
   try {
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     const { sessionStorage } = context as any;
-    console.log("sessionStorage", sessionStorage)
     const { DB } = context.env as any;
     const cookies = request.headers.get("Cookie"); //the random id set on the first call to roles_link
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const discordState = url.searchParams.get("state");
-    console.log(code, cookies, discordState)
     if (!cookies || !code || !discordState) return null;
 
     const cookieHeader = parse(cookies);
