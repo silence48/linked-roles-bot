@@ -72,6 +72,7 @@ export async function action({ request, context, params }: ActionArgs) {
         user[0].stellar_refresh_token = refreshtoken;
         user[0].stellar_expires_at = payload.exp.toString();
         user[0].public_key = transaction.source;
+        console.log(await User.update(user[0], DB))
       }
 
       let responsetext = JSON.stringify({ token: accesstoken });
