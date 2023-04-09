@@ -29,19 +29,19 @@ const WalletConnect = ({ connectWallet, openModal }: any) => {
   React.useEffect(() => {
     if (isBrowser) {
       SignClient.init({
-        projectId: "dacff933c2c1886c24cbdf69b5bbf21c",
+        projectId: "de5dffb20a999465a31bef12a0defd9b",
         metadata: {
-          name: "izar-network",
+          name: "CommuuniDAO",
           url: "my-auth-dapp.com",
-          description: "A dapp using WalletConnect SignClient",
-          icons: ["https://my-auth-dapp.com/icons/logo.png"],
+          description: "CommuniDAO is the Stellar Dao Discord Bot",
+          icons: ["https://cdn.discordapp.com/attachments/1094354605401460896/1094354605887996104/StellarDiscordDaoBot.png"],
         },
       }).then(async (client: any) => {
         const { uri, approval } = await client.connect({
           requiredNamespaces: {
             stellar: {
               methods: [WalletConnectMethods.SIGN],
-              chains: [WalletConnectChains.PUBLIC],
+              chains: [WalletConnectChains.TESTNET],
               events: [],
             },
           },
@@ -218,6 +218,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     <IconHeading text="Wallet Connect" icon="walletConnect" />
                     <div className="text-paragraph-medium-medium ">
                       Scan the QR with your phone from a wallet app
+                      ** WALLET CONNECT IS STILL BEING DEBUGGED USE A DIFFERENT WALLET**
                     </div>
                     <div className="flex flex-col items-center my-8" style={{height: '300px'}}>
                       <WalletConnect connectWallet={setPayload} />
