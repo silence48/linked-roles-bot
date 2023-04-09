@@ -13,6 +13,8 @@
     "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol https"
   },
   "dependencies": {
+    "@emotion/react": "^11.10.6",
+    "@emotion/styled": "^11.10.6",
     "@remix-run/cloudflare": "^1.15.0",
     "@remix-run/cloudflare-pages": "^1.15.0",
     "@remix-run/react": "^1.15.0",

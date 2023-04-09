@@ -71,22 +71,24 @@ description_localizations?	dictionary with keys in available locales	translation
     // GET/PUT /users/@me/applications/:id/role-connection
     const url = `https://discord.com/api/v10/users/@me/applications/${env.DISCORD_CLIENT_ID}/role-connection`;
     // const accessToken = await getAccessToken(discord_user_id, data);
-    const { discord_access_token: accessToken } = await User.findOne('discord_user_id', discord_user_id, env.DB)
+    const user = await User.findOne('discord_user_id', discord_user_id, env.DB)
+    console.log(user)
     const body = {
       platform_name: 'Stellar Discord Bot',
       metadata,
     };
     try {
-      await fetch(url, {
+      const pushed = await fetch(url, {
         method: 'PUT',
         body: JSON.stringify(body),
         headers: {
-          "Authorization": `Bearer ${accessToken}`,
+          "Authorization": `Bearer ${user.discord_access_token}`,
           'Content-Type': 'application/json',
         },
       });
-      console.log('Pushing successful')
-
+      
+      console.log('Pushing successful ', pushed)
+      return pushed
     } catch (e) {
     console.log(e)
     }

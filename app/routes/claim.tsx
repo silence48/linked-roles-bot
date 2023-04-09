@@ -1,6 +1,7 @@
 import * as React from "react";
 import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare";
 import { getUser } from "~/utils/session.server";
+import { User } from "~/models";
 import { useModal } from "~/context";
 import { Layout, Button } from "communi-design-system";
 import { WalletClient } from "~/utils/WalletClient.client";
@@ -12,6 +13,8 @@ import jwt from '@tsndr/cloudflare-worker-jwt';
 
 export const loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
+  const Env = context.env;
+  //console.log(Env)
   const { authsigningkey } = context.env as any;
   const { isAuthed, isClaimed, provider, token: accesstoken } = (await getUser(request, sessionStorage)) ?? {}; //todo: error handling or make this more clear
   
@@ -20,10 +23,13 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   }
   //todo: verifyAndRenewAccess, and make that update the users jwt when necessary.
   let validity = jwt.verify(accesstoken, authsigningkey);
-  
+  console.log(accesstoken, "ACCESSTOKEN")
   const { payload } = jwt.decode(accesstoken);
   
-  const { discord_user_id } = payload;
+  const { userid } = payload;
+  console.log(payload, "PAYLOAD")
+  console.log(userid, "DISCORD USER ID")
+  console.log(await User.findBy("discord_user_id", userid, Env.DB));
   const public_key = payload.sub as string
   //todo:check if the user ever claimed the asset even if the balance is 0, as they can only claim once
   //todo: make it an authonly asset or make that an option in the asset creation.
@@ -32,7 +38,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 
   var isOwned = false
   let claim = ''
-  var roles = await checkRoles(context, public_key, discord_user_id )
+  var roles = await checkRoles(context, public_key, userid )
   if (roles?.defaultrole == 0 ) {
     claim = await generateDefaultClaimTransaction(context, public_key) ?? ''
   }
