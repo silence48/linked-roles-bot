@@ -119,7 +119,7 @@ export async function getaccesstoken(refreshtoken, request, context){
 
 export async function verifyAndRenewAccess(accesstoken, context){
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
-  if (validity){
+  if (await validity){
     const { DB } = context.env as any
     const { payload } = jwt.decode(accesstoken)
     const user = await User.findBy('discord_user_id', payload.userid, DB)
@@ -127,7 +127,7 @@ export async function verifyAndRenewAccess(accesstoken, context){
     if (lastaccesstoken == accesstoken){
       if (payload.exp < Date.now()){
         const refreshtoken = user.stellar_refresh_token
-        const newaccesstoken = await getaccesstoken(refreshtoken, context)
+        const newaccesstoken = await getaccesstoken(refreshtoken, request, context)
         const { payload } = jwt.decode(refreshtoken)
         user[0].stellar_expires_at = (payload.exp).toString()
         user[0].stellar_access_token = newaccesstoken
