@@ -110,12 +110,17 @@ const Freighter = ({ openModal }: any) => {
 };
 
 const Rabet = ({ openModal }: any) => {
-  const wc = new WalletClient("rabet", "TESTNET");
-  wc.getPublicKey().then(
-    async ({ publicKey }: any) => {
-      openModal({ type: 'challenge', content: { public_key: publicKey, provider: "rabet", padding: 'large' }})
-    }
-  );
+  React.useEffect(() => {
+    const wc = new WalletClient("rabet", "TESTNET");
+    // console.log('WC', wc)
+    wc.getPublicKey().then(
+      async (publicKey: any) => {
+        console.log('getting', publicKey)
+        openModal({ type: 'challenge', content: { public_key: publicKey, provider: "rabet", padding: 'large' }})
+      }
+    );
+  }, [])
+
   return <Loader />;
 };
 
@@ -137,6 +142,7 @@ const options = [
 type ImportAccountProps = {};
 
 const walletAssert = (view: any, openModal: any) => {
+  console.log('Asseting wallet')
   switch (view) {
     case "Rabet":
       return <Rabet openModal={openModal} />;
