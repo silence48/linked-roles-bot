@@ -109,7 +109,7 @@ class WalletClient {
   private async getRabetKey() {
     const w: any = window;
     if (w.rabet) {
-      return w.rabet.connect()
+      return w.rabet.connect().then(({ publicKey }: any) => publicKey)
     }
   }
 
