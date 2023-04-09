@@ -35,12 +35,6 @@ export default function App() {
         </ModalProvider>
         <ScrollRestoration />
         <Scripts />
-<<<<<<< Updated upstream
-        {/* {process.env.NODE_ENV === 'development' && <LiveReload port={8002} />} */}
-        
-=======
-       {process.env.NODE_ENV === 'development' && <LiveReload port={8002} />} 
->>>>>>> Stashed changes
       </body>
     </html>
   );
