@@ -39,6 +39,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   var isOwned = false
   let claim = ''
   var roles = await checkRoles(context, public_key, userid )
+
   if (roles?.defaultrole == 0 ) {
     claim = await generateDefaultClaimTransaction(context, public_key) ?? ''
   }
@@ -61,6 +62,7 @@ export default function Claim() {
   const claimKey = async ({ xdr }: any) => {
     const wc = new WalletClient(provider, "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
+    console.log("horizonResult in claim", horizonResult)
     if (horizonResult.success) {
       if (fetcher.state === "idle" && fetcher.data == null) {
         fetcher.load(`/check_roles`);

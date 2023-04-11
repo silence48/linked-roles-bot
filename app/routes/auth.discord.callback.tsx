@@ -23,6 +23,7 @@ export const loader: LoaderFunction = async ({
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const discordState = url.searchParams.get("state");
+    console.log(`auth.discord.callback - loaderfunction - ${code}, ${cookies}, ${discordState}`)
     if (!cookies || !code || !discordState) return null;
 
     const cookieHeader = parse(cookies);

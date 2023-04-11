@@ -10,6 +10,7 @@ export async function action({ request, context, params }: ActionArgs) {
   const { sessionStorage } = context as any;
   const body = await request.formData();
   const signedEnvelope = body.get("signed_envelope_xdr");
+  console.log(`from challenge.verify - action - signedEnvelope ${signedEnvelope}`);
   const url = new URL(request.url);
   const provider = url.searchParams.get("provider") as any;
   const cookies = request.headers.get("Cookie") ?? null;
@@ -20,7 +21,7 @@ export async function action({ request, context, params }: ActionArgs) {
   let areq = {
     Transaction: signedEnvelope,
     NETWORK_PASSPHRASE: Networks.TESTNET,
-    discord_user_id: discord_user_id,
+    discord_user_id: discord_user_id
   };
   const { Transaction, NETWORK_PASSPHRASE } = areq;
   let passphrase: Networks = Networks.TESTNET;
@@ -28,13 +29,12 @@ export async function action({ request, context, params }: ActionArgs) {
     passphrase = NETWORK_PASSPHRASE;
   }
   const { DB } = context.env as any;
-  let transaction = new (TransactionBuilder.fromXDR as any)(
-    Transaction,
-    passphrase
-  );
+  let transaction = new (TransactionBuilder.fromXDR as any)(Transaction, passphrase);
   //verify the state.
   const decoder = new TextDecoder();
   let authedstate = decoder.decode(transaction.operations[0].value);
+  console.log(`from challenge.verify - action - authedstate ${authedstate} - clientState ${clientState}`);
+  console.log(areq, "the auth request");
   if (clientState !== authedstate) {
     let errmsg = JSON.stringify("State verification failed.");
     return new Response(errmsg, {
@@ -46,15 +46,17 @@ export async function action({ request, context, params }: ActionArgs) {
   }
 
   const refreshtoken = await getrefreshtoken(transaction, request, context);
+
   if (refreshtoken != false) {
-    await User.findBy("discord_user_id", discord_user_id, DB);
-    const userExists = (
-      await User.findBy("discord_user_id", discord_user_id, DB)
-    ).length;
+
+
+    const userExists = (await User.findBy("discord_user_id", discord_user_id, DB)).length;
+    console.log(`from challenge.verify - action - userExists ${userExists}`)
     const accesstoken = await getaccesstoken(refreshtoken, request, context);
-    if (accesstoken) {
-      const { payload } = jwt.decode(refreshtoken);
-      await User.findBy("discord_user_id", discord_user_id, DB)
+    if (accesstoken){
+    const { payload } = jwt.decode(refreshtoken)
+      console.log('chk2 in auth.ts function')
+      console.log(await User.findBy('discord_user_id', discord_user_id, DB))
 
       // If user does not exist, create it
       if (!userExists) {
@@ -66,13 +68,13 @@ export async function action({ request, context, params }: ActionArgs) {
           },
         });
       } else {
+    
         const user = await User.findBy("discord_user_id", discord_user_id, DB);
-        if (!payload.exp) return;
         user[0].stellar_access_token = accesstoken;
         user[0].stellar_refresh_token = refreshtoken;
-        user[0].stellar_expires_at = payload.exp.toString();
+        user[0].stellar_expires_at = (payload.exp).toString();
         user[0].public_key = transaction.source;
-        console.log(await User.update(user[0], DB))
+        console.log(await User.update(user[0], DB));
       }
 
       let responsetext = JSON.stringify({ token: accesstoken });

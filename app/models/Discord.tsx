@@ -68,6 +68,7 @@ description_localizations?	dictionary with keys in available locales	translation
     env: any
   ) {
 
+    console.log(`pushMetadata - metadata: ${metadata}`)
     // GET/PUT /users/@me/applications/:id/role-connection
     const url = `https://discord.com/api/v10/users/@me/applications/${env.DISCORD_CLIENT_ID}/role-connection`;
     // const accessToken = await getAccessToken(discord_user_id, data);

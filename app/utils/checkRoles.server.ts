@@ -7,7 +7,8 @@ export async function checkRoles(context: any, publickey: string, discord_user_i
     await fetch(`${server}/accounts/${publickey}`)
   ).json();
   const balances: Horizon.BalanceLine[] = account.balances;
-
+  
+  console.log(`checkRoles - balances -  ${balances} `)
   //todo: get the roles and assets from the kv store
   let theAssets: Array<Array<string>> = [
     //todo: store this as an envvar
@@ -21,6 +22,7 @@ export async function checkRoles(context: any, publickey: string, discord_user_i
   function updateMetadata(role: string) {
     switch (role) {
       case "defaultrole":
+        console.log(`checkRoles - updateMetadata -  found defaultrole`)
         metadata.defaultrole = 1;
     }
   }
