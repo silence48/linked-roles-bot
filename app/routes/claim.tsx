@@ -61,12 +61,21 @@ export default function Claim() {
     }
   }, []);
 
+  React.useEffect(() => {
+    if (fetcher.data) {
+      const { ok } = fetcher.data;
+      if (ok) {
+        console.log('Role updated successfuly')
+      } else {
+        console.log('Something went role while updating the role')
+      }
+    }
+  }, [fetcher])
+  
   const claimKey = async ({ xdr }: any) => {
     const wc = new WalletClient(provider, "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
-    console.log("horizonResult in claim", horizonResult);
     if (horizonResult.successful) {
-      console.log('opensuccess')
       openModal({ type: 'tx_success', content: horizonResult })
 
       if (fetcher.state === "idle" && fetcher.data == null) {
