@@ -11,8 +11,12 @@ export const loader = async ({ context, request }: LoaderArgs) => {
     throw("there is no metadata something is broken")
   }
   try{
-    const md = await checkRoles(context, payload.sub, discord_user_id)
-    return md;
+    const md = await checkRoles(context, payload.sub, discord_user_id) as any;
+    if (md.defaultrole === 1) {
+      return json({ ok: true })
+    } else {
+      return json({ ok: false })
+    }
   }catch{
     return json({ ok: false, error: "something is borked with the discord api" });
   }
