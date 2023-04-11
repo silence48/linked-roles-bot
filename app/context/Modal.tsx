@@ -2,7 +2,7 @@ import React, { type ReactElement, type FunctionComponent } from 'react';
 import { useTheme } from './Theme'
 import { Modal as ModalComponent } from 'communi-design-system';
 import { Challenge } from '~/templates/Challenge';
-
+import { TxSuccess } from '~/templates/TxSuccess';
 type ModalProviderProps = { children: ReactElement }
 type ModalContextType = {
   isOpen: boolean;
@@ -26,6 +26,8 @@ const modalAssert = (action: { type: string; content: any }) => {
   switch (action.type) {
     case 'challenge':
       return <Challenge content={action.content} />
+    case 'tx_success':
+      return <TxSuccess content={action.content} />
     default:
       return <></>;
   }
