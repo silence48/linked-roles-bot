@@ -125,10 +125,10 @@ const Rabet = ({ openModal }: any) => {
 };
 
 const options = [
-  {
-    name: "Albedo",
-    icon: "albedo",
-  },
+  // {
+  //   name: "Albedo",
+  //   icon: "albedo",
+  // },
   {
     name: "Rabet",
     icon: "rabet",
@@ -184,12 +184,12 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
           width: "100%",
         }}
       >
-        <Layout variant="large">
+        <Layout variant="tiny">
           <div className="flex items-center h-screen">
             <div className="bg-neutral-300 rounded-[20px] p-[40px] w-full ">
               <div className="flex flex-col">
                 <div className="flex flex-row w-full">
-                  <div className="flex-1">
+                  {/* <div className="flex-1">
                     <IconHeading text="Wallet Connect" icon="walletConnect" />
                     <div className="text-paragraph-medium-medium ">
                       Scan the QR with your phone from a wallet app
@@ -198,13 +198,13 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     <div className="flex flex-col items-center my-8" style={{height: '300px'}}>
                       <WalletConnect openModal={openModal} />
                     </div>
-                  </div>
+                  </div> */}
                   <div className="flex-1">
                     <IconHeading text="Extensions" icon="extensions" />
                     <div className="text-paragraph-medium-medium ">
                       Other login options to login from your browser
                     </div>
-                    <div >
+                    <div className="my-8">
                     <div className="flex flex-col space-y-4">
                       {view === "" ? (
                         <>
