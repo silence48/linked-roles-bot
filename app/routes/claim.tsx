@@ -9,39 +9,41 @@ import { useFetcher, useLoaderData } from "@remix-run/react";
 import { checkRoles } from "~/utils/checkRoles.server";
 import { verifyAndRenewAccess } from "~/utils/auth.server";
 import { generateDefaultClaimTransaction } from "~/utils/stellarUtils.server";
-import jwt from '@tsndr/cloudflare-worker-jwt';
+import jwt from "@tsndr/cloudflare-worker-jwt";
 
 export const loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
-  const Env = context.env;
-  //console.log(Env)
+  const { DB } = context.env as any;
   const { authsigningkey } = context.env as any;
-  const { isAuthed, isClaimed, provider, token: accesstoken } = (await getUser(request, sessionStorage)) ?? {}; //todo: error handling or make this more clear
-  
-  if (typeof isAuthed == 'undefined' || typeof accesstoken == 'undefined') {
-    return redirect('/')
+  const {
+    isAuthed,
+    isClaimed,
+    provider,
+    token: accesstoken,
+  } = (await getUser(request, sessionStorage)) ?? {}; //todo: error handling or make this more clear
+
+  if (typeof isAuthed == "undefined" || typeof accesstoken == "undefined") {
+    return redirect("/");
   }
   //todo: verifyAndRenewAccess, and make that update the users jwt when necessary.
   let validity = jwt.verify(accesstoken, authsigningkey);
-  console.log(accesstoken, "ACCESSTOKEN")
   const { payload } = jwt.decode(accesstoken);
-  
+
   const { userid } = payload;
-  console.log(payload, "PAYLOAD")
-  console.log(userid, "DISCORD USER ID")
-  console.log(await User.findBy("discord_user_id", userid, Env.DB));
-  const public_key = payload.sub as string
+  console.log(payload, "PAYLOAD");
+  console.log(userid, "DISCORD USER ID");
+  console.log(await User.findBy("discord_user_id", userid, DB));
+  const public_key = payload.sub as string;
   //todo:check if the user ever claimed the asset even if the balance is 0, as they can only claim once
   //todo: make it an authonly asset or make that an option in the asset creation.
   //todo: isClaimed should be in the d1 users object somewhere, or something like that.
 
+  var isOwned = false;
+  let claim = "";
+  var roles = await checkRoles(context, public_key, userid);
 
-  var isOwned = false
-  let claim = ''
-  var roles = await checkRoles(context, public_key, userid )
-
-  if (roles?.defaultrole == 0 ) {
-    claim = await generateDefaultClaimTransaction(context, public_key) ?? ''
+  if (roles?.defaultrole == 0) {
+    claim = (await generateDefaultClaimTransaction(context, public_key)) ?? "";
   }
   return json({ xdr: claim, isClaimed, provider });
 
@@ -49,7 +51,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 };
 
 export default function Claim() {
-  const { closeModal, isOpen } = useModal();
+  const { closeModal, isOpen, openModal } = useModal();
   const { xdr, isClaimed, provider } = useLoaderData() ?? {};
   const fetcher = useFetcher();
 
@@ -62,8 +64,11 @@ export default function Claim() {
   const claimKey = async ({ xdr }: any) => {
     const wc = new WalletClient(provider, "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
-    console.log("horizonResult in claim", horizonResult)
-    if (horizonResult.success) {
+    console.log("horizonResult in claim", horizonResult);
+    if (horizonResult.successful) {
+      console.log('opensuccess')
+      openModal({ type: 'tx_success', content: horizonResult })
+
       if (fetcher.state === "idle" && fetcher.data == null) {
         fetcher.load(`/check_roles`);
       }
@@ -82,35 +87,37 @@ export default function Claim() {
         width: "100%",
       }}
     >
-      <Layout>
+      <Layout variant="small">
         <div className="flex items-center h-screen">
           <div
-            className="bg-neutral-100 rounded-md p-[20px]"
-            style={{ height: "min-content", width: "100%" }}
+            className="bg-neutral-100 rounded-[40px]"
+            style={{ height: "min-content", width: "100%", padding: '20px 40px 20px 40px', marginLeft: '80px', marginRight: '80px' }}
           >
             {/* {!isClaimed ? */}
-              <>
+            <>
               <div className="text-h4-normal-semi-bold text-center">
-              Membership Key
-            </div>
-            <img
-              alt="key"
-              style={{
-                height: "340px",
-                borderRadius: "20px",
-                margin: "0 auto",
-              }}
-              src="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/fd46e53f-a572-43e3-6994-db20e5723a00/public"
-            />
-            <Button
-              text="Claim"
-              customCss="w-full mt-[40px]"
-              onClick={() => claimKey({ xdr })}
-            />
-            <div
-            className="text-paragraph-medium-medium text-center mt-[20px]"
-            >This key will give you access to the discord server</div>
-              </>
+                Membership Key
+              </div>
+              <img
+                alt="key"
+                style={{
+                  height: "340px",
+                  borderRadius: "20px",
+                  margin: "0 auto",
+                }}
+                src="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/fd46e53f-a572-43e3-6994-db20e5723a00/public"
+              />
+              {xdr && (
+                <Button
+                  text="Claim"
+                  customCss="w-full mt-[40px]"
+                  onClick={() => claimKey({ xdr })}
+                />
+              )}
+              <div className="text-paragraph-medium-medium text-center mt-[20px]">
+                This key will give you access to the discord server
+              </div>
+            </>
             {/* :
             <>
             <div
@@ -118,7 +125,6 @@ export default function Claim() {
             >You already own the membership key</div>
             </>
             } */}
-            
           </div>
         </div>
       </Layout>
