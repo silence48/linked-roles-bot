@@ -11,7 +11,9 @@ type ChallengeProps = {
 };
 
 export const Challenge: React.FC<ChallengeProps> = ({ content }) => {
+  
   const { public_key, provider } = content as any;
+  
   const fetcher = useFetcher();
   const payload = useFetcher();
 

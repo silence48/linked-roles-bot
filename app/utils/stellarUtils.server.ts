@@ -45,6 +45,7 @@ export async function generateAuthChallenge(
 }
 
 export async function generateDefaultClaimTransaction(context, userPublicKey) {
+  console.log("generateDefaultClaimTransaction")
   try{
       let serverseqnumber = await getSequenceNumber(context, context.env.botpubkey);    
       let serverAccount = new Account(context.env.botpubkey, serverseqnumber);
@@ -75,6 +76,7 @@ export async function generateDefaultClaimTransaction(context, userPublicKey) {
   transaction.sign(serverKeypair);
 
   const xdr = transaction.toXDR();
+  console.log(`generateDefaultClaimTransaction - xdr -  ${xdr} `)
   return xdr;
 
   }catch(err){
