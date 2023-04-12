@@ -71,12 +71,12 @@ export default function Claim() {
       }
     }
   }, [fetcher])
-  
+
   const claimKey = async ({ xdr }: any) => {
     const wc = new WalletClient(provider, "TESTNET");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
     if (horizonResult.successful) {
-      openModal({ type: 'tx_success', content: horizonResult })
+      openModal({ type: 'tx_success', content: horizonResult, padding: 'large' })
 
       if (fetcher.state === "idle" && fetcher.data == null) {
         fetcher.load(`/check_roles`);
