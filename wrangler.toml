@@ -4,9 +4,9 @@ compatibility_date = "2022-04-05"
 compatibility_flags = ["streams_enable_constructors"]
 
 kv_namespaces = [
-    { binding = "SESSION_STORAGE", id = "3e72ac9816ab45909c493267dac88d1b", preview_id = "51bb79ab719b4271aedc5f9556beec8d" },
-    { binding = "TOMLKEYS", id = "20aae67ac807482098ad13f1ca7e4337", preview_id = "fb2d0cdb0c9c4f1986221338ece1b44d" },
-    { binding = "ROLEDATA", id = "0f5933381b0a43a8b658b912f0c6a984", preview_id = "7de201d67bbc4da8a5b96fbf10f05b79" }
+    { binding = "SESSION_STORAGE", id = "363e26122ea845ba9bcbaed2e3062303", preview_id = "98bea1cc343443a680126ff80cab6ec1" },
+    { binding = "TOMLKEYS", id = "1850521f66d04f3086b5a1d3605f2828", preview_id = "edcc3a2094314732bb790a03c975126b" },
+    { binding = "ROLEDATA", id = "accd0dc2ff9d4e7284b7319157e5c87e", preview_id = "25f342cc635e4f949b4e7cd882a5e55e" }
 ]
 [site]
   bucket = "./public"
@@ -15,4 +15,4 @@ kv_namespaces = [
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "SDBDATA"
-database_id = "8a4b3992-9618-4a2e-b948-c39b4290e922"
+database_id = "2809820a-48a3-4e76-aeb5-5aa87a913cd3"
