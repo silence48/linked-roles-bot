@@ -1,7 +1,7 @@
 // routes/delink.tsx
 
-import { ActionFunction, json, redirect } from "@remix-run/cloudflare";
-import { fetchRegisteredAccounts, getAccessToken, generateProofs } from "./_index";
+import { type ActionFunction, redirect } from "@remix-run/cloudflare";
+import { fetchRegisteredAccounts, generateProofs } from "../utils/sqproof";
 
 // Define your action function
 export const action: ActionFunction = async ({ request, context }) => {

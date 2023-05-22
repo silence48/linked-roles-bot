@@ -1,8 +1,8 @@
 /* eslint-disable no-dupe-keys */
 import type { LoaderFunction, LoaderArgs } from "@remix-run/cloudflare";
 import { parse } from "cookie";
-import { UserForm, AccountForm } from "~/forms";
-import { Discord, User, Account } from "~/models";
+import { UserForm } from "~/forms";
+import { Discord, User } from "~/models";
 import { createUserSession } from "~/utils/session.server";
 
 export interface Env {

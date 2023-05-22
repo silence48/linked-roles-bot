@@ -1,3 +1,4 @@
+import { Horizon } from 'horizon-api';
 import {
   Account,
   TransactionBuilder,

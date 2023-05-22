@@ -2,9 +2,9 @@
 import { badgeDetails } from '../utils/badge-details';
 import { ActionFunction, json, redirect, LoaderArgs } from "@remix-run/cloudflare";
 import styled from "@emotion/styled";
-import { fetchRegisteredAccounts, generateProofs } from "./_index";
+import { fetchRegisteredAccounts, generateProofs } from "../utils/sqproof";
 import {fetchOperations} from "../utils/sqproof";
-import { Page, Container } from "~/routes/_index";
+import { Page, Container } from "~/components";
 import { useLoaderData } from '@remix-run/react';
 
 // Define your action function

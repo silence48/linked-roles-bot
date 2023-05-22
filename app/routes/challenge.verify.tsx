@@ -1,5 +1,5 @@
 import { TransactionBuilder, Networks } from "stellar-base";
-import { json, type ActionArgs } from "@remix-run/cloudflare";
+import { type ActionArgs } from "@remix-run/cloudflare";
 import { parse } from "cookie";
 import { updateUserSession, getUser } from "~/utils/session.server";
 import { User, StellarAccount } from "../models";
@@ -21,11 +21,11 @@ export async function action({ request, context, params }: ActionArgs) {
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   let areq = {
     Transaction: signedEnvelope,
-    NETWORK_PASSPHRASE: Networks.TESTNET,
+    NETWORK_PASSPHRASE: Networks.PUBLIC,
     discord_user_id: discord_user_id
   };
   const { Transaction, NETWORK_PASSPHRASE } = areq;
-  let passphrase: Networks = Networks.TESTNET;
+  let passphrase: Networks = Networks.PUBLIC;
   if (NETWORK_PASSPHRASE) {
     passphrase = NETWORK_PASSPHRASE;
   }

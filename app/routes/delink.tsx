@@ -1,6 +1,6 @@
-import { ActionFunction, json, redirect } from "@remix-run/cloudflare";
-import { fetchRegisteredAccounts, getAccessToken, generateProofs } from "./_index";
-import { User, StellarAccount } from "../models";
+import { type ActionFunction, redirect } from "@remix-run/cloudflare";
+import { fetchRegisteredAccounts } from "../utils/sqproof";
+import { StellarAccount } from "../models";
 // Define your action function
 export const action: ActionFunction = async ({ request, context }) => {
   const { sessionStorage } = context as any;

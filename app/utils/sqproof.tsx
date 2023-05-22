@@ -1,9 +1,55 @@
-import { Networks } from 'stellar-base';
+import { Networks, TransactionBuilder } from 'stellar-base';
 import { handleResponse } from './scfapi';
-import { badgeDetails, seriesFourIssuers } from './badge-details';
+import { badgeDetails } from './badge-details';
 import jwt from "@tsndr/cloudflare-worker-jwt";
-import { getrefreshtoken, getaccesstoken } from "~/utils/auth.server";
 import { Horizon } from 'horizon-api';
+import { Discord, StellarAccount } from '~/models';
+import { getUser } from './session.server';
+
+export async function fetchRegisteredAccounts(request: Request, context: any) {
+  const { DB } = context.env as any;
+  const { discord_user_id } = await getUser(request, context.sessionStorage);
+  const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
+  return stellarAccounts;
+}
+export async function getAccessToken(account: string, request: Request, context: any) {
+  const { DB } = context.env as any;
+  const { discord_user_id } = await getUser(request, context.sessionStorage);
+  const record = await StellarAccount.findBy("public_key", account, DB);
+  return record[0].refresh_token;
+}
+export async function generateProofs(request: Request, context: any, accounts: string[]) {
+  const { sessionStorage } = context as any;
+  const user = await getUser(request, sessionStorage);
+  const { discord_user_id } = user ?? false;
+
+  const proofs = [];
+  var totalSorobanQuestCodes = 0;
+  var totalStellarQuestCodes = 0;
+  for (const account of accounts) {
+    const accesstoken = await getAccessToken(account, request, context);
+    const decoded = await jwt.decode(accesstoken)
+    let passphrase: Networks = Networks.PUBLIC;
+    let transaction = new (TransactionBuilder.fromXDR as any)(decoded.payload.xdr, passphrase);
+    const signature = transaction.signatures[0].signature().toString("base64");
+    const token = await getVerificationToken(account, 'production', transaction, signature);
+    proofs.push(token);
+    totalSorobanQuestCodes += token.soroban.length;
+    totalStellarQuestCodes += token.userBadges.length;
+  }
+  console.log(proofs, 'THE PROOFS')
+
+  const metadata = {
+    sorobanquest: totalSorobanQuestCodes,
+    stellarquest: totalStellarQuestCodes
+  };
+
+  console.log(metadata, 'metadata')
+  const pushed = await Discord.pushMetadata(discord_user_id, metadata, context.env);
+  console.log(pushed, "PUSHED")
+
+  return proofs;
+}
 
 export async function generateVerificationHash(verificationObject: any) {
   let jsonString = JSON.stringify(verificationObject);
