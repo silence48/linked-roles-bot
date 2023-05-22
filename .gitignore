@@ -11,4 +11,7 @@ tunnle
 .wrangler/state/d1/DB.sqlite3
 .wrangler
 .vscode
+file.session.sql
+utils/register_discord_metadata.ts
+utils/register_discord_metadata.mjs
 old

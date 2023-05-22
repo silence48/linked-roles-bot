@@ -64,7 +64,7 @@ description_localizations?	dictionary with keys in available locales	translation
   static async pushMetadata(
     discord_user_id: string,
     //todo: define the roles using the kv data.
-    metadata: {defaultrole: number},
+    metadata: any,
     env: any
   ) {
 

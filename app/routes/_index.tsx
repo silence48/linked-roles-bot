@@ -1,14 +1,31 @@
 //import { Button } from "communi-design-system";
 import styled from "@emotion/styled";
-
+import { Discord } from '~/models';
 import { TransactionBuilder, Networks } from "stellar-base";
 import { Link, useLoaderData } from "@remix-run/react";
-import { type LoaderArgs, json, type ActionFunction, redirect } from "@remix-run/cloudflare";
+import { type LoaderArgs, json } from "@remix-run/cloudflare";
 import { StellarAccount } from "../models";
 import { getUser } from "~/utils/session.server";
 import { getVerificationToken } from "~/utils/sqproof";
 import jwt from "@tsndr/cloudflare-worker-jwt";
-import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2 } from 'react-icons/fi';
+import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
+
+const GridContainer = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  grid-gap: 10px;
+  overflow-x: auto;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+`;
+const TableContainer = styled.div`
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: auto;
+`;
 
 const Table = styled.table`
   width: 100%;
@@ -33,7 +50,7 @@ const TableCell = styled.td`
   border: 1px solid #ddd;
   padding: 8px;
 `;
-const Page = styled.div`
+export const Page = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
@@ -41,14 +58,17 @@ const Page = styled.div`
   background-color: #1A202C;
 `;
 
-const Container = styled.div`
+export const Container = styled.div`
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 42rem;
+  max-width: 50rem;
   padding: 2.5rem;
   margin: 2rem;
   border-radius: 0.375rem;
   box-shadow: 0 1px 3px 0 #1A202C, 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   background-color: #F7FAFC;
+  height: 80vh;
 `;
 
 const AccountContainer = styled.div`
@@ -67,7 +87,7 @@ const ProofContainer = styled.div`
   margin-bottom: 0.5rem;
   background-color: #EDF2F7;
   overflow: auto;
-  max-height: 200px;
+  max-height: 650px;
   overflow-wrap: anywhere;
 `;
 
@@ -127,7 +147,13 @@ export async function getAccessToken(account: string, request: Request, context:
   return record[0].refresh_token;
 }
 export async function generateProofs(request: Request, context: any, accounts: string[]) {
+  const { sessionStorage } = context as any;
+  const user = await getUser(request, sessionStorage);
+  const { discord_user_id } = user ?? false;
+
   const proofs = [];
+  var totalSorobanQuestCodes = 0;
+  var totalStellarQuestCodes = 0;
   for (const account of accounts) {
     console.log('account', account)
     const accesstoken = await getAccessToken(account, request, context);
@@ -140,8 +166,20 @@ export async function generateProofs(request: Request, context: any, accounts: s
     const signature = transaction.signatures[0].signature().toString("base64");
     const token = await getVerificationToken(account, 'production', transaction, signature);
     proofs.push(token);
+    totalSorobanQuestCodes += token.soroban.length;
+    totalStellarQuestCodes += token.userBadges.length;
   }
   console.log(proofs, 'THE PROOFS')
+
+  const metadata = {
+    sorobanquest: totalSorobanQuestCodes,
+    stellarquest: totalStellarQuestCodes
+  };
+
+  console.log(metadata, 'metadata')
+  const pushed = await Discord.pushMetadata(discord_user_id, metadata, context.env);
+  console.log(pushed, "PUSHED")
+
   return proofs;
 }
 
@@ -162,11 +200,13 @@ export let loader = async ({ request, context }: LoaderArgs) => {
 
 export default function Index() {
   const { discord_user_id, accounts, proofs } = useLoaderData();
-
+  const copyToClipboard = (token) => {
+    navigator.clipboard.writeText(token);
+  };
   // Render proofs if they are available
   let renderProofs = null;
   if (proofs) {
-    renderProofs = proofs.map((proof, index) => <p key={index}>{proof}</p>);
+    renderProofs = true;
   }
 
   return (
@@ -228,33 +268,48 @@ export default function Index() {
           </div>
         }
 
-{renderProofs &&
-    <div className="overflow-auto">
-        <h3 className="text-center mb-4">Generated Proofs:</h3>
-        {proofs.map((proofObj, index) =>
-            <ProofContainer key={index}>
-                <p>{proofObj.Proof}</p>
+        {renderProofs &&
+          <div className="overflow-auto">
+            <h3 className="text-center mb-4">Generated Proofs:</h3>
+
+            {proofs.map((proofObj, index) =>
+              <ProofContainer key={index}>
                 <p>User Badges:</p>
-                <Table>
+                <GridContainer>
+                  {proofObj.userBadges.map((badge, badgeIndex) => (
+                    <div key={badgeIndex}>
+                      {badge.code}
+                    </div>
+                  ))}
+                </GridContainer>
+                <p>Soroban:</p>
+                <GridContainer>
+                  {proofObj.soroban.map((badge, badgeIndex) => (
+                    <div key={badgeIndex}>
+                      {badge.code}
+                    </div>
+                  ))}
+                </GridContainer>
+                <TableContainer>
+                  <Table>
                     <thead>
-                        <TableRow>
-                            <TableHeader>User Badge Code</TableHeader>
-                            <TableHeader>Soroban Code</TableHeader>
-                        </TableRow>
+                      <TableRow>
+                        <TableHeader>Token <IconButton onClick={() => copyToClipboard(proofObj.token)}>
+                          <FiClipboard />  </IconButton>
+                        </TableHeader>
+                      </TableRow>
                     </thead>
                     <tbody>
-                        {proofObj.userBadges.map((badge, badgeIndex) => (
-                            <TableRow key={badgeIndex}>
-                                <TableCell>{badge.code}</TableCell>
-                                <TableCell>{proofObj.soroban.code}</TableCell>
-                            </TableRow>
-                        ))}
+                      <TableRow>
+                        <TableCell>{proofObj.token}</TableCell>
+                      </TableRow>
                     </tbody>
-                </Table>
-            </ProofContainer>
-        )}
-    </div>
-}
+                  </Table>
+                </TableContainer>
+              </ProofContainer>
+            )}
+          </div>
+        }
       </Container>
     </Page>
   );
