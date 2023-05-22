@@ -153,7 +153,7 @@ export async function getVerificationToken(
     let finalArray = new Array(JSON.stringify(verificationObject), hash);
     let token = Buffer.from(finalArray.join(',')).toString('base64');
     console.log(token)
-    return token;
+    return {token, userBadges, soroban};
   }
 
   

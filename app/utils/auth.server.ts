@@ -117,6 +117,8 @@ export async function getaccesstoken(refreshtoken, request, context){
   return accesstoken
 };
 
+
+//this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){

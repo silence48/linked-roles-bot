@@ -3,7 +3,7 @@ import { getUser } from "~/utils/session.server";
 import { generateAuthChallenge } from '~/utils/stellarUtils.server';
 import { Keypair } from "stellar-base";
 
-// URL: /challenge/$public_key
+// URL: /challenge/$public_key 
 export const loader = async ({ request, context, params }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const { publicKey } = params

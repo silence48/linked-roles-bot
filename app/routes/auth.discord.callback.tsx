@@ -38,7 +38,7 @@ export const loader: LoaderFunction = async ({
           "content-type": "application/json;charset=UTF-8",
         },
       });
-    }
+    } 
 
     const discordTokens: any = await Discord.getOAuthTokens(code, context.env);
 
