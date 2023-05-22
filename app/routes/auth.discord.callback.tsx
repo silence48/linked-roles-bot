@@ -1,8 +1,8 @@
 /* eslint-disable no-dupe-keys */
 import type { LoaderFunction, LoaderArgs } from "@remix-run/cloudflare";
 import { parse } from "cookie";
-import { UserForm } from "~/forms";
-import { Discord, User } from "~/models";
+import { UserForm, AccountForm } from "~/forms";
+import { Discord, User, Account } from "~/models";
 import { createUserSession } from "~/utils/session.server";
 
 export interface Env {
@@ -69,6 +69,7 @@ export const loader: LoaderFunction = async ({
         })
       );
       await User.create(userForm, DB);
+      //if the user already exists is the else statement
     } else {
       const discord_expires_at = (Date.now() + expires_in * 1000).toString();
       
@@ -88,7 +89,7 @@ export const loader: LoaderFunction = async ({
         discord_user_id,
         clientState
       },
-      { redirectTo: "/connect" }
+      { redirectTo: "/" }
     );
   } catch (e) {
     console.log(e);

@@ -61,8 +61,8 @@ export async function getrefreshtoken(transaction, request, context){
   console.log('trying to make a refresh token')
  // console.log(transaction)
   const decoder = new TextDecoder();
-  const userid =   decoder.decode(transaction.operations[1].value)
-  console.log('userid', userid)
+  const userid = decoder.decode(transaction.operations[1].value)
+  console.log(`making a refresh token for userid: ${userid}` )
   const jti = decoder.decode(transaction.operations[0].value)
   console.log(jti, 'JTI')
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){

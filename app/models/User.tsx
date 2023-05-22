@@ -9,11 +9,7 @@ const userSchema: SchemaConfigI = new Schema({
     { name: 'discord_user_id', type: 'string' },
     { name: 'discord_access_token', type: 'string' },
     { name: 'discord_refresh_token', type: 'string' },
-    { name: 'stellar_access_token', type: 'string' },
-    { name: 'stellar_refresh_token', type: 'string' },
     { name: 'discord_expires_at', type: 'string' },
-    { name: 'stellar_expires_at', type: 'string' },
-    { name: 'public_key', type: 'string'}
   ],
 })
 
