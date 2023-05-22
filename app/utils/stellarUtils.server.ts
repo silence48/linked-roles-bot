@@ -19,7 +19,7 @@ export async function generateAuthChallenge(
   let transaction = new TransactionBuilder(tempAccount, {
     fee: BASE_FEE,
     //todo: set the passphrase programatically based on an envvar
-    networkPassphrase: Networks.TESTNET,
+    networkPassphrase: Networks.PUBLIC,
   })
     // add a payment operation to the transaction
     .addOperation(
@@ -55,7 +55,7 @@ export async function generateDefaultClaimTransaction(context, userPublicKey) {
       const defaultRole = new Asset("defaultrole", serverPublicKey);
   const transaction = new TransactionBuilder(serverAccount, {
     fee: BASE_FEE,
-    networkPassphrase: Networks.TESTNET, // Use Networks.PUBLIC for the mainnet
+    networkPassphrase: Networks.PUBLIC, // Use Networks.PUBLIC for the mainnet
   })
     .addOperation(
       Operation.changeTrust({

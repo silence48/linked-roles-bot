@@ -92,7 +92,7 @@ export async function getaccesstoken(refreshtoken, request, context){
     throw('the token is not valid')
   }
   const { payload } = jwt.decode(refreshtoken) // decode the refresh token
-  let passphrase = Networks.TESTNET
+  let passphrase = Networks.PUBLIC
   console.log('trying to get an access token')
   const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   //let transaction = payload.xdr
