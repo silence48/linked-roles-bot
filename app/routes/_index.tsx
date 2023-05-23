@@ -11,7 +11,13 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const user = await getUser(request, sessionStorage);
   const { discord_user_id } = user ?? false;
-  const accounts = await fetchRegisteredAccounts(request, context);
+  var accounts;
+  if (discord_user_id) {
+    accounts = await fetchRegisteredAccounts(request, context);
+  }else{
+    accounts = []
+  }
+  
 
   // Get the session and then get proofs from session
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
