@@ -16,4 +16,5 @@ kv_namespaces = [
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "SDBDATA"
+
 database_id = "2809820a-48a3-4e76-aeb5-5aa87a913cd3"
