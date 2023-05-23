@@ -54,7 +54,8 @@ export const loader: LoaderFunction = async ({
     const userExists = (
       await User.findBy("discord_user_id", discord_user_id, DB)
     ).length;
-
+    console.log(userExists)
+    console.log(JSON.stringify(userExists))
     // // If user does not exist, create it
     if (!userExists) {
       const userForm = new UserForm(
@@ -68,7 +69,8 @@ export const loader: LoaderFunction = async ({
           ).toString(),
         })
       );
-      await User.create(userForm, DB);
+      console.log(userForm)
+      console.log(await User.create(userForm, DB));
       //if the user already exists is the else statement
     } else {
       const discord_expires_at = (Date.now() + expires_in * 1000).toString();
