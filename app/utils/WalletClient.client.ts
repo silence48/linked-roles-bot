@@ -55,7 +55,7 @@ class WalletClient {
   private async submitTx(xdr: string) {
     const { network } = this
     const txThresholds = encodeURIComponent(xdr);
-    return await (await fetch(`https://horizon-testnet.stellar.org/transactions/`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: `tx=${txThresholds}` })).json()
+    return await (await fetch(`https://horizon.stellar.org/transactions/`, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' }, body: `tx=${txThresholds}` })).json()
   }
 
   private async signAlbedo(xdr: string, submit: boolean) {
@@ -71,6 +71,7 @@ class WalletClient {
 
   private async signFreighter(xdr: string, submit: boolean) {
     const { network } = this
+    console.log('in sign freighter the network is', network)
     const signed_envelope_xdr = await signTx(xdr, { network })
     if (submit) {
       const response = await this.submitTx(signed_envelope_xdr)

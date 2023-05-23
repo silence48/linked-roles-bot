@@ -10,7 +10,7 @@
     "typecheck": "tsc",
     "db:seeds": "npx wrangler d1 execute DB --file ./db/schema.sql",
     "db:seeds:local": "npx wrangler d1 execute DB --file ./db/schema.sql --local",
-    "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --local-protocol https"
+    "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol https"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
@@ -46,7 +46,7 @@
     "npm-run-all": "^4.1.5",
     "react-qrcode-logo": "latest",
     "typescript": "^4.9.5",
-    "wrangler": "^3.0.1"
+    "wrangler": "^2.2.1"
   },
   "engines": {
     "node": ">=16.15.1"

@@ -21,6 +21,7 @@ export async function createUserSession(
   resp?: RespI
 ) {
   const session = await sessionStorage.getSession();
+  console.log('from session.server', session)
   session.set("data", {
     ...sessionData,
   });

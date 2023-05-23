@@ -11,6 +11,7 @@ export const loader = async ({ request, context, params }: LoaderArgs) => {
   // Check if publicKey is a valid ED25519 address
   if (!publicKey) return;
   const { discord_user_id, clientState } = await getUser(request, sessionStorage)
+  console.log('challenge.$publickey loader', discord_user_id, clientState)
   const { authsigningkey } = context.env as any;
   const uri = new URL(request.url).origin
   let serverKeypair = Keypair.fromSecret(String(authsigningkey));

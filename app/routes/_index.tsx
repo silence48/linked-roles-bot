@@ -50,7 +50,7 @@ export default function Index() {
         }
 
         <div className="flex justify-center mb-4">
-          <Button as={Link} to="/verify" disabled={!!discord_user_id}>
+          <Button as={Link} to="/verify" /*disabled={!!discord_user_id}*/>
             <FiLink /> Connect with Discord
           </Button>
         </div>

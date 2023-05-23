@@ -25,7 +25,9 @@ export const Challenge: React.FC<ChallengeProps> = ({ content }) => {
   }, [fetcher]);
 
   const signChallenge = async ({ challenge }: any) => {
-    const wc = new WalletClient(provider, "TESTNET");
+    console.log('in sign challenge, this is the challenge', challenge)
+    const wc = new WalletClient(provider, "PUBLIC");
+    console.log(wc)
     const { signed_envelope_xdr }: any = await wc.signTransaction(
       challenge,
       false

@@ -12,6 +12,7 @@ export async function gatherTxSigners(transaction, signers) {
   const hashedSignatureBase = transaction.hash();
   const signersFound = new Set();
   for (const signer of signers) {
+    console.log(signers[signer])
     if (transaction.signatures.length === 0) {
       break;
     }
@@ -40,8 +41,9 @@ export async function verifyTxSignedBy(transaction, accountID) {
   try{
    //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
    const authInfo = getAccountAuthorization(transaction.source)
- 
+    console.log('verify tx signed by', transaction, accountID)
    const signedby = await gatherTxSigners(transaction, [accountID]) 
+   console.log(signedby, 'signed by')
    let comparelist = [accountID]
    for (let n in comparelist){
      for (let i in signedby){
@@ -96,7 +98,7 @@ export async function getaccesstoken(refreshtoken, request, context){
   console.log('trying to get an access token')
   const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   //let transaction = payload.xdr
- // console.log(ntransaction)
+  console.log('ntx', ntransaction)
   const decoder = new TextDecoder();
   console.log(ntransaction.operations[0].value)
   const userid =   decoder.decode(ntransaction.operations[1].value)
@@ -160,6 +162,7 @@ interface accountAuth{
 }
 
 export async function getAccountAuthorization(pubkey): Promise<accountAuth> {
+  console.log('getting account auth', pubkey)
   const horizonURL = "https://horizon.stellar.org";
   const url = horizonURL + "/accounts/" + pubkey;
   const init = {
@@ -168,8 +171,10 @@ export async function getAccountAuthorization(pubkey): Promise<accountAuth> {
     },
   };
   const response = await fetch(url, init);
+
   const json: any = await response.json()
-  console.log(json.thresholds)
-  console.log(json.signers)
+  //console.log('json', json)
+  console.log('json.thresholds', json.thresholds)
+  console.log('json.signers', json.signers)
   return {signers: json.signers, threasholds: json.thresholds}
 }
