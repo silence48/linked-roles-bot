@@ -19,13 +19,15 @@ export const loader: LoaderFunction = async ({
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     const { sessionStorage } = context as any;
     const { DB } = context.env as any;
+    console.log(DB, context.env)
+
     const cookies = request.headers.get("Cookie"); //the random id set on the first call to roles_link
     const url = new URL(request.url);
     const code = url.searchParams.get("code");
     const discordState = url.searchParams.get("state");
     console.log(`auth.discord.callback - loaderfunction - ${code}, ${cookies}, ${discordState}`)
     if (!cookies || !code || !discordState) return null;
-
+    console.log('it made it past line 27')
     const cookieHeader = parse(cookies);
     // make sure the state parameter exists
     const { clientState } = cookieHeader;
@@ -55,7 +57,7 @@ export const loader: LoaderFunction = async ({
       await User.findBy("discord_user_id", discord_user_id, DB)
     ).length;
     console.log(userExists)
-    console.log(JSON.stringify(userExists))
+    
     // // If user does not exist, create it
     if (!userExists) {
       const userForm = new UserForm(
