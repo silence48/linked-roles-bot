@@ -2,6 +2,7 @@ name = "stellar-discord-bot"
 
 compatibility_date = "2022-04-05"
 compatibility_flags = ["streams_enable_constructors"]
+usage_model="unbound"
 
 kv_namespaces = [
     { binding = "SESSION_STORAGE", id = "363e26122ea845ba9bcbaed2e3062303", preview_id = "98bea1cc343443a680126ff80cab6ec1" },

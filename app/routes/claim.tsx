@@ -73,7 +73,7 @@ export default function Claim() {
   }, [fetcher])
 
   const claimKey = async ({ xdr }: any) => {
-    const wc = new WalletClient(provider, "TESTNET");
+    const wc = new WalletClient(provider, "PUBLIC");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
     if (horizonResult.successful) {
       openModal({ type: 'tx_success', content: horizonResult, padding: 'large' })

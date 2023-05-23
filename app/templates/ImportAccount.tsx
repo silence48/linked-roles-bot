@@ -41,7 +41,7 @@ const WalletConnect = ({ openModal }: any) => {
           requiredNamespaces: {
             stellar: {
               methods: [WalletConnectMethods.SIGN],
-              chains: [WalletConnectChains.TESTNET],
+              chains: [WalletConnectChains.PUBLIC],
               events: [],
             },
           },
@@ -89,7 +89,7 @@ const WalletConnect = ({ openModal }: any) => {
 };
 
 const Albedo = ({ openModal }: any) => {
-  const wc = new WalletClient("albedo", "TESTNET");
+  const wc = new WalletClient("albedo", "PUBLIC");
   wc.getPublicKey().then(async (account: any) => {
     openModal({ type: 'challenge', content: { public_key: account.pubkey, provider: "albedo", padding: 'large' }});
   });
@@ -99,7 +99,7 @@ const Albedo = ({ openModal }: any) => {
 const Freighter = ({ openModal }: any) => {
   React.useEffect(() => {
     if (isConnected()) {
-      const wc = new WalletClient("freighter", "TESTNET");
+      const wc = new WalletClient("freighter", "PUBLIC");
       wc.getPublicKey().then(async (value: any) => {
         const public_key = await value();
         openModal({ type: 'challenge', content: { public_key, provider: "freighter", padding: 'large' }})
@@ -111,7 +111,7 @@ const Freighter = ({ openModal }: any) => {
 
 const Rabet = ({ openModal }: any) => {
   React.useEffect(() => {
-    const wc = new WalletClient("rabet", "TESTNET");
+    const wc = new WalletClient("rabet", "PUBLIC");
     // console.log('WC', wc)
     wc.getPublicKey().then(
       async (publicKey: any) => {

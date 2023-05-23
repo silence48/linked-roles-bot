@@ -1,10 +1,11 @@
 import { TransactionBuilder, Networks } from "stellar-base";
-import { json, type ActionArgs } from "@remix-run/cloudflare";
+import { type ActionArgs } from "@remix-run/cloudflare";
 import { parse } from "cookie";
 import { updateUserSession, getUser } from "~/utils/session.server";
-import { User } from "../models";
+import { User, StellarAccount } from "../models";
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { getrefreshtoken, getaccesstoken } from "~/utils/auth.server";
+import { AccountForm } from "~/forms";
 
 export async function action({ request, context, params }: ActionArgs) {
   const { sessionStorage } = context as any;
@@ -20,11 +21,11 @@ export async function action({ request, context, params }: ActionArgs) {
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   let areq = {
     Transaction: signedEnvelope,
-    NETWORK_PASSPHRASE: Networks.TESTNET,
+    NETWORK_PASSPHRASE: Networks.PUBLIC,
     discord_user_id: discord_user_id
   };
   const { Transaction, NETWORK_PASSPHRASE } = areq;
-  let passphrase: Networks = Networks.TESTNET;
+  let passphrase: Networks = Networks.PUBLIC;
   if (NETWORK_PASSPHRASE) {
     passphrase = NETWORK_PASSPHRASE;
   }
@@ -34,7 +35,7 @@ export async function action({ request, context, params }: ActionArgs) {
   const decoder = new TextDecoder();
   let authedstate = decoder.decode(transaction.operations[0].value);
   console.log(`from challenge.verify - action - authedstate ${authedstate} - clientState ${clientState}`);
-  console.log(areq, "the auth request");
+  console.log(`the auth request is ${JSON.stringify(areq)}`);
   if (clientState !== authedstate) {
     let errmsg = JSON.stringify("State verification failed.");
     return new Response(errmsg, {
@@ -48,17 +49,14 @@ export async function action({ request, context, params }: ActionArgs) {
   const refreshtoken = await getrefreshtoken(transaction, request, context);
 
   if (refreshtoken != false) {
-
-
     const userExists = (await User.findBy("discord_user_id", discord_user_id, DB)).length;
     console.log(`from challenge.verify - action - userExists ${userExists}`)
     const accesstoken = await getaccesstoken(refreshtoken, request, context);
     if (accesstoken){
     const { payload } = jwt.decode(refreshtoken)
       console.log('chk2 in auth.ts function')
-      console.log(await User.findBy('discord_user_id', discord_user_id, DB))
+      console.log(`the user table object is ${JSON.stringify(await User.findBy('discord_user_id', discord_user_id, DB))}`)
 
-      // If user does not exist, create it
       if (!userExists) {
         const errmsg = JSON.stringify("User does not exist.");
         return new Response(errmsg, {
@@ -68,13 +66,46 @@ export async function action({ request, context, params }: ActionArgs) {
           },
         });
       } else {
-    
         const user = await User.findBy("discord_user_id", discord_user_id, DB);
-        user[0].stellar_access_token = accesstoken;
-        user[0].stellar_refresh_token = refreshtoken;
-        user[0].stellar_expires_at = (payload.exp).toString();
-        user[0].public_key = transaction.source;
-        console.log(await User.update(user[0], DB));
+        const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
+        const userOwnedAccounts = stellarAccounts.length;
+        console.log(`the ${userOwnedAccounts} accounts are ${JSON.stringify(stellarAccounts)}`)    
+        let publickey = transaction.source;
+        console.log(`the publickey is ${publickey}`)
+        let accountRecord = await StellarAccount.findBy("public_key", publickey, DB);
+        console.log(`the accountRecord is ${JSON.stringify(accountRecord)}`)
+        // check if the account has already been registered to a different user.
+        if ( (accountRecord.length != 0) && (accountRecord[0].discord_user_id != discord_user_id)) {
+
+          //take other action like ban the user.
+          const errmsg = JSON.stringify("Account is owned by a different discord user!");
+          return new Response(errmsg, {
+            status: 403,
+            headers: {
+              "content-type": "application/json;charset=UTF-8",
+              },
+            });
+          };
+        // then update or create the registration.
+        if(accountRecord.length != 0) {
+        stellarAccounts[userOwnedAccounts].discord_user_id = discord_user_id;
+        stellarAccounts[userOwnedAccounts].public_key = publickey;
+        stellarAccounts[userOwnedAccounts].access_token = accesstoken;
+        stellarAccounts[userOwnedAccounts].refresh_token = refreshtoken;
+        console.log(await StellarAccount.update(stellarAccounts[userOwnedAccounts], DB));
+        } else {
+        const accountForm = new AccountForm(
+          new StellarAccount({
+            discord_user_id: discord_user_id,
+            public_key: publickey,
+            access_token: accesstoken,
+            refresh_token: refreshtoken,
+          })
+        );
+        console.log(`the accountForm is ${JSON.stringify(accountForm)}`)
+
+        console.log(await StellarAccount.create(accountForm, DB));
+
       }
 
       let responsetext = JSON.stringify({ token: accesstoken });
@@ -85,7 +116,7 @@ export async function action({ request, context, params }: ActionArgs) {
         request,
         sessionStorage,
         { isAuthed: true, token: accesstoken, provider },
-        { redirectTo: "/claim" }
+        { redirectTo: "/" }
       );
     }
   } else {
@@ -107,4 +138,5 @@ export async function action({ request, context, params }: ActionArgs) {
   // Generate JWT
 
   // Store as a Token
+}
 }

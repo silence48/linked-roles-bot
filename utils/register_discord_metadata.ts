@@ -18,10 +18,16 @@ const url = `https://discord.com/api/v10/applications/${DISCORD_CLIENT_ID}/role-
 
 const body = [
   {
-    "key":"defaultrole",
-    "name":"Default Role",
-    "description":"This Default Role grants access to the server and requires owning the defaultrole asset.",
-    "type":7
+    "key":"sorobanquest",
+    "name":"Soroban Quester",
+    "description":"This role is for the number of soroban quests completed.",
+    "type":2
+},
+{
+    "key":"stellarquest",
+    "name":"Stellar Quester",
+    "description":"This role is for the number of stellar quests completed.",
+    "type":2
 },
 ];
 

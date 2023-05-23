@@ -28,7 +28,7 @@
 
 //   const transaction = new TransactionBuilder(serverKeypair, {
 //     fee: BASE_FEE,
-//     networkPassphrase: Networks.TESTNET, // Use Networks.PUBLIC for the mainnet
+//     networkPassphrase: Networks.PUBLIC, // Use Networks.PUBLIC for the mainnet
 //   })
 //     .addOperation(
 //       Operation.changeTrust({

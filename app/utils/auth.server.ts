@@ -61,8 +61,8 @@ export async function getrefreshtoken(transaction, request, context){
   console.log('trying to make a refresh token')
  // console.log(transaction)
   const decoder = new TextDecoder();
-  const userid =   decoder.decode(transaction.operations[1].value)
-  console.log('userid', userid)
+  const userid = decoder.decode(transaction.operations[1].value)
+  console.log(`making a refresh token for userid: ${userid}` )
   const jti = decoder.decode(transaction.operations[0].value)
   console.log(jti, 'JTI')
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
@@ -92,7 +92,7 @@ export async function getaccesstoken(refreshtoken, request, context){
     throw('the token is not valid')
   }
   const { payload } = jwt.decode(refreshtoken) // decode the refresh token
-  let passphrase = Networks.TESTNET
+  let passphrase = Networks.PUBLIC
   console.log('trying to get an access token')
   const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   //let transaction = payload.xdr
@@ -117,6 +117,8 @@ export async function getaccesstoken(refreshtoken, request, context){
   return accesstoken
 };
 
+
+//this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
