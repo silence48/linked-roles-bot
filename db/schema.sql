@@ -31,3 +31,23 @@ CREATE TABLE metadata (
   description text,
   type number
 )
+
+DROP TABLE IF EXISTS balances;
+
+CREATE TABLE balances (  
+  id text PRIMARY KEY,
+  asset_id text,
+  account_id text,
+  balance text,
+  date_acquired text,
+  verified_ownership text,
+)
+
+DROP TABLE IF EXISTS cursor 
+
+CREATE TABLE cursor(
+  id text PRIMARY KEY,
+  url text,
+  cursor text,
+  query text,
+);

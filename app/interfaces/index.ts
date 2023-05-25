@@ -26,3 +26,25 @@ export interface StellarAccountsDataI{
 export interface StellarAccountsI extends Model {
   data: StellarAccountsDataI
 }
+
+export interface BalanceDataI {
+  id?: string
+  asset_id?: string
+  account_id?: string
+  balance?: string
+  date_acquired?: string
+  verified_ownership?: string
+}
+export interface BalanceI extends Model {
+  data: BalanceDataI
+}
+
+export interface CursorDataI {
+  id?: string
+  url?: string
+  cursor?: string
+  query?: string
+}
+export interface CursorI extends Model {
+  data: CursorDataI
+}

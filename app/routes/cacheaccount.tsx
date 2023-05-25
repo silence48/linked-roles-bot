@@ -6,32 +6,40 @@ import { fetchRegisteredAccounts, generateProofs } from "../utils/sqproof";
 import {fetchOperations} from "../utils/sqproof";
 import { Page, Container } from "~/components";
 import { useLoaderData } from '@remix-run/react';
+import { getOriginalPayees } from '../utils/sqproof';
+import {Balance} from "../models";
+import {BalanceForm} from "~/forms";
 
 // Define your action function
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
-  for (const badge in badgeDetails) {
-    console.log(badgeDetails[badge].issuer)
-    }
+  const {owners, nextcursor} = await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
+  const { DB } = context.env as any;
+
+  //for (const badge in badgeDetails) {
+
+  //  console.log(badgeDetails[badge].issuer)
+  //  }
   //const accountops = await fetchOperations(request, context, session.get("account"));
   // Redirect back to the root route ("/")
-  return json({ badgeDetails });
+  return json({ owners, nextcursor });
   
 };
 
 export default function Index() {
-    const { badgeDetails } = useLoaderData();
+
+    const { owners, nextcursor } = useLoaderData();
   
     return (
       <Page>
         <Container>
-          {Object.keys(badgeDetails).map((badgeKey) => {
-            const badge = badgeDetails[badgeKey];
+            <p>{nextcursor}</p>
+          {Object.keys(owners).map((pos) => {
+            const owner = owners[pos];
             return (
-              <div key={badgeKey}>
-                <h3>{badgeKey}</h3>
-                <p>Issuer: {badge.issuer}</p>
+              <div key={pos}>
+                <p>{owner.account_id}</p>
                 {/* Render other badge properties as needed */}
               </div>
             );

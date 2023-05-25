@@ -214,3 +214,60 @@ async function getPrizeTransaction(hash: string, env: any) {
   );
   return prizeRecord.length > 0 ? parseInt(prizeRecord[0].amount) : false;
 }
+export async function fetchPayments(
+  env: any,
+  issuer: string,
+) {
+  return fetch(
+    horizonUrl(env) +
+    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`,
+  ).then(handleResponse);
+}
+
+export async function getOriginalPayees(
+  env: any,
+  context: any,
+  issuer: any,
+  assetid: any,
+) {
+  let accountPayments: any  = [];
+  let owners: [{asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
+  let paymentResponse: any  = await fetchPayments(env, issuer);
+  if (paymentResponse.status === 404) {
+    return ;
+  }
+  //console.log('paymentResponse', paymentResponse._embedded.records)
+  let iter = 0
+  let needsNext = false
+  let nextcursor = "blank"
+  while (
+    paymentResponse.length % 200 === 0 ||
+    paymentResponse._embedded.records.length !== 0 
+  ) {
+    //handle extremely large accounts
+    console.log(iter, "iter")
+    if (iter > 1000){
+
+      needsNext = true;
+      nextcursor = paymentResponse['_links'].next.href
+      break}
+    accountPayments = accountPayments.concat(paymentResponse._embedded.records);
+    for (let record in paymentResponse._embedded.records){
+      if (paymentResponse._embedded.records[record].asset_code === assetid){
+        owners.push({asset_id: assetid, 
+                     account_id: paymentResponse._embedded.records[record].to,
+                     balance: paymentResponse._embedded.records[record].amount,
+                     date_acquired: paymentResponse._embedded.records[record].created_at,
+                    })
+      }
+    }
+    paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
+    iter += 1
+  }
+
+
+  //console.log('accountPayments', accountPayments)
+  //console.log('owners', owners)
+  console.log(nextcursor)
+  return { owners, nextcursor };
+}
