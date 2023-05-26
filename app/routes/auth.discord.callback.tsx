@@ -61,7 +61,7 @@ export const Callback: React.FC<CallbackProps> = ({}) => {
         { method: 'post', action: '/auth/discord/check' }
       );
     } else if (fetcher.data && fetcher.state === "idle") {
-      window.location.replace("/connect");
+      window.location.replace("/");
     }
     console.log("fetcher", fetcher)
   }, [code, clientState, fetcher])
