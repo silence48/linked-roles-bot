@@ -274,6 +274,7 @@ export namespace Horizon {
       OperationResponseType.payment,
       OperationResponseTypeI.payment
     > {
+    [x: string]: number;
     from: string;
     to: string;
     asset_type: AssetType;

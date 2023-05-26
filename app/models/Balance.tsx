@@ -15,7 +15,6 @@ const balancesSchema: SchemaConfigI = new Schema({
     ]
   })
   
-  
   export class Balance extends Model implements BalanceI {
     data: BalanceDataI
   

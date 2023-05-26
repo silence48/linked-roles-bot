@@ -239,7 +239,7 @@ export async function getOriginalPayees(
   //console.log('paymentResponse', paymentResponse._embedded.records)
   let iter = 0
   let needsNext = false
-  let nextcursor = "blank"
+  let nextcursor = ""
   while (
     paymentResponse.length % 200 === 0 ||
     paymentResponse._embedded.records.length !== 0 

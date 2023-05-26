@@ -5,6 +5,10 @@ import { getUser } from "~/utils/session.server";
 import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 import { Page, Container, GridContainer, TableContainer, Table, TableRow, TableCell, TableHeader, AccountContainer, ProofContainer, Button, IconButton, IconText } from "~/components";
 import { fetchRegisteredAccounts } from "~/utils/sqproof";
+//import { Button, IconButton, Link, Table, Tooltip } from "@stellar/design-system";
+
+
+
 
 // Define your loader function
 export let loader = async ({ request, context }: LoaderArgs) => {

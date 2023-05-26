@@ -1,4 +1,4 @@
-import { isEqual } from '../../helpers'
+//import { isEqual } from '../../helpers'
 import qrGenerator from 'qrcode-generator';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';

@@ -26,7 +26,7 @@ export class Discord {
       code,
       redirect_uri: env.DISCORD_REDIRECT_URI,
     });
-  
+    
     const response = await fetch(url, { method: 'POST', body: data, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
     return response.json()
   }

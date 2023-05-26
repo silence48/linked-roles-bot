@@ -43,7 +43,7 @@ export const loader: LoaderFunction = async ({
     } 
 
     const discordTokens: any = await Discord.getOAuthTokens(code, context.env);
-
+    console.log(`auth.discord.callback - loaderfunction - discordTokens ${JSON.stringify(discordTokens)}`);
     // 2. Uses the Discord Access Token to fetch the user profile
     const discordData: any = await Discord.getUserData(discordTokens);
     const discord_user_id = discordData.user.id;
