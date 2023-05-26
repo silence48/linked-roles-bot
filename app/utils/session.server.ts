@@ -1,37 +1,49 @@
 import { redirect, json } from "@remix-run/cloudflare";
 
 interface SessionI {
+  id?: string;
   discord_user_id?: string;
+  user?: any;
   token?: string;
   clientState?: string;
-  isAuthed?: boolean;
   metadata?: any;
   isClaimed?: boolean;
+  account?: string | null;
   provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
 }
 
-interface RespI {
-  redirectTo?: string
-  message?: string
+interface UserSessionResponseI {
+  redirectTo?: string;
+  message?: string;
 }
 
 export async function createUserSession(
   sessionStorage: Storage,
   sessionData: SessionI,
-  resp?: RespI
+  response?: UserSessionResponseI
 ) {
   const session = await sessionStorage.getSession();
-  console.log('from session.server', session)
   session.set("data", {
     ...sessionData,
   });
-  
-  if (!resp?.redirectTo) return;
-  return redirect(resp.redirectTo, {
-    headers: {
-      "Set-Cookie": await sessionStorage.commitSession(session),
-    },
-  });
+  const { message, redirectTo } = response ?? {};
+  const hasRedirect = Boolean(redirectTo) && typeof redirectTo === "string";
+
+  if (hasRedirect) {
+    return redirect(redirectTo, {
+      headers: {
+        "Set-Cookie": await sessionStorage.commitSession(session),
+      },
+    });
+  } else {
+    return json(
+      { message: message ? message : "Session Created" },
+      {
+        status: 200,
+        headers: { "Set-Cookie": await sessionStorage.commitSession(session) },
+      }
+    );
+  }
 }
 
 async function getUserSession(request: Request, sessionStorage: Storage) {
@@ -39,7 +51,10 @@ async function getUserSession(request: Request, sessionStorage: Storage) {
 }
 
 export async function getUser(request: Request, sessionStorage: Storage) {
+  console.log("sessionStorage", sessionStorage);
+
   const session = await getUserSession(request, sessionStorage);
+  console.log("session", session);
   return session.get("data");
 }
 
@@ -47,15 +62,16 @@ export async function updateUserSession(
   request: Request,
   sessionStorage: Storage,
   sessionData: SessionI,
-  { redirectTo, message}: RespI
+  { redirectTo, message }: UserSessionResponseI
 ) {
   let session = await getUser(request, sessionStorage);
   let newSession = await sessionStorage.getSession();
   newSession.set("data", {
-      ...session,
-      ...sessionData,
+    ...session,
+    ...sessionData,
   });
-  if (!!redirectTo) {
+  const hasRedirect = Boolean(redirectTo) && typeof redirectTo === "string";
+  if (hasRedirect) {
     return redirect(redirectTo, {
       headers: {
         "Set-Cookie": await sessionStorage.commitSession(newSession),
