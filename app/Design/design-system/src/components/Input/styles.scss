@@ -1,0 +1,40 @@
+@use "../../mixins.scss";
+
+.Input {
+  width: 100%;
+
+  &__container {
+    @include mixins.form-field-container;
+  }
+
+  &__wrapper {
+    @include mixins.form-field-wrapper;
+    flex: 1;
+    height: 100%;
+
+    @media (hover: hover) {
+      &:hover {
+        @include mixins.form-field-wrapper-hover;
+      }
+    }
+
+    input {
+      @include mixins.form-field-base;
+      @include mixins.form-field-focus;
+
+      &::placeholder {
+        color: var(--pal-text-tertiary);
+      }
+
+      @include mixins.form-field-disabled;
+    }
+  }
+
+  &--error {
+    @include mixins.form-field-wrapper-error(".Input__wrapper");
+  }
+
+  &--disabled {
+    @include mixins.form-field-wrapper-disabled(".Input__wrapper");
+  }
+}

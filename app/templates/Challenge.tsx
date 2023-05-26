@@ -1,7 +1,7 @@
 import React from "react";
 import { useFetcher } from "@remix-run/react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button } from "communi-design-system";
+import { Button } from "../components";
 
 type ChallengeProps = {
   content: {

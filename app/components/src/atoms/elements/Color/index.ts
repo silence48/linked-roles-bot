@@ -1,0 +1,1 @@
+export { ColorPallet } from './ColorPallet';

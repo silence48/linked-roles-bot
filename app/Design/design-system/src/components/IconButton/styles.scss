@@ -1,0 +1,62 @@
+@use "../../mixins.scss";
+
+.IconButton {
+  --IconButton-size: 1.25rem;
+
+  cursor: pointer;
+  height: var(--IconButton-size);
+  flex-shrink: 0;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity var(--anim-transition-default);
+
+  svg {
+    width: var(--IconButton-size);
+    height: var(--IconButton-size);
+    @include mixins.svg-color(var(--IconButton-color));
+  }
+
+  &__label {
+    color: var(--IconButton-color);
+    margin-right: 0.5rem;
+    font-weight: var(--font-weight-medium);
+    font-size: max(1rem, calc(var(--IconButton-size) * 0.75));
+  }
+
+  &--default {
+    --IconButton-color: var(--pal-text-secondary);
+  }
+
+  &--error {
+    --IconButton-color: var(--pal-error);
+  }
+
+  &--success {
+    --IconButton-color: var(--pal-success);
+  }
+
+  &--warning {
+    --IconButton-color: var(--pal-warning);
+  }
+
+  &--highlight {
+    --IconButton-color: var(--pal-brand-primary);
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: var(--opacity-disabled-button);
+  }
+}

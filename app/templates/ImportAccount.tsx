@@ -5,7 +5,7 @@ import {
   Loader,
   Layout,
   Icon,
-} from "communi-design-system";
+} from "../components/components";
 import { isConnected } from "@stellar/freighter-api";
 import { useFetcher } from "@remix-run/react";
 import { WalletClient } from "~/utils/WalletClient.client";

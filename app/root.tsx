@@ -7,7 +7,7 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
-import designStyle from 'communi-design-system/styles/index.css';
+import designStyle from './css/index.css';
 import { ModalProvider } from '~/context';
 
 export const meta: MetaFunction = () => ({
