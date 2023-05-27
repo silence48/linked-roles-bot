@@ -20,7 +20,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   for (const badge in badgeDetails) {
     await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code );
   //  console.log(badgeDetails[badge].issuer)
-    }
+  }
   //const accountops = await fetchOperations(request, context, session.get("account"));
   // Redirect back to the root route ("/")
   return json({ owners, nextcursor });

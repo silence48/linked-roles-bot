@@ -1,4 +1,4 @@
-import { Form } from 'model-one'
+import { Form } from '../models/model-one'
 import { CursorI } from '../interfaces'
 import Joi from 'joi'
 

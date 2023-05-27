@@ -1,5 +1,5 @@
-import { Model, Schema } from 'model-one'
-import type { SchemaConfigI } from 'model-one';
+import { Model, Schema } from './model-one'
+import type { SchemaConfigI } from './model-one';
 import { UserI, UserDataI } from '../interfaces/'
 
 const userSchema: SchemaConfigI = new Schema({

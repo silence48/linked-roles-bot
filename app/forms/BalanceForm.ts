@@ -1,4 +1,4 @@
-import { Form } from 'model-one'
+import { Form } from '../models/model-one'
 import { BalanceI } from '../interfaces'
 import Joi from 'joi'
 

@@ -17,4 +17,4 @@ kv_namespaces = [
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
 database_name = "SCFDBDATA"
-database_id = "ac6c1f8b-b9e9-4309-ad63-6ff3c151f936"
+database_id = "6120043f-d1e6-409f-850a-6892e3257253"

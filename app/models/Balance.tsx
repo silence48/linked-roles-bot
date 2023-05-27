@@ -1,5 +1,5 @@
-import { Model, Schema } from 'model-one'
-import type { SchemaConfigI } from 'model-one';
+import { Model, Schema } from './model-one'
+import type { SchemaConfigI } from './model-one';
 import { BalanceI, BalanceDataI } from '../interfaces/'
 
 
