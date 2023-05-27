@@ -360,21 +360,21 @@ export async function getOriginalPayees(
         })
       }
     }
-    const maxParametersPerStatement = 100; // d1 limit
-     const parametersPerRecord = 9; // number of parameters in your record
-     const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
-    //const chunkSize = 99; // Change this to fit the actual number of parameters per record
+    //const maxParametersPerStatement = 100; // d1 limit
+     //const parametersPerRecord = 9; // number of parameters in your record
+     //const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
+    const chunkSize = 9; // Change this to fit the actual number of parameters per record
 
 
     for (let i = 0; i < balanceForms.length; i += chunkSize) {
       const chunk = balanceForms.slice(i, i + chunkSize);
       //console.log(chunk, 'chunk');
-      const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
+      const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
 
-      const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.balance_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
+      const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
 
       const preparedStatement = DB.prepare(`
-        INSERT OR IGNORE INTO balances (id, tx_id, balance_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
+        INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
       //console.log(preparedStatement.D1PreparedStatement.params.length, "preparedStatement.length")
