@@ -8,6 +8,7 @@ import { getUser } from './session.server';
 import {Balance, Cursor } from '~/models';
 import {BalanceForm, CursorForm} from '~/forms';
 import { Model } from '~/models/model-one';
+import { exist } from 'joi';
 
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
@@ -218,14 +219,32 @@ async function getPrizeTransaction(hash: string, env: any) {
   );
   return prizeRecord.length > 0 ? parseInt(prizeRecord[0].amount) : false;
 }
+async function fetchWithRetry(url, retries = 3, delay = 500) {
+  try {
+    const response = await fetch(url);
+    if (response.status !== 503) {
+      return response;
+    }
+    throw new Error('Service Unavailable');
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`Retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchWithRetry(url, retries - 1, delay * 2);
+    } else {
+      throw error;
+    }
+  }
+}
+
 export async function fetchPayments(
   env: any,
   issuer: string,
 ) {
-  return fetch(
-    horizonUrl(env) +
-    `/accounts/${issuer}/payments?limit=100&order=desc&include_failed=false`,
-  ).then(handleResponse);
+  const url = horizonUrl(env) +
+    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`;
+  const response = await fetchWithRetry(url);
+  return handleResponse(response);
 }
 
 export async function getOriginalClaimants(
@@ -237,6 +256,7 @@ export async function getOriginalClaimants(
   const { DB } = context.env;
   return null
 }
+
 
 export async function getOriginalPayees(
   env: any,
@@ -252,9 +272,16 @@ export async function getOriginalPayees(
     return ;
   }
   //console.log('paymentResponse', paymentResponse._embedded.records)
+ // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
+ const stmt = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
+const existingRecords = await stmt.bind(issuer, assetid, ).all();
+
+//console.log(existingRecords, "existing records")
   let iter = 0
   let needsNext = false
   let nextcursor = "blank"
+  if (existingRecords>0){return {assetExists, nextcursor}}
+  const preparedStatements = [];
   while (
     paymentResponse.length % 100 === 0 ||
     paymentResponse._embedded.records.length !== 0 
@@ -270,23 +297,29 @@ export async function getOriginalPayees(
     let balanceForms = [];
     for (let record in paymentResponse._embedded.records){
       if (paymentResponse._embedded.records[record].asset_code === assetid){
+        const txid = paymentResponse._embedded.records[record].transaction_hash;
         const balanceid = paymentResponse._embedded.records[record].id;
-        const assetExists = (await Balance.findBy("asset_id", assetid, DB )).length;
-        if (assetExists){break}
-//       if (!assetExists){
+        const paymentExists = existingRecords.results.some((balance) => {
+          return balance.balance_id === balanceid;
+        });
+
+
+       if (!paymentExists){
           const balanceForm = new BalanceForm(
             new Balance({
+              tx_id: txid,
               balance_id: paymentResponse._embedded.records[record].id,
+              issuer_id: issuer,
               asset_id: assetid, 
               account_id: paymentResponse._embedded.records[record].to,
               balance: paymentResponse._embedded.records[record].amount,
               date_acquired: paymentResponse._embedded.records[record].created_at,
             })
           );
-    
+        console.log(balanceForms.length, "balance forms length")
         balanceForms.push(balanceForm);
         // await Balance.create(balanceForm, DB)
-       // }
+        }
 
         owners.push({asset_id: assetid, 
                      account_id: paymentResponse._embedded.records[record].to,
@@ -295,22 +328,35 @@ export async function getOriginalPayees(
                     })
       }
     }
-    const preparedStatements = balanceForms.map((form) => {
-      const { keys, values } = Model.deserializeData(form.data);  // Assuming Model is imported
+   // const maxParametersPerStatement = 100; // d1 limit
+   // const parametersPerRecord = 9; // number of parameters in your record
+   // const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
+    const chunkSize = 99; // Change this to fit the actual number of parameters per record
     
-      return DB.prepare(
-        `INSERT INTO balances (${keys}, created_at, updated_at)
-         VALUES(${values}, datetime('now'), datetime('now')) RETURNING *;`
-      );
-    });
-    //console.log(preparedStatements)
-    await DB.batch(preparedStatements);
+    
+    for (let i = 0; i < balanceForms.length; i += chunkSize) {
+      const chunk = balanceForms.slice(i, i + chunkSize);
+      
+      const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
+      
+      const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.balance_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
+    
+      const preparedStatement = DB.prepare(`
+        INSERT OR IGNORE INTO balances (id, tx_id, balance_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
+        VALUES ${valuesPlaceholders} RETURNING *;
+      `).bind(...values);
+      //console.log(preparedStatement.D1PreparedStatement.params.length, "preparedStatement.length")
+      preparedStatements.push(preparedStatement);
+    }
+    if (preparedStatements.length > 0){
+    console.log(preparedStatements.length, "preparedStatements.length")
+    console.log(preparedStatements)
+    }
 
-    
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
   }
-
+  await DB.batch(preparedStatements);
 
   //console.log('accountPayments', accountPayments)
   //console.log('owners', owners)

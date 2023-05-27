@@ -29,7 +29,9 @@ export interface StellarAccountsI extends Model {
 
 export interface BalanceDataI {
   id?: string
+  tx_id?: string
   balance_id?: string
+  issuer_id?: string
   asset_id?: string
   account_id?: string
   balance?: string

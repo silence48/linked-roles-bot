@@ -4,7 +4,9 @@ import Joi from 'joi'
 
 const schema = Joi.object({
   id: Joi.string(),
+  tx_id: Joi.string(),
   balance_id: Joi.string(),
+  issuer_id: Joi.string(),
   asset_id: Joi.string(),
   account_id: Joi.string(),
   balance: Joi.string(),

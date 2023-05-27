@@ -37,7 +37,9 @@ DROP TABLE IF EXISTS balances;
 
 CREATE TABLE balances (  
   id text PRIMARY KEY,
+  tx_id text,
   balance_id text,
+  issuer_id text,
   asset_id text,
   account_id text,
   balance text,
