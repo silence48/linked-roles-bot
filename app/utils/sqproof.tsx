@@ -224,7 +224,7 @@ export async function fetchPayments(
 ) {
   return fetch(
     horizonUrl(env) +
-    `/accounts/${issuer}/payments?limit=100&order=desc&include_failed=false`,
+    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`,
   ).then(handleResponse);
 }
 
@@ -271,9 +271,9 @@ export async function getOriginalPayees(
     for (let record in paymentResponse._embedded.records){
       if (paymentResponse._embedded.records[record].asset_code === assetid){
         const balanceid = paymentResponse._embedded.records[record].id;
-        //const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length;
-    
-       // if (!balanceExists){
+        const assetExists = (await Balance.findBy("asset_id", assetid, DB )).length;
+        if (assetExists){break}
+//       if (!assetExists){
           const balanceForm = new BalanceForm(
             new Balance({
               balance_id: paymentResponse._embedded.records[record].id,
