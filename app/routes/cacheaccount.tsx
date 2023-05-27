@@ -16,7 +16,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
   const {owners, nextcursor} = await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
   const { DB } = context.env as any;
-
+/*
   const claimable_balance_quests = badgeDetails.filter(object => object.code.startsWith('SQ04'));
   
   const cbPromises = claimable_balance_quests.map(async(object) => {
@@ -29,18 +29,18 @@ export let loader = async ({ request, context }: LoaderArgs) => {
      console.log(`${badge.code} is caching the payments.`);
      return result;
   })
-
- // for (const badge of badgeDetails) {
-   // await getOriginalPayees("production", context, badge.issuer, badge.code );
- // }
+*/
+  for (const badge of badgeDetails) {
+    await getOriginalPayees("production", context, badge.issuer, badge.code );
+  }
 
   //const accountops = await fetchOperations(request, context, session.get("account"));
   // Redirect back to the root route ("/")
-  let allowners = []
-  Promise.all(cbPromises)
-  Promise.all(payeePromises).then((values) => {
-    allowners.push(values)
-  })
+ // let allowners = []
+  //Promise.all(cbPromises)
+  //Promise.all(payeePromises).then((values) => {
+   // allowners.push(values)
+  //})
   return json({ owners, nextcursor });
   
 };
