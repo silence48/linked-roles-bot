@@ -14,7 +14,8 @@ import {BalanceForm} from "~/forms";
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
-  const {owners, nextcursor} = await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
+  const {owners, nextcursor} = {owners: [`one`, `two`], nextcursor: "blah"}
+  //await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
   const { DB } = context.env as any;
 /*
   const claimable_balance_quests = badgeDetails.filter(object => object.code.startsWith('SQ04'));

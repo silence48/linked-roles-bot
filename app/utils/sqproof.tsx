@@ -274,7 +274,7 @@ export async function getOriginalPayees(
   //console.log('paymentResponse', paymentResponse._embedded.records)
  // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
  const stmt = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
-const existingRecords = await stmt.bind(issuer, assetid, ).all();
+const existingRecords = await stmt.bind(issuer, assetid ).all();
 
 //console.log(existingRecords, "existing records")
   let iter = 0
