@@ -14,7 +14,7 @@ import {BalanceForm} from "~/forms";
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { sessionStorage } = context as any;
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
-  //const {owners, nextcursor} = {owners: [], nextcursor: "blah"}
+  const {owners, nextcursor} = {owners: [], nextcursor: "blah"}
   //await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
   const { DB } = context.env as any;
 /*
@@ -31,9 +31,9 @@ export let loader = async ({ request, context }: LoaderArgs) => {
      return result;
   })
 */
-let owners = []
+//let owners = []
   for (const badge in badgeDetails) {
-    owners.push(await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code ));
+    await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code );
   }
 
   //const accountops = await fetchOperations(request, context, session.get("account"));
