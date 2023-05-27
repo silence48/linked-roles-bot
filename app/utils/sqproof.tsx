@@ -224,7 +224,7 @@ export async function fetchPayments(
 ) {
   return fetch(
     horizonUrl(env) +
-    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`,
+    `/accounts/${issuer}/payments?limit=100&order=desc&include_failed=false`,
   ).then(handleResponse);
 }
 
@@ -256,7 +256,7 @@ export async function getOriginalPayees(
   let needsNext = false
   let nextcursor = "blank"
   while (
-    paymentResponse.length % 200 === 0 ||
+    paymentResponse.length % 100 === 0 ||
     paymentResponse._embedded.records.length !== 0 
   ) {
     //handle extremely large accounts
