@@ -33,7 +33,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
 */
 //let owners = []
   for (const badge in badgeDetails) {
-    await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code );
+      console.log(await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code ));
   }
 
   //const accountops = await fetchOperations(request, context, session.get("account"));

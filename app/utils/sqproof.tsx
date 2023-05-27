@@ -5,8 +5,8 @@ import jwt from "@tsndr/cloudflare-worker-jwt";
 import { Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
-import {Balance, Cursor } from '~/models';
-import {BalanceForm, CursorForm} from '~/forms';
+import { Balance, Cursor } from '~/models';
+import { BalanceForm, CursorForm } from '~/forms';
 import { Model } from '~/models/model-one';
 import { exist } from 'joi';
 
@@ -96,7 +96,7 @@ export async function fetchOperations(
 ) {
   return fetch(
     horizonUrl(env) +
-      `/accounts/${account}/operations?limit=200&order=desc&include_failed=false`,
+    `/accounts/${account}/operations?limit=200&order=desc&include_failed=false`,
   ).then(handleResponse);
 }
 
@@ -112,102 +112,102 @@ export async function fetchOperation(
 
 
 export async function getVerificationToken(
-    pubkey: string,
-    env: any,
-    message: any,
-    signature: any,
+  pubkey: string,
+  env: any,
+  message: any,
+  signature: any,
+) {
+  let accountOperations: any = [];
+  let opRes: any = await fetchOperations(env, pubkey);
+  if (opRes.status === 404) {
+    return;
+  }
+  console.log('opRes', opRes)
+  let iter = 0
+  while (
+    accountOperations.length % 200 === 0 ||
+    opRes._embedded.records.length !== 0
   ) {
-    let accountOperations: any  = [];
-    let opRes: any = await fetchOperations(env, pubkey);
-    if (opRes.status === 404) {
-      return ;
-    }
-    console.log('opRes', opRes)
-    let iter = 0
-    while (
-      accountOperations.length % 200 === 0 ||
-      opRes._embedded.records.length !== 0 
-    ) {
-      //handle extremely large accounts
-      if (iter> 1000){break}
-      accountOperations= accountOperations.concat(opRes._embedded.records);
-      opRes = await fetch(opRes['_links'].next.href).then(handleResponse);
-      iter += 1
-    }
-  
-    const badgePayments = accountOperations
-      .filter(
-        (item: any) => item.type === 'payment' && item.asset_type !== 'native',
-      )
-      .filter((item: any) =>
-        badgeDetails.find(
-          ({ code, issuer }) => item.asset_code === code && item.from === issuer,
-        ),
-      );
-  
-    const badgeOperations = accountOperations
-      .filter(
-        (item: any) =>
-          item.type === 'create_claimable_balance' &&
-          item.claimants.some((e: any) => e.destination === pubkey),
-      )
-      .filter((item: any) =>
-        badgeDetails.find(
-          ({ code, issuer }) =>
-            item.asset.split(':')[0] === code &&
-            item.asset.split(':')[1] === issuer,
-        ),
-      );
-  
-    let allBadges = await Promise.all(
-      badgeDetails.map(async (item) => {
-        let payment;
-        if (/^SSQ0[234]|SQ040[1-6]$/.test(item.code)) {
-          payment = badgeOperations.find(
-            ({ asset, source_account }: any) =>
-              item.code === asset.split(':')[0] &&
-              item.issuer === source_account &&
-              item.issuer === asset.split(':')[1],
-          );
-        } else {
-          payment = badgePayments.find(
-            ({ asset_code, from }: any) =>
-              item.code === asset_code && item.issuer === from,
-          );
-        }
-        if (!payment) return item;
-        return {
-          ...item,
-          owned: true,
-          date: new Date(payment.created_at).toISOString().split('T')[0],
-          hash: payment.transaction_hash,
-          operation: payment.id,
-          prize: await getPrizeTransaction(payment.transaction_hash, env),
-        };
-      }),
-    );
-    let userBadges = allBadges.filter((item) => item.owned === true);
-    console.log(userBadges)
-    let soroban = userBadges.filter((item) => item.soroban === true);
-    console.log(soroban)
-    console.log(soroban.length)
-    console.log('user badges - soroban badges', userBadges.length - soroban.length)
-    let verificationObject = {
-      p: pubkey,
-      m: message,
-      s: signature,
-      d: new Date(),
-      o: generateVerificationOperations(userBadges),
-    };
-  
-    const hash = await generateVerificationHash(verificationObject);
-    let finalArray = new Array(JSON.stringify(verificationObject), hash);
-    let token = Buffer.from(finalArray.join(',')).toString('base64');
-    console.log(token)
-    return {token, userBadges, soroban};
+    //handle extremely large accounts
+    if (iter > 1000) { break }
+    accountOperations = accountOperations.concat(opRes._embedded.records);
+    opRes = await fetch(opRes['_links'].next.href).then(handleResponse);
+    iter += 1
   }
 
-  
+  const badgePayments = accountOperations
+    .filter(
+      (item: any) => item.type === 'payment' && item.asset_type !== 'native',
+    )
+    .filter((item: any) =>
+      badgeDetails.find(
+        ({ code, issuer }) => item.asset_code === code && item.from === issuer,
+      ),
+    );
+
+  const badgeOperations = accountOperations
+    .filter(
+      (item: any) =>
+        item.type === 'create_claimable_balance' &&
+        item.claimants.some((e: any) => e.destination === pubkey),
+    )
+    .filter((item: any) =>
+      badgeDetails.find(
+        ({ code, issuer }) =>
+          item.asset.split(':')[0] === code &&
+          item.asset.split(':')[1] === issuer,
+      ),
+    );
+
+  let allBadges = await Promise.all(
+    badgeDetails.map(async (item) => {
+      let payment;
+      if (/^SSQ0[234]|SQ040[1-6]$/.test(item.code)) {
+        payment = badgeOperations.find(
+          ({ asset, source_account }: any) =>
+            item.code === asset.split(':')[0] &&
+            item.issuer === source_account &&
+            item.issuer === asset.split(':')[1],
+        );
+      } else {
+        payment = badgePayments.find(
+          ({ asset_code, from }: any) =>
+            item.code === asset_code && item.issuer === from,
+        );
+      }
+      if (!payment) return item;
+      return {
+        ...item,
+        owned: true,
+        date: new Date(payment.created_at).toISOString().split('T')[0],
+        hash: payment.transaction_hash,
+        operation: payment.id,
+        prize: await getPrizeTransaction(payment.transaction_hash, env),
+      };
+    }),
+  );
+  let userBadges = allBadges.filter((item) => item.owned === true);
+  console.log(userBadges)
+  let soroban = userBadges.filter((item) => item.soroban === true);
+  console.log(soroban)
+  console.log(soroban.length)
+  console.log('user badges - soroban badges', userBadges.length - soroban.length)
+  let verificationObject = {
+    p: pubkey,
+    m: message,
+    s: signature,
+    d: new Date(),
+    o: generateVerificationOperations(userBadges),
+  };
+
+  const hash = await generateVerificationHash(verificationObject);
+  let finalArray = new Array(JSON.stringify(verificationObject), hash);
+  let token = Buffer.from(finalArray.join(',')).toString('base64');
+  console.log(token)
+  return { token, userBadges, soroban };
+}
+
+
 async function getPrizeTransaction(hash: string, env: any) {
   let res = await fetch(
     horizonUrl(env) + '/transactions/' + hash + '/operations',
@@ -242,19 +242,19 @@ export async function fetchPayments(
   issuer: string,
   cursor?: string,
 ) {
-  if(cursor !== undefined){
+  if (cursor !== undefined) {
     const url = horizonUrl(env) +
-    `/accounts/${issuer}/payments?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
+      `/accounts/${issuer}/payments?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
     console.log(url)
-  const response = await fetchWithRetry(url);
-  return handleResponse(response);
-  }else{
+    const response = await fetchWithRetry(url);
+    return handleResponse(response);
+  } else {
     const url = horizonUrl(env) +
-    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`;
-  const response = await fetchWithRetry(url);
-  return handleResponse(response);
+      `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`;
+    const response = await fetchWithRetry(url);
+    return handleResponse(response);
   }
- 
+
 }
 
 export async function getOriginalClaimants(
@@ -279,31 +279,33 @@ export async function getOriginalPayees(
   SELECT * 
   FROM balances 
   WHERE issuer_id = ?1 AND asset_id = ?2 
-  ORDER BY created_at DESC 
+  ORDER BY date_acquired ASC 
   LIMIT 1
 `);
-let cursor;
-const lastrecord = await stmt.bind(issuer, assetid).all();
-if (lastrecord.results.length > 0) {
-  cursor = lastrecord.results[0].id;
-} else {
-  cursor = undefined
-}
+  let cursor;
+  const lastrecord = await stmt.bind(issuer, assetid).all();
+  console.log(lastrecord, "last record")
+  if (lastrecord.results.length > 0) {
+    cursor = lastrecord.results[0].id;
+    console.log(cursor, "cursor")
+  } else {
+    cursor = undefined
+  }
 
 
-//console.log(lastrecord.results, "last record")
-  let accountPayments: any  = [];
-  let owners: [{asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
-  let paymentResponse: any  = await fetchPayments(env, issuer, cursor);
+  //console.log(lastrecord.results, "last record")
+  let accountPayments: any = [];
+  let owners: [{ asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
+  let paymentResponse: any = await fetchPayments(env, issuer, cursor);
   if (paymentResponse.status === 404) {
-    return ;
+    return;
   }
   //console.log('paymentResponse', paymentResponse._embedded.records)
- // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
-// const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
-//const existingRecords = await stmt.bind(issuer, assetid).all();
+  // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
+  // const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
+  //const existingRecords = await stmt.bind(issuer, assetid).all();
 
-//console.log(existingRecords, "existing records")
+  //console.log(existingRecords, "existing records")
   let iter = 0
   let needsNext = false
   let nextcursor = "blank"
@@ -311,63 +313,65 @@ if (lastrecord.results.length > 0) {
   const preparedStatements = [];
   while (
     paymentResponse.length % 200 === 0 ||
-    paymentResponse._embedded.records.length !== 0 
+    paymentResponse._embedded.records.length !== 0
   ) {
     //handle extremely large accounts
     //console.log(iter, "iter")
-    if (iter > 100){
+    if (iter > 1000) {
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
-      break}
+      break
+    }
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
     //console.log(assetid, iter)
     let balanceForms = [];
-    for (let record in paymentResponse._embedded.records){
-      if (paymentResponse._embedded.records[record].asset_code === assetid){
+    for (let record in paymentResponse._embedded.records) {
+      if (paymentResponse._embedded.records[record].asset_code === assetid) {
         const txid = paymentResponse._embedded.records[record].transaction_hash;
         const balanceid = paymentResponse._embedded.records[record].id;
-       // const paymentExists = existingRecords.results.some((balance) => {
-      //    return balance.balance_id === balanceid;
-       // });
+        // const paymentExists = existingRecords.results.some((balance) => {
+        //    return balance.balance_id === balanceid;
+        // });
 
 
-    //   if (!paymentExists){
-          const balanceForm = new BalanceForm(
-            new Balance({
-              tx_id: txid,
-              balance_id: paymentResponse._embedded.records[record].id,
-              issuer_id: issuer,
-              asset_id: assetid, 
-              account_id: paymentResponse._embedded.records[record].to,
-              balance: paymentResponse._embedded.records[record].amount,
-              date_acquired: paymentResponse._embedded.records[record].created_at,
-            })
-          );
-        
+        //   if (!paymentExists){
+        const balanceForm = new BalanceForm(
+          new Balance({
+            tx_id: txid,
+            balance_id: paymentResponse._embedded.records[record].id,
+            issuer_id: issuer,
+            asset_id: assetid,
+            account_id: paymentResponse._embedded.records[record].to,
+            balance: paymentResponse._embedded.records[record].amount,
+            date_acquired: paymentResponse._embedded.records[record].created_at,
+          })
+        );
+
         balanceForms.push(balanceForm);
         // await Balance.create(balanceForm, DB)
         //}
 
-        owners.push({asset_id: assetid, 
-                     account_id: paymentResponse._embedded.records[record].to,
-                     balance: paymentResponse._embedded.records[record].amount,
-                     date_acquired: paymentResponse._embedded.records[record].created_at,
-                    })
+        owners.push({
+          asset_id: assetid,
+          account_id: paymentResponse._embedded.records[record].to,
+          balance: paymentResponse._embedded.records[record].amount,
+          date_acquired: paymentResponse._embedded.records[record].created_at,
+        })
       }
     }
-   // const maxParametersPerStatement = 100; // d1 limit
-   // const parametersPerRecord = 9; // number of parameters in your record
-   // const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
+    // const maxParametersPerStatement = 100; // d1 limit
+    // const parametersPerRecord = 9; // number of parameters in your record
+    // const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
     const chunkSize = 99; // Change this to fit the actual number of parameters per record
-    
-    
+
+
     for (let i = 0; i < balanceForms.length; i += chunkSize) {
       const chunk = balanceForms.slice(i, i + chunkSize);
-      
+
       const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
-      
+
       const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.balance_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
-    
+
       const preparedStatement = DB.prepare(`
         INSERT OR IGNORE INTO balances (id, tx_id, balance_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
@@ -375,11 +379,11 @@ if (lastrecord.results.length > 0) {
       //console.log(preparedStatement.D1PreparedStatement.params.length, "preparedStatement.length")
       preparedStatements.push(preparedStatement);
     }
-    if (preparedStatements.length > 0){
-    //console.log(preparedStatements.length, "preparedStatements.length")
-    //console.log(preparedStatements)
+    if (preparedStatements.length > 0) {
+      //console.log(preparedStatements.length, "preparedStatements.length")
+      //console.log(preparedStatements)
     }
-
+    console.log(paymentResponse['_links'].next.href, "next")
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
   }
