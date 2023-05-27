@@ -59,7 +59,7 @@ class Model {
     this.schema = schema
   }
 
-  private static deserializeData(data: any): any {
+  static deserializeData(data: any): any {
     const { id }: { id: string | null } = data;
     if (!Boolean(id)) {
       const keys: string[] = ['id'];
@@ -85,7 +85,7 @@ class Model {
     }
   }
   
-  private static serializeData(data: any): any {
+  static serializeData(data: any): any {
     const { schema } = new this()
     let output: any = {};
     schema.columns.map((column: Column) => {
@@ -97,7 +97,18 @@ class Model {
     return result
   }
 
-  
+  static async batch({ data }: any, env: any) {
+    let { schema } = new this();
+    const { keys, values } = this.deserializeData(data)
+    const { results, success} = await env.prepare(
+      `INSERT INTO ${schema.table_name} (${keys}, created_at, updated_at)
+        VALUES(${values}, datetime('now'), datetime('now')) RETURNING *;`
+    )
+    if (success) {
+      return results.map((result: any) => this.serializeData(result))
+    }
+    return null
+  }
 
   static async create({ data }: any, env: any) {
     let { schema } = new this();

@@ -7,6 +7,7 @@ import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
 import {Balance, Cursor } from '~/models';
 import {BalanceForm, CursorForm} from '~/forms';
+import { Model } from '~/models/model-one';
 
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
@@ -227,6 +228,16 @@ export async function fetchPayments(
   ).then(handleResponse);
 }
 
+export async function getOriginalClaimants(
+  env: any,
+  context: any,
+  issuer: any,
+  assetid: any,
+) {
+  const { DB } = context.env;
+  return null
+}
+
 export async function getOriginalPayees(
   env: any,
   context: any,
@@ -256,25 +267,27 @@ export async function getOriginalPayees(
       break}
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
     console.log(assetid, iter)
+    let balanceForms = [];
     for (let record in paymentResponse._embedded.records){
-      
       if (paymentResponse._embedded.records[record].asset_code === assetid){
-        const balanceid = paymentResponse._embedded.records[record].id
-        const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length
-        //console.log(balanceExists, paymentResponse._embedded.records[record].created_at)
+        const balanceid = paymentResponse._embedded.records[record].id;
+        const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length;
+    
         if (!balanceExists){
-        const balanceForm = new BalanceForm(
-          new Balance({
-            balance_id: paymentResponse._embedded.records[record].id,
-            asset_id: assetid, 
-            account_id: paymentResponse._embedded.records[record].to,
-            balance: paymentResponse._embedded.records[record].amount,
-            date_acquired: paymentResponse._embedded.records[record].created_at,
-          })
-        )
-        //console.log(balanceForm)
-        await Balance.create(balanceForm, DB)
+          const balanceForm = new BalanceForm(
+            new Balance({
+              balance_id: paymentResponse._embedded.records[record].id,
+              asset_id: assetid, 
+              account_id: paymentResponse._embedded.records[record].to,
+              balance: paymentResponse._embedded.records[record].amount,
+              date_acquired: paymentResponse._embedded.records[record].created_at,
+            })
+          );
+    
+        balanceForms.push(balanceForm);
+        // await Balance.create(balanceForm, DB)
         }
+
         owners.push({asset_id: assetid, 
                      account_id: paymentResponse._embedded.records[record].to,
                      balance: paymentResponse._embedded.records[record].amount,
@@ -282,6 +295,18 @@ export async function getOriginalPayees(
                     })
       }
     }
+    const preparedStatements = balanceForms.map((form) => {
+      const { keys, values } = Model.deserializeData(form.data);  // Assuming Model is imported
+    
+      return DB.prepare(
+        `INSERT INTO balances (${keys}, created_at, updated_at)
+         VALUES(${values}, datetime('now'), datetime('now')) RETURNING *;`
+      );
+    });
+    //console.log(preparedStatements)
+    await DB.batch(preparedStatements);
+
+    
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
   }
