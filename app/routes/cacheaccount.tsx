@@ -36,6 +36,18 @@ const BadgeButton = styled.button`
   height: 80px;
 `;
 
+const AddressButton = styled.button`
+  padding: 10px;
+  background-color: #4F8A10;
+  color: white;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  border-radius: 8px;
+  font-size: 1em;
+  width: 300px;
+  height: 80px;
+`;
 const DetailModal = styled.div`
   position: fixed;
   top: 50%;
@@ -133,7 +145,7 @@ export default function Index() {
   };
 
   const handleAddressClick = async (address) => {
-    setSelectedBadge(address);
+    setSelectedBadge({"filename": address});
     setIsLoading(true);
     const response = await fetch(`/api/fetchaccount/${address}`);
     const data = await response.json();
@@ -151,7 +163,7 @@ export default function Index() {
       {selectedBadge && (
         <DetailModal>
           <CloseButton onClick={() => setSelectedBadge(null)}>x</CloseButton>
-          <h2>{selectedBadge.filename.substring(0, 12)}</h2>
+          <h2>{selectedBadge.filename.substring(0, 32)}</h2>
           {isLoading ? (
             <Spinner />  // display the spinner while isLoading is true
             ) : Data && Data.length > 0 ? (  // only try to map over Data if it's an array with length > 0
@@ -171,9 +183,9 @@ export default function Index() {
                 <DataRow key={index}>
                   <td>{record.id}</td>
                   <td>{record.tx_id}</td>
-                  <td><BadgeButton onClick={() => handleAddressClick(record.account_id)}>
+                  <td><AddressButton onClick={() => handleAddressClick(record.account_id)}>
                   {record.account_id}
-                    </BadgeButton></td>
+                    </AddressButton></td>
                   <td>{record.balance}</td>
                   <td>{record.date_acquired}</td>
                   <td>{record.verified_ownership}</td>
