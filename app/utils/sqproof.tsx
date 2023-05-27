@@ -261,7 +261,7 @@ export async function getOriginalPayees(
   ) {
     //handle extremely large accounts
     console.log(iter, "iter")
-    if (iter > 1000){
+    if (iter > 100){
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
       break}
