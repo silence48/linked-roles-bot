@@ -284,12 +284,13 @@ export async function getOriginalPayees(
 `);
   let cursor;
   const lastrecord = await stmt.bind(issuer, assetid).all();
-  console.log(lastrecord, "last record")
+  //console.log(lastrecord, "last record")
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "cursor")
   } else {
     cursor = undefined
+    console.log(`there is no cursor for ${issuer} ${assetid}`)
   }
 
 
@@ -359,15 +360,15 @@ export async function getOriginalPayees(
         })
       }
     }
-    // const maxParametersPerStatement = 100; // d1 limit
-    // const parametersPerRecord = 9; // number of parameters in your record
-    // const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
-    const chunkSize = 99; // Change this to fit the actual number of parameters per record
+    const maxParametersPerStatement = 100; // d1 limit
+     const parametersPerRecord = 9; // number of parameters in your record
+     const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
+    //const chunkSize = 99; // Change this to fit the actual number of parameters per record
 
 
     for (let i = 0; i < balanceForms.length; i += chunkSize) {
       const chunk = balanceForms.slice(i, i + chunkSize);
-
+      //console.log(chunk, 'chunk');
       const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
 
       const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.balance_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
@@ -383,7 +384,7 @@ export async function getOriginalPayees(
       //console.log(preparedStatements.length, "preparedStatements.length")
       //console.log(preparedStatements)
     }
-    console.log(paymentResponse['_links'].next.href, "next")
+   // console.log(paymentResponse['_links'].next.href, "next")
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
   }
