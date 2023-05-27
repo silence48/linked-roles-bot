@@ -240,11 +240,21 @@ async function fetchWithRetry(url, retries = 3, delay = 500) {
 export async function fetchPayments(
   env: any,
   issuer: string,
+  cursor?: string,
 ) {
-  const url = horizonUrl(env) +
+  if(cursor !== undefined){
+    const url = horizonUrl(env) +
+    `/accounts/${issuer}/payments?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
+    console.log(url)
+  const response = await fetchWithRetry(url);
+  return handleResponse(response);
+  }else{
+    const url = horizonUrl(env) +
     `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`;
   const response = await fetchWithRetry(url);
   return handleResponse(response);
+  }
+ 
 }
 
 export async function getOriginalClaimants(
@@ -265,9 +275,26 @@ export async function getOriginalPayees(
   assetid: any,
 ) {
   const { DB } = context.env;
+  const stmt = DB.prepare(`
+  SELECT * 
+  FROM balances 
+  WHERE issuer_id = ?1 AND asset_id = ?2 
+  ORDER BY created_at DESC 
+  LIMIT 1
+`);
+let cursor;
+const lastrecord = await stmt.bind(issuer, assetid).all();
+if (lastrecord.results.length > 0) {
+  cursor = lastrecord.results[0].id;
+} else {
+  cursor = undefined
+}
+
+
+//console.log(lastrecord.results, "last record")
   let accountPayments: any  = [];
   let owners: [{asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
-  let paymentResponse: any  = await fetchPayments(env, issuer);
+  let paymentResponse: any  = await fetchPayments(env, issuer, cursor);
   if (paymentResponse.status === 404) {
     return ;
   }
