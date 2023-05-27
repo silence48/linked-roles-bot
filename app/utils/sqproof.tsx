@@ -273,8 +273,8 @@ export async function getOriginalPayees(
   }
   //console.log('paymentResponse', paymentResponse._embedded.records)
  // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
- const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
-const existingRecords = await stmt.bind(issuer, assetid).all();
+// const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
+//const existingRecords = await stmt.bind(issuer, assetid).all();
 
 //console.log(existingRecords, "existing records")
   let iter = 0
@@ -287,7 +287,7 @@ const existingRecords = await stmt.bind(issuer, assetid).all();
     paymentResponse._embedded.records.length !== 0 
   ) {
     //handle extremely large accounts
-    console.log(iter, "iter")
+    //console.log(iter, "iter")
     if (iter > 100){
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
@@ -299,12 +299,12 @@ const existingRecords = await stmt.bind(issuer, assetid).all();
       if (paymentResponse._embedded.records[record].asset_code === assetid){
         const txid = paymentResponse._embedded.records[record].transaction_hash;
         const balanceid = paymentResponse._embedded.records[record].id;
-        const paymentExists = existingRecords.results.some((balance) => {
-          return balance.balance_id === balanceid;
-        });
+       // const paymentExists = existingRecords.results.some((balance) => {
+      //    return balance.balance_id === balanceid;
+       // });
 
 
-       if (!paymentExists){
+    //   if (!paymentExists){
           const balanceForm = new BalanceForm(
             new Balance({
               tx_id: txid,
@@ -319,7 +319,7 @@ const existingRecords = await stmt.bind(issuer, assetid).all();
         
         balanceForms.push(balanceForm);
         // await Balance.create(balanceForm, DB)
-        }
+        //}
 
         owners.push({asset_id: assetid, 
                      account_id: paymentResponse._embedded.records[record].to,
