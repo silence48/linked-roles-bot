@@ -280,7 +280,7 @@ const existingRecords = await stmt.bind(issuer, assetid, ).all();
   let iter = 0
   let needsNext = false
   let nextcursor = "blank"
-  if (existingRecords>0){return {assetExists, nextcursor}}
+  //if (existingRecords>0){return {assetExists, nextcursor}}
   const preparedStatements = [];
   while (
     paymentResponse.length % 100 === 0 ||
@@ -316,7 +316,7 @@ const existingRecords = await stmt.bind(issuer, assetid, ).all();
               date_acquired: paymentResponse._embedded.records[record].created_at,
             })
           );
-        console.log(balanceForms.length, "balance forms length")
+        
         balanceForms.push(balanceForm);
         // await Balance.create(balanceForm, DB)
         }
