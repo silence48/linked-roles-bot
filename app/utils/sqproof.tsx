@@ -271,9 +271,9 @@ export async function getOriginalPayees(
     for (let record in paymentResponse._embedded.records){
       if (paymentResponse._embedded.records[record].asset_code === assetid){
         const balanceid = paymentResponse._embedded.records[record].id;
-        const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length;
+        //const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length;
     
-        if (!balanceExists){
+       // if (!balanceExists){
           const balanceForm = new BalanceForm(
             new Balance({
               balance_id: paymentResponse._embedded.records[record].id,
@@ -286,7 +286,7 @@ export async function getOriginalPayees(
     
         balanceForms.push(balanceForm);
         // await Balance.create(balanceForm, DB)
-        }
+       // }
 
         owners.push({asset_id: assetid, 
                      account_id: paymentResponse._embedded.records[record].to,
