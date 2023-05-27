@@ -273,8 +273,8 @@ export async function getOriginalPayees(
   }
   //console.log('paymentResponse', paymentResponse._embedded.records)
  // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
- const stmt = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
-const existingRecords = await stmt.bind(issuer, assetid ).all();
+ const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
+const existingRecords = await stmt.bind(issuer, assetid).all();
 
 //console.log(existingRecords, "existing records")
   let iter = 0
@@ -283,7 +283,7 @@ const existingRecords = await stmt.bind(issuer, assetid ).all();
   //if (existingRecords>0){return {assetExists, nextcursor}}
   const preparedStatements = [];
   while (
-    paymentResponse.length % 100 === 0 ||
+    paymentResponse.length % 200 === 0 ||
     paymentResponse._embedded.records.length !== 0 
   ) {
     //handle extremely large accounts
@@ -293,7 +293,7 @@ const existingRecords = await stmt.bind(issuer, assetid ).all();
       nextcursor = paymentResponse['_links'].next.href
       break}
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
-    console.log(assetid, iter)
+    //console.log(assetid, iter)
     let balanceForms = [];
     for (let record in paymentResponse._embedded.records){
       if (paymentResponse._embedded.records[record].asset_code === assetid){
@@ -349,8 +349,8 @@ const existingRecords = await stmt.bind(issuer, assetid ).all();
       preparedStatements.push(preparedStatement);
     }
     if (preparedStatements.length > 0){
-    console.log(preparedStatements.length, "preparedStatements.length")
-    console.log(preparedStatements)
+    //console.log(preparedStatements.length, "preparedStatements.length")
+    //console.log(preparedStatements)
     }
 
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
