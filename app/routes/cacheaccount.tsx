@@ -17,10 +17,10 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   const {owners, nextcursor} = await getOriginalPayees("production", context, "GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO", "SQ0601" );
   const { DB } = context.env as any;
 
-  //for (const badge in badgeDetails) {
-
+  for (const badge in badgeDetails) {
+    await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code );
   //  console.log(badgeDetails[badge].issuer)
-  //  }
+    }
   //const accountops = await fetchOperations(request, context, session.get("account"));
   // Redirect back to the root route ("/")
   return json({ owners, nextcursor });

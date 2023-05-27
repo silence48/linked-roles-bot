@@ -1,20 +1,20 @@
-name = "stellar-discord-bot"
+name = "scf-discord-bot"
 
 compatibility_date = "2022-04-05"
 
 usage_model="unbound"
 
 kv_namespaces = [
-    { binding = "SESSION_STORAGE", id = "363e26122ea845ba9bcbaed2e3062303", preview_id = "98bea1cc343443a680126ff80cab6ec1" },
-    { binding = "TOMLKEYS", id = "1850521f66d04f3086b5a1d3605f2828", preview_id = "edcc3a2094314732bb790a03c975126b" },
-    { binding = "ROLEDATA", id = "accd0dc2ff9d4e7284b7319157e5c87e", preview_id = "25f342cc635e4f949b4e7cd882a5e55e" }
+    { binding = "SESSION_STORAGE", id = "8b7d15e78c0c42deb9fceb8b05190a7c", preview_id = "4bcd720d70ef4bd9ab1e0bd3b952305b" },
+    { binding = "TOMLKEYS", id = "b2b65162e00a4ac785aa0b77e8660df2", preview_id = "c5e77c42db1b402d92ae819117bcced3" },
+    { binding = "ROLEDATA", id = "5ca8bd87c38347119999a0f36f3097a2", preview_id = "6ba22652d4ab4170a406a2e26928ed9f" }
 ]
 [site]
   bucket = "./public"
 [build]
   command = "npm run build"
+
 [[ d1_databases ]]
 binding = "DB" # i.e. available in your Worker on env.DB
-database_name = "SDBDATA"
-
-database_id = "2809820a-48a3-4e76-aeb5-5aa87a913cd3"
+database_name = "SCFDBDATA"
+database_id = "ac6c1f8b-b9e9-4309-ad63-6ff3c151f936"

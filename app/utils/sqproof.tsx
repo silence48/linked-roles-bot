@@ -5,6 +5,9 @@ import jwt from "@tsndr/cloudflare-worker-jwt";
 import { Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
+import {Balance, Cursor } from '~/models';
+import {BalanceForm, CursorForm} from '~/forms';
+
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { DB } = context.env as any;
@@ -230,6 +233,7 @@ export async function getOriginalPayees(
   issuer: any,
   assetid: any,
 ) {
+  const { DB } = context.env;
   let accountPayments: any  = [];
   let owners: [{asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
   let paymentResponse: any  = await fetchPayments(env, issuer);
@@ -247,13 +251,30 @@ export async function getOriginalPayees(
     //handle extremely large accounts
     console.log(iter, "iter")
     if (iter > 1000){
-
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
       break}
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
+    console.log(assetid, iter)
     for (let record in paymentResponse._embedded.records){
+      
       if (paymentResponse._embedded.records[record].asset_code === assetid){
+        const balanceid = paymentResponse._embedded.records[record].id
+        const balanceExists = (await Balance.findBy("balance_id", balanceid, DB )).length
+        //console.log(balanceExists, paymentResponse._embedded.records[record].created_at)
+        if (!balanceExists){
+        const balanceForm = new BalanceForm(
+          new Balance({
+            balance_id: paymentResponse._embedded.records[record].id,
+            asset_id: assetid, 
+            account_id: paymentResponse._embedded.records[record].to,
+            balance: paymentResponse._embedded.records[record].amount,
+            date_acquired: paymentResponse._embedded.records[record].created_at,
+          })
+        )
+        //console.log(balanceForm)
+        await Balance.create(balanceForm, DB)
+        }
         owners.push({asset_id: assetid, 
                      account_id: paymentResponse._embedded.records[record].to,
                      balance: paymentResponse._embedded.records[record].amount,
@@ -268,6 +289,6 @@ export async function getOriginalPayees(
 
   //console.log('accountPayments', accountPayments)
   //console.log('owners', owners)
-  console.log(nextcursor)
+  //console.log(nextcursor)
   return { owners, nextcursor };
 }

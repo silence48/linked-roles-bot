@@ -10,6 +10,7 @@ CREATE TABLE users (
   created_at datetime,
   updated_at datetime
 );
+
 DROP TABLE IF EXISTS stellar_accounts;
 
 CREATE TABLE stellar_accounts (
@@ -30,24 +31,31 @@ CREATE TABLE metadata (
   name text,
   description text,
   type number
-)
+);
 
 DROP TABLE IF EXISTS balances;
 
 CREATE TABLE balances (  
   id text PRIMARY KEY,
+  balance_id text,
   asset_id text,
   account_id text,
   balance text,
   date_acquired text,
   verified_ownership text,
-)
+  deleted_at datetime,
+  created_at datetime,
+  updated_at datetime
+);
 
-DROP TABLE IF EXISTS cursor 
+DROP TABLE IF EXISTS cursor;
 
 CREATE TABLE cursor(
   id text PRIMARY KEY,
   url text,
   cursor text,
   query text,
+  deleted_at datetime,
+  created_at datetime,
+  updated_at datetime
 );

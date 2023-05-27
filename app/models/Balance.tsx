@@ -7,6 +7,7 @@ const balancesSchema: SchemaConfigI = new Schema({
     table_name: 'balances',
     columns: [
     { name: 'id', type: 'string' },
+    { name: 'balance_id', type: 'string' },
     { name: 'asset_id', type: 'string' },
     { name: 'account_id', type: 'string' },
     { name: 'balance', type: 'string' },
