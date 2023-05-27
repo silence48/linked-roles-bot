@@ -224,7 +224,7 @@ export async function fetchPayments(
 ) {
   return fetch(
     horizonUrl(env) +
-    `/accounts/${issuer}/payments?limit=200&order=desc&include_failed=false`,
+    `/accounts/${issuer}/payments?limit=100&order=desc&include_failed=false`,
   ).then(handleResponse);
 }
 
@@ -267,7 +267,7 @@ export async function getOriginalPayees(
       break}
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
     console.log(assetid, iter)
-  //  let balanceForms = [];
+    let balanceForms = [];
     for (let record in paymentResponse._embedded.records){
       if (paymentResponse._embedded.records[record].asset_code === assetid){
         const balanceid = paymentResponse._embedded.records[record].id;
@@ -284,8 +284,8 @@ export async function getOriginalPayees(
             })
           );
     
-        //balanceForms.push(balanceForm);
-         await Balance.create(balanceForm, DB)
+        balanceForms.push(balanceForm);
+        // await Balance.create(balanceForm, DB)
         }
 
         owners.push({asset_id: assetid, 
@@ -295,7 +295,7 @@ export async function getOriginalPayees(
                     })
       }
     }
-    /*const preparedStatements = balanceForms.map((form) => {
+    const preparedStatements = balanceForms.map((form) => {
       const { keys, values } = Model.deserializeData(form.data);  // Assuming Model is imported
     
       return DB.prepare(
@@ -305,7 +305,7 @@ export async function getOriginalPayees(
     });
     //console.log(preparedStatements)
     await DB.batch(preparedStatements);
-*/
+
     
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
