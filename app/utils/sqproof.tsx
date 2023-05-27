@@ -338,8 +338,8 @@ export async function getOriginalPayees(
         //   if (!paymentExists){
         const balanceForm = new BalanceForm(
           new Balance({
+            id: balanceid,
             tx_id: txid,
-            balance_id: paymentResponse._embedded.records[record].id,
             issuer_id: issuer,
             asset_id: assetid,
             account_id: paymentResponse._embedded.records[record].to,
@@ -371,7 +371,7 @@ export async function getOriginalPayees(
       //console.log(chunk, 'chunk');
       const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
 
-      const values = chunk.flatMap(form => [form.data.balance_id, form.data.tx_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
+      const values = chunk.flatMap(form => [form.data.id, form.data.tx_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
 
       const preparedStatement = DB.prepare(`
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
