@@ -25,26 +25,6 @@ const rotate = keyframes`
   }
 `;
 
-const BadgeWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 80px;
-  
-  @media (min-width: 600px) {
-    width: 180px;
-  }
-`;
-
-const BadgeImage = styled.img`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: 0;
-`;
-
 const Loader = styled.div`
   --Loader-color: var(--color-gray-80);
   --Loader-size: 1rem;
@@ -67,33 +47,81 @@ const LoaderInner = styled.div`
 `;
 
 const BadgeGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-  padding: 20px;
-  justify-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1vw;
   background-color: #2e2e32;
+  padding: 1vw;
+  width: 100%;
 
-  @media (min-width: 600px) {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  @media (max-width: 600px) {
+    justify-content: flex-start;
+    gap: 2vw;
   }
 `;
 
+
+const BadgeWrapper = styled.div`
+  flex: 1 0 20%;
+  min-width: 120px;
+  max-width: 240px;
+  margin: 1vw;
+`;
+
 const BadgeButton = styled.button`
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
-  padding: 10px;
-  background-color: rgba(99, 76, 201, 0.6);
-  color: white;
+  padding-bottom: 100%;
+  background-color: transparent;
   border: none;
   cursor: pointer;
+  overflow: hidden;
+  transition: background-color 0.3s;
+  background-image: url(/assets/badges/${props => props.badge.filename});
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(99, 76, 201, 0.8);
+      opacity: 0.7;
+      z-index: 1;
+    }
+  }
+`;
+
+const BadgeImage = styled.img`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+`;
+
+const BadgeLabel = styled.div`
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 8px;
   text-align: center;
-  border-radius: 8px;
-  font-size: 1em;
-  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  font-size: 14px;
 `;
 
 const AddressButton = styled.button`
@@ -277,15 +305,15 @@ export default function Index() {
 
     return (
         <BadgeGrid>
-            {badgeDetails.map((badge, index) => (
-                <BadgeWrapper key={index}>
-                    <BadgeButton onClick={() => handleBadgeClick(badge)}>
-                        {badge.filename.substring(0, 12)}
-                    </BadgeButton>
-                    <BadgeImage src={`/assets/badges/${badge.filename}`} alt={badge.filename} /> 
-                    {/* Note the leading slash indicating the file path is relative to the root directory */}
-                </BadgeWrapper>
-            ))}
+
+{badgeDetails.map((badge, index) => (
+    <BadgeWrapper key={index}>
+      <BadgeButton badge={badge} onClick={() => handleBadgeClick(badge)}>
+        <BadgeLabel>{badge.filename.substring(0, 12)}</BadgeLabel>
+      </BadgeButton>
+    </BadgeWrapper>
+  ))}
+
 
             {selectedBadge && (
                 <DetailModal>
