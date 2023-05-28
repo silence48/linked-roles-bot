@@ -1,6 +1,6 @@
 import { Networks, TransactionBuilder } from 'stellar-base';
 import { handleResponse } from './scfapi';
-import { badgeDetails } from './badge-details';
+import { badgeDetails, seriesFourIssuers } from './badge-details';
 import jwt from "@tsndr/cloudflare-worker-jwt";
 import { Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
@@ -264,6 +264,8 @@ export async function getOriginalClaimants(
   assetid: any,
 ) {
   const { DB } = context.env;
+
+
   return null
 }
 
