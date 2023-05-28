@@ -14,13 +14,43 @@ import { BalanceForm } from "~/forms";
 import React, { useState, useEffect } from 'react';
 //import { BadgeGrid, BadgeButton, DetailModal, CloseButton, DataTable, DataRow } from './styledComponents'; // import the styled components
 
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+`;
+
+const Loader = styled.div`
+  --Loader-color: var(--color-gray-80);
+  --Loader-size: 1rem;
+  position: relative;
+  width: var(--Loader-size);
+  height: var(--Loader-size);
+`;
+
+const LoaderInner = styled.div`
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: calc(var(--Loader-size) * 0.8);
+  height: calc(var(--Loader-size) * 0.8);
+  margin: calc(var(--Loader-size) * 0.1);
+  border: calc(var(--Loader-size) * 0.1) solid var(--Loader-color);
+  border-radius: 50%;
+  animation: ${rotate} 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: var(--Loader-color) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
+`;
+
 const BadgeGrid = styled.div`
   display: grid;
   grid-template-columns: 1fr;
   gap: 20px;
   padding: 20px;
   justify-items: center;
-  background-color: #F5F5F5;
+  background-color: #2e2e32;
 
   @media (min-width: 600px) {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -29,7 +59,7 @@ const BadgeGrid = styled.div`
 
 const BadgeButton = styled.button`
   padding: 10px;
-  background-color: #4F8A10;
+  background-color: #634cc9;
   color: white;
   border: none;
   cursor: pointer;
@@ -46,7 +76,7 @@ const BadgeButton = styled.button`
 
 const AddressButton = styled.button`
   padding: 10px;
-  background-color: #4F8A10;
+  background-color: #634cc9;
   color: white;
   border: none;
   cursor: pointer;
@@ -54,7 +84,6 @@ const AddressButton = styled.button`
   border-radius: 8px;
   font-size: 1em;
   width: 100%;
-  height: 80px;
   min-width: 200px;
 
   @media (min-width: 600px) {
@@ -118,7 +147,8 @@ const ResponsiveTableHeader = styled.thead`
 
 const DataRow = styled.tr`
   &:nth-child(even) {
-    background-color: #f2f2f2;
+    background-color: #2e2e32;
+    color: white;
   }
 
   @media (max-width: 600px), (orientation: portrait) {
@@ -155,14 +185,11 @@ const TableHeader = styled.th`
   }
 `;
 
-const rotate = keyframes`
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-`;
+
 
 const Spinner = styled.div`
-  border: 16px solid #f3f3f3;
-  border-top: 16px solid #3498db;
+  border: 16px solid  #ededef;
+  border-top: 16px solid #28282c;
   border-radius: 50%;
   width: 60px;
   height: 60px;
@@ -256,7 +283,7 @@ export default function Index() {
                   <DataRow key={index}>
                     <TableCell>{record.id}</TableCell>
                     <TableCell>{record.tx_id}</TableCell>
-                    <TableCell><AddressButton onClick={() => handleAddressClick(record.account_id)}>
+                    <TableCell><AddressButton variant="secondary" size="md" onClick={() => handleAddressClick(record.account_id)}>
                       {record.account_id}
                     </AddressButton></TableCell>
                     <TableCell>{record.balance}</TableCell>

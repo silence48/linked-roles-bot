@@ -27,6 +27,7 @@
     "joi": "^17.8.3",
     "model-one": "^0.0.7",
     "react": "^17",
+    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^17",
     "react-icons": "^4.8.0",
     "stellar-base": "^8.2.2"
