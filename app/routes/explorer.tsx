@@ -15,10 +15,21 @@ import React, { useState, useEffect } from 'react';
 
 //import { allBadges } from '../assets/badges/allBadges'; // import all the badges
 //import { BadgeGrid, BadgeButton, DetailModal, CloseButton, DataTable, DataRow } from './styledComponents'; // import the styled components
+const NavBar = styled.nav`
+  display: flex;
+
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #2B2A50;
+  color: #FFFFFF;
+`;
+
 const LeftContainer = styled.div`
   display: flex;
   align-items: center;
 `;
+
 const CenterContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -28,9 +39,10 @@ const CenterContainer = styled.div`
 
 const RightContainer = styled.div`
   display: flex;
+  justify-content: flex-end;
   align-items: center;
+  width: 100%;
 `;
-
 
 const LoginContainer = styled.div`
   display: flex;
@@ -38,7 +50,7 @@ const LoginContainer = styled.div`
   align-items: flex-start;
   margin-right: 1rem;
   height: 50px;
-  justify-content: space-between;
+  justify-content: flex-end;
 `;
 
 
@@ -61,15 +73,6 @@ const LoginButton = styled.button`
   &:hover {
     background-color: #FFD700;
   }
-`;
-
-const NavBar = styled.nav`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  background-color: #2B2A50;
-  color: #FFFFFF;
 `;
 
 const ExpandButton = styled.button`
@@ -101,11 +104,17 @@ const ProfileImage = styled.img`
   border-radius: 50%;
   border: 1px solid #FFFFFF;
   padding: 5px;
+  justify-content: flex-end;
 `;
+
 const Title = styled.h1`
-  font-size: 2rem;
-  color: #FFFFFF;
-  margin-right: 2rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 3vw;
+  @media (min-width: 1024px) {
+    font-size: 1.5rem;
+  }
 `;
 
 const NavLink = styled.a`
@@ -409,23 +418,19 @@ export default function Index() {
     };
 
     return (<><NavBar>
-        
-        <NavItems>
-            <LeftContainer>
-                <Logo src="/path/to/logo.png" alt="SDDB Logo" />
-                <Title>Stellar Quest Badge Explorer</Title>
-            </LeftContainer>
-            <CenterContainer>
-                <SearchBox type="search" placeholder="Search..." />
-            </CenterContainer>
-            <RightContainer>
-                <LoginContainer>
-                    <LoginButton>Login with Discord</LoginButton>
-                </LoginContainer>
-                <ProfileImage src="/path/to/default-profile.png" alt="Profile" />
-            </RightContainer>
-        </NavItems>
-        <ExpandButton>Expand</ExpandButton>
+        <LeftContainer>
+            <Logo src="/path/to/logo.png" alt="SDDB Logo" />
+            <Title>Stellar Quest Badge Explorer</Title>
+        </LeftContainer>
+        <CenterContainer>
+            <SearchBox type="search" placeholder="Search..." />
+        </CenterContainer>
+        <RightContainer>
+            <LoginContainer>
+                <LoginButton>Login with Discord</LoginButton>
+            </LoginContainer>
+            <ProfileImage src="/path/to/default-profile.png" alt="Profile" />
+        </RightContainer>
     </NavBar>
         <ExpandButton onClick={() => setIsExpanded(!isExpanded)}>
             {isExpanded ? 'Collapse' : 'Expand'}
