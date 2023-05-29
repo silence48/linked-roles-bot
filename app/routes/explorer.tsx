@@ -10,11 +10,116 @@ import { useLoaderData } from '@remix-run/react';
 
 import { Balance } from "../models";
 import { BalanceForm } from "~/forms";
-
+import 'app/xlmstyles.css'
 import React, { useState, useEffect } from 'react';
 
 //import { allBadges } from '../assets/badges/allBadges'; // import all the badges
 //import { BadgeGrid, BadgeButton, DetailModal, CloseButton, DataTable, DataRow } from './styledComponents'; // import the styled components
+const LeftContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+const CenterContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-grow: 1;
+`;
+
+const RightContainer = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+
+const LoginContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-right: 1rem;
+  height: 50px;
+  justify-content: space-between;
+`;
+
+
+const SearchBox = styled.input`
+  margin-left: 1rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #FFFFFF;
+`;
+
+const LoginButton = styled.button`
+  color: #FFFFFF;
+  background-color: #3C3B6E;
+  border: 1px solid #FFFFFF;
+  padding: 0.5rem;
+  margin-right: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #FFD700;
+  }
+`;
+
+const NavBar = styled.nav`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #2B2A50;
+  color: #FFFFFF;
+`;
+
+const ExpandButton = styled.button`
+  display: none;
+
+  @media (max-width: 600px) {
+    display: block;
+  }
+`;
+
+const NavItems = styled.div`
+  display: flex;
+
+  @media (max-width: 600px) {
+    display: none;
+  }
+`;
+
+const Logo = styled.img`
+  height: 40px;
+  margin-right: 1rem;
+  border: 1px solid #FFFFFF;
+  padding: 5px;
+`;
+
+const ProfileImage = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid #FFFFFF;
+  padding: 5px;
+`;
+const Title = styled.h1`
+  font-size: 2rem;
+  color: #FFFFFF;
+  margin-right: 2rem;
+`;
+
+const NavLink = styled.a`
+  color: #FFFFFF;
+  text-decoration: none;
+  margin-right: 1rem;
+  padding: 0.5rem;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #FFD700;
+  }
+`;
+
 
 const rotate = keyframes`
   from {
@@ -236,7 +341,6 @@ const TableHeader = styled.th`
 `;
 
 
-
 const Spinner = styled.div`
   border: 16px solid  #ededef;
   border-top: 16px solid #28282c;
@@ -278,6 +382,7 @@ export default function Index() {
     const [accountData, setAccountData] = useState(null);
 
     const [isLoading, setIsLoading] = useState(false);  // initialize isLoading as false
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         if (badgeDetails) {
@@ -285,7 +390,7 @@ export default function Index() {
         }
     }, [badgeDetails]);
 
-    const handleBadgeClick = async (badge) => {
+    const handleBadgeClick = async (badge: React.SetStateAction<null>) => {
         setSelectedBadge(badge);
         setIsLoading(true);
         const response = await fetch(`/api/fetchbalances/${badge.code}/${badge.issuer}`);
@@ -294,7 +399,7 @@ export default function Index() {
         setIsLoading(false);
     };
 
-    const handleAddressClick = async (address) => {
+    const handleAddressClick = async (address: any) => {
         setSelectedBadge({ "filename": address });
         setIsLoading(true);
         const response = await fetch(`/api/fetchaccount/${address}`);
@@ -303,16 +408,43 @@ export default function Index() {
         setIsLoading(false);
     };
 
-    return (
+    return (<><NavBar>
+        
+        <NavItems>
+            <LeftContainer>
+                <Logo src="/path/to/logo.png" alt="SDDB Logo" />
+                <Title>Stellar Quest Badge Explorer</Title>
+            </LeftContainer>
+            <CenterContainer>
+                <SearchBox type="search" placeholder="Search..." />
+            </CenterContainer>
+            <RightContainer>
+                <LoginContainer>
+                    <LoginButton>Login with Discord</LoginButton>
+                </LoginContainer>
+                <ProfileImage src="/path/to/default-profile.png" alt="Profile" />
+            </RightContainer>
+        </NavItems>
+        <ExpandButton>Expand</ExpandButton>
+    </NavBar>
+        <ExpandButton onClick={() => setIsExpanded(!isExpanded)}>
+            {isExpanded ? 'Collapse' : 'Expand'}
+        </ExpandButton>
+        {isExpanded && (
+            <div>
+                {/* Your expanded navigation items */}
+            </div>
+        )}
+
         <BadgeGrid>
 
-{badgeDetails.map((badge, index) => (
-    <BadgeWrapper key={index}>
-      <BadgeButton badge={badge} onClick={() => handleBadgeClick(badge)}>
-        <BadgeLabel>{badge.filename.substring(0, 12)}</BadgeLabel>
-      </BadgeButton>
-    </BadgeWrapper>
-  ))}
+            {badgeDetails.map((badge: { filename: string; }, index: React.Key | null | undefined) => (
+                <BadgeWrapper key={index}>
+                    <BadgeButton badge={badge} onClick={() => handleBadgeClick(badge)}>
+                        <BadgeLabel>{badge.filename.substring(0, 12)}</BadgeLabel>
+                    </BadgeButton>
+                </BadgeWrapper>
+            ))}
 
 
             {selectedBadge && (
@@ -320,8 +452,8 @@ export default function Index() {
                     <CloseButton onClick={() => setSelectedBadge(null)}>x</CloseButton>
                     <h2>{selectedBadge.filename.substring(0, 32)}</h2>
                     {isLoading ? (
-                        <Spinner />  // display the spinner while isLoading is true
-                    ) : Data && Data.length > 0 ? (  // only try to map over Data if it's an array with length > 0
+                        <Spinner /> // display the spinner while isLoading is true
+                    ) : Data && Data.length > 0 ? ( // only try to map over Data if it's an array with length > 0
                         <DataTable>
                             <ResponsiveTableHeader>
                                 <DataRow>
@@ -350,12 +482,11 @@ export default function Index() {
 
                         </DataTable>
                     ) : (
-                        <p>No data to display</p>  // display a message if Data is an empty array
-                    )
-                    }
+                        <p>No data to display</p> // display a message if Data is an empty array
+                    )}
 
                 </DetailModal>
             )}
-        </BadgeGrid>
+        </BadgeGrid></>
     );
 }
