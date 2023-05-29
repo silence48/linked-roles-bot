@@ -10,7 +10,7 @@ import { useLoaderData } from '@remix-run/react';
 import type { LinksFunction } from "@remix-run/cloudflare";
 import { Balance } from "../models";
 import { BalanceForm } from "~/forms";
-import { Layout, TextLink, Button, Input, Icon } from "xlm-design-system";
+import { Layout, TextLink, Button, Input, Icon, Avatar } from "xlm-design-system";
 
 
 import stylesHref from "app/xlmstyles.css";
@@ -445,8 +445,17 @@ export default function Index() {
         isEnabled: true,
         onOpen: handleMenuOpen,
       }}
-      contentCenter={<TextLink >Center Content</TextLink>}
-      contentRight={<TextLink >Right Content</TextLink>}
+      contentCenter={<></>}
+      contentRight={<><Input
+        id="search-input"
+        label="Search"
+        placeholder="Search" /><Avatar
+          source={[
+            {
+              altText: 'Stellar logo',
+              image: <Icon.User />
+            }
+          ]} /></>}
     />
     <Layout.Content>
 
@@ -462,6 +471,7 @@ export default function Index() {
 
 
             {selectedBadge && (
+              
                 <DetailModal>
                     <CloseButton onClick={() => setSelectedBadge(null)}>x</CloseButton>
                     <h2>{selectedBadge.filename.substring(0, 32)}</h2>
