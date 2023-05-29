@@ -7,17 +7,24 @@ import { fetchRegisteredAccounts, generateProofs, getOriginalClaimants, getOrigi
 import { fetchOperations } from "../utils/sqproof";
 import { Page, Container } from "~/components";
 import { useLoaderData } from '@remix-run/react';
-
+import type { LinksFunction } from "@remix-run/cloudflare";
 import { Balance } from "../models";
 import { BalanceForm } from "~/forms";
-import 'app/xlmstyles.css'
+import { Layout, TextLink, Button, Input, Icon } from "xlm-design-system";
+
+
+import stylesHref from "app/xlmstyles.css";
+
 import React, { useState, useEffect } from 'react';
+export const links: LinksFunction = () => {
+    return [{ rel: "stylesheet", href: stylesHref },];};
+
 
 //import { allBadges } from '../assets/badges/allBadges'; // import all the badges
 //import { BadgeGrid, BadgeButton, DetailModal, CloseButton, DataTable, DataRow } from './styledComponents'; // import the styled components
+
 const NavBar = styled.nav`
   display: flex;
-
   justify-content: space-between;
   align-items: center;
   padding: 1rem;
@@ -416,30 +423,32 @@ export default function Index() {
         setData(data);
         setIsLoading(false);
     };
-
-    return (<><NavBar>
-        <LeftContainer>
-            <Logo src="/path/to/logo.png" alt="SDDB Logo" />
-            <Title>Stellar Quest Badge Explorer</Title>
-        </LeftContainer>
-        <CenterContainer>
-            <SearchBox type="search" placeholder="Search..." />
-        </CenterContainer>
-        <RightContainer>
-            <LoginContainer>
-                <LoginButton>Login with Discord</LoginButton>
-            </LoginContainer>
-            <ProfileImage src="/path/to/default-profile.png" alt="Profile" />
-        </RightContainer>
-    </NavBar>
-        <ExpandButton onClick={() => setIsExpanded(!isExpanded)}>
-            {isExpanded ? 'Collapse' : 'Expand'}
-        </ExpandButton>
-        {isExpanded && (
-            <div>
-                {/* Your expanded navigation items */}
-            </div>
-        )}
+    const handleDarkModeToggleEnd = (isDarkMode: boolean) => {
+      console.log(`Dark mode is now ${isDarkMode ? 'enabled' : 'disabled'}`);
+    };
+  
+    const handleSignOut = () => {
+      console.log('Signing out...');
+    };
+  
+    const handleMenuOpen = () => {
+      console.log('Opening menu...');
+    };
+    return (<><Layout.Header
+      projectTitle="Stellar Quest Badge Explorer"
+      projectLink="https://github.com/communidao"
+      hasDarkModeToggle={true}
+      onDarkModeToggleEnd={handleDarkModeToggleEnd}
+      onSignOut={handleSignOut}
+      showButtonBorder={true}
+      menu={{
+        isEnabled: true,
+        onOpen: handleMenuOpen,
+      }}
+      contentCenter={<TextLink >Center Content</TextLink>}
+      contentRight={<TextLink >Right Content</TextLink>}
+    />
+    <Layout.Content>
 
         <BadgeGrid>
 
@@ -492,6 +501,16 @@ export default function Index() {
 
                 </DetailModal>
             )}
-        </BadgeGrid></>
+        </BadgeGrid>
+        </Layout.Content>
+        <Layout.Footer
+          marginTop="2rem"
+          hideLegalLinks={false}
+          hideTopBorder={false}
+          gitHubLink="https://github.com/myproject"
+          gitHubLabel="My Project on GitHub"
+        >
+          
+        </Layout.Footer></>
     );
 }
