@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import styled from '@emotion/styled';
 
 interface NavButtonProps {
@@ -10,9 +10,10 @@ interface NavButtonProps {
   showBorder?: boolean;
 }
 
-const NavButtonStyled = styled.button<{ showBorder: boolean }>`
+const StyledNavButton = styled.button<NavButtonProps>`
   --NavButton-size: 3rem;
   --NavButton-icon-size: 1.2rem;
+
   cursor: pointer;
   width: var(--NavButton-size);
   height: var(--NavButton-size);
@@ -29,12 +30,14 @@ const NavButtonStyled = styled.button<{ showBorder: boolean }>`
   opacity: 1;
   transition: opacity var(--anim-transition-default);
 
-  border-color: ${props => props.showBorder ? 'var(--pal-border-primary)' : 'transparent'};
+  ${props => props.showBorder && `
+    border-color: var(--pal-border-primary);
+  `}
 
   svg {
     width: var(--NavButton-icon-size);
     height: var(--NavButton-icon-size);
-    fill: var(--pal-text-secondary);
+    stroke: var(--pal-text-secondary);
   }
 
   &:hover {
@@ -55,15 +58,14 @@ export const NavButton: React.FC<NavButtonProps> = ({
   disabled,
   showBorder,
 }) => (
-  <NavButtonStyled
+  <StyledNavButton
     id={id}
     title={title}
     onClick={onClick}
+    icon={icon}
     disabled={disabled}
-    showBorder={showBorder ?? false}
+    showBorder={showBorder}
   >
     {icon}
-  </NavButtonStyled>
+  </StyledNavButton>
 );
-
-NavButton.displayName = "NavButton";

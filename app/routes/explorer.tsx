@@ -13,11 +13,11 @@ import { BalanceForm } from "~/forms";
 import { Layout, TextLink, Button, Input, Icon, Avatar } from "xlm-design-system";
 
 
-import stylesHref from "app/xlmstyles.css";
+//import stylesHref from "app/xlmstyles.css";
 
 import React, { useState, useEffect } from 'react';
-export const links: LinksFunction = () => {
-    return [{ rel: "stylesheet", href: stylesHref },];};
+//export const links: LinksFunction = () => {
+  //  return [{ rel: "stylesheet", href: stylesHref },];};
 
 
 //import { allBadges } from '../assets/badges/allBadges'; // import all the badges
@@ -434,6 +434,7 @@ export default function Index() {
     const handleMenuOpen = () => {
       console.log('Opening menu...');
     };
+    const [isModalVisible, setIsModalVisible] = useState(false);
     return (<><Layout.Header
       projectTitle="Stellar Quest Badge Explorer"
       projectLink="https://github.com/communidao"
@@ -517,7 +518,7 @@ export default function Index() {
           marginTop="2rem"
           hideLegalLinks={false}
           hideTopBorder={false}
-          gitHubLink="https://github.com/myproject"
+          gitHubLink="https://github.com/communidao"
           gitHubLabel="My Project on GitHub"
         >
           

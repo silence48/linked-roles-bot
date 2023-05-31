@@ -219,6 +219,7 @@ async function getPrizeTransaction(hash: string, env: any) {
   );
   return prizeRecord.length > 0 ? parseInt(prizeRecord[0].amount) : false;
 }
+
 async function fetchWithRetry(url, retries = 3, delay = 500) {
   try {
     const response = await fetch(url);

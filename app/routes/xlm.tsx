@@ -11,13 +11,9 @@ import { Balance } from "../models";
 import { BalanceForm } from "~/forms";
 import React, { useState, useEffect } from 'react';
 //import { ProjectLogo, TextLink, TextLinkVariant, NavButton, Layout, ToggleDarkMode, IconButton, IconButtonPreset, IconButtonVariant, Icon } from '../components'
+import {Cartel} from "communi-design-system";
+//import {Layout, TextLink} from "xlm-design-system";
 
-import stylesHref from "xlm-design-system/build/styles.min.css";
-
-import {Layout, TextLink} from "xlm-design-system";
-
-export const links: LinksFunction = () => {
-    return [{ rel: "stylesheet", href: stylesHref },];};
 
 export let loader = async ({ request, context }: LoaderArgs) => {
 
