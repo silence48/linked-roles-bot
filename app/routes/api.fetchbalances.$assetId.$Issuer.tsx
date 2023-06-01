@@ -1,7 +1,4 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
-import { getUser } from "~/utils/session.server";
-import { generateAuthChallenge } from '~/utils/stellarUtils.server';
-import { Keypair } from "stellar-base";
 
 
 export const loader = async ({ request, context, params }: LoaderArgs) => {

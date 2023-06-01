@@ -1,4 +1,4 @@
-import { Horizon } from 'horizon-api';
+import type { Horizon } from 'horizon-api';
 import {
   Account,
   TransactionBuilder,

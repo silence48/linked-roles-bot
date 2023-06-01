@@ -1,9 +1,9 @@
 // routes/cacheaccount.tsx
 import { badgeDetails } from '../utils/badge-details';
-import { ActionFunction, json, redirect, LoaderArgs } from "@remix-run/cloudflare";
+import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
-
+import {getOriginalClaimants} from "../utils/sqproof"
 import { useLoaderData } from '@remix-run/react';
 
 import React, { useState, useEffect } from 'react';
@@ -361,7 +361,9 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     const { DB } = context.env as any;
 
     // this updates and caches all the data to the database, ignore it
-
+    for (const badge in badgeDetails) {
+      await getOriginalClaimants("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
+      }
     //for (const badge in badgeDetails) {
     //await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
     //}

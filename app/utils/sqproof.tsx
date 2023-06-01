@@ -1,11 +1,11 @@
 import { Networks, TransactionBuilder } from 'stellar-base';
-import { badgeDetails, seriesFourIssuers } from './badge-details';
+import { badgeDetails } from './badge-details';
 import jwt from "@tsndr/cloudflare-worker-jwt";
-import { type Horizon } from 'horizon-api';
+import type { Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
-import { Balance, Cursor, Claimable, Asset } from '~/models';
-import { BalanceForm, CursorForm, ClaimableForm, AssetForm } from '~/forms';
+import { Balance, Claimable } from '~/models';
+import { BalanceForm, ClaimableForm } from '~/forms';
 
 
 export async function handleResponse(response: Response) {
