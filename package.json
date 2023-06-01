@@ -13,11 +13,10 @@
     "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol https"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.6",
-    "@emotion/styled": "^11.10.6",
-    "@headlessui/react": "^1.7.14",
-    "@remix-run/cloudflare": "^1.15.0",
-    "@remix-run/cloudflare-pages": "^1.15.0",
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@remix-run/cloudflare": "^1.16.1",
+    "@remix-run/cloudflare-pages": "^1.16.1",
     "@remix-run/react": "^1.15.0",
     "@tsndr/cloudflare-worker-jwt": "^2.2.1",
     "buffer-polyfill": "npm:buffer@^6.0.3",
@@ -25,16 +24,15 @@
     "joi": "^17.8.3",
     "model-one": "^0.0.7",
     "react": "^17",
-    "react-copy-to-clipboard": "^5.1.0",
     "react-dom": "^17",
     "react-icons": "^4.8.0",
-    "stellar-base": "^8.2.2"
+    "stellar-base": "stellar/js-stellar-base#v9.0.0-beta.2"
   },
   "devDependencies": {
     "@albedo-link/intent": "latest",
-    "@cloudflare/workers-types": "^3.18.0",
-    "@remix-run/dev": "^1.15.0",
-    "@remix-run/eslint-config": "^1.15.0",
+    "@cloudflare/workers-types": "^3.19.0",
+    "@remix-run/dev": "^1.16.1",
+    "@remix-run/eslint-config": "^1.16.1",
     "@stellar/freighter-api": "latest",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.8",

@@ -1,15 +1,25 @@
 import { Networks, TransactionBuilder } from 'stellar-base';
-import { handleResponse } from './scfapi';
 import { badgeDetails, seriesFourIssuers } from './badge-details';
 import jwt from "@tsndr/cloudflare-worker-jwt";
-import { Horizon } from 'horizon-api';
+import { type Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
 import { Balance, Cursor, Claimable, Asset } from '~/models';
 import { BalanceForm, CursorForm, ClaimableForm, AssetForm } from '~/forms';
-import { Model } from '~/models/model-one';
-import { exist } from 'joi';
 
+
+export async function handleResponse(response: Response) {
+  const { headers, ok } = response;
+  const contentType = headers.get('content-type');
+  
+  const content = contentType
+    ? contentType.includes('json')
+      ? response.json()
+      : response.text()
+    : { status: response.status, message: response.statusText };
+  if (ok) return content;
+  else throw await content;
+}  
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { DB } = context.env as any;
@@ -63,11 +73,6 @@ export async function generateVerificationHash(verificationObject: any) {
   return hashHex;
 }
 
-let generateVerificationOperations = (assets: any[]) => {
-  return assets.reduce((acc, item, i, a) => {
-    return acc.concat(item.operation);
-  }, []);
-};
 
 export const horizonUrl = (env: any) =>
   env === 'production'
@@ -202,6 +207,12 @@ export async function getVerificationToken(
   console.log(soroban)
   console.log(soroban.length)
   console.log('user badges - soroban badges', userBadges.length - soroban.length)
+  let generateVerificationOperations = (assets: any[]) => {
+    return assets.reduce((acc, item, i, a) => {
+      return acc.concat(item.operation);
+    }, []);
+  };
+  
   let verificationObject = {
     p: pubkey,
     m: message,
@@ -268,7 +279,7 @@ export async function fetchPayments(
 
 }
 
-async function getOriginalClaimants(
+export async function getOriginalClaimants(
   env: any,
   context: any,
   issuer: any,
