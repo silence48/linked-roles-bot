@@ -284,7 +284,9 @@ export async function getOriginalClaimants(
   context: any,
   issuer: any,
   assetid: any,
+  subrequests: any,
 ) {
+  
   let accountOperations = [];
   const { DB } = context.env;
 
@@ -299,7 +301,7 @@ export async function getOriginalClaimants(
   let cursor;
   let preparedStatements = [];
   const lastrecord = await stmt.bind(issuer, assetid).all();
-
+  subrequests += 1
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "claimable cursor")
@@ -309,6 +311,7 @@ export async function getOriginalClaimants(
   }
 
   let operationResults = await fetchOperations("production", issuer, cursor);
+  subrequests += 1
   if (operationResults.status === 404) {
     return;
   }
@@ -325,6 +328,7 @@ export async function getOriginalClaimants(
     accountOperations = accountOperations.concat(operationResults._embedded.records);
     operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
     iter += 1
+    subrequests += 1
   }
   const balanceForms: BalanceForm[] = [];
   const claimableForms: ClaimableForm[] = [];
@@ -354,8 +358,10 @@ export async function getOriginalClaimants(
     );
 
   for (let op in badgeOperations) {
-    const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
 
+    if (subrequests > 998) {break}
+    const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
+    subrequests += 1
     const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created");
 
     const claimable_ID = claimcreated[0].balance_id;
@@ -392,6 +398,7 @@ export async function getOriginalClaimants(
     );
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
+    console.log(subrequests, "subrequests")
   }
   let chunkSize = 9; 
   for (let i = 0; i < balanceForms.length; i += chunkSize) {
@@ -402,7 +409,7 @@ export async function getOriginalClaimants(
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
-    console.log(preparedStatement.length, "prepared statement")
+    console.log(preparedStatements.length, "prepared statement")
     preparedStatements.push(preparedStatement);
   }
   chunkSize = 18;
@@ -418,7 +425,7 @@ export async function getOriginalClaimants(
     preparedStatements.push(preparedStatement);
   }
   await DB.batch(preparedStatements);
-   return void 0;
+   return subrequests;
 }
 
 

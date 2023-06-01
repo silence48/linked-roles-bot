@@ -361,9 +361,13 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     const { DB } = context.env as any;
 
     // this updates and caches all the data to the database, ignore it
-    
+    let subrequests = 0
     for (const badge in seriesFourIssuers) {
-      await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code);
+      const sr = await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
+      subrequests += sr;
+      if (subrequests > 799) {
+        break;
+      }
       }
     //for (const badge in badgeDetails) {
     //await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
