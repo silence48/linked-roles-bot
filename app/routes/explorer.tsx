@@ -475,6 +475,7 @@ export default function Index() {
                                 <DataRow>
                                     <TableHeader>ID</TableHeader>
                                     <TableHeader>Transaction ID</TableHeader>
+                                    <TableHeader>Asset ID</TableHeader>
                                     <TableHeader>Account ID</TableHeader>
                                     <TableHeader>Balance</TableHeader>
                                     <TableHeader>Date Acquired</TableHeader>
@@ -486,6 +487,7 @@ export default function Index() {
                                     <DataRow key={index}>
                                         <TableCell>{record.id}</TableCell>
                                         <TableCell>{record.tx_id}</TableCell>
+                                        <TableCell>{record.asset_id}</TableCell>
                                         <TableCell><AddressButton variant="secondary" size="md" onClick={() => handleAddressClick(record.account_id)}>
                                             {record.account_id}
                                         </AddressButton></TableCell>
