@@ -362,8 +362,8 @@ export let loader = async ({ request, context }: LoaderArgs) => {
 
     // this updates and caches all the data to the database, ignore it
     
-    for (const badge in badgeDetails) {
-      await getOriginalClaimants("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
+    for (const badge in seriesFourIssuers) {
+      await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code);
       }
     //for (const badge in badgeDetails) {
     //await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
