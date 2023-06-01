@@ -391,7 +391,7 @@ export async function getOriginalClaimants(
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
-  const chunkSize = 9; 
+  let chunkSize = 9; 
   for (let i = 0; i < balanceForms.length; i += chunkSize) {
     const chunk = balanceForms.slice(i, i + chunkSize);
     const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
@@ -403,6 +403,7 @@ export async function getOriginalClaimants(
     console.log(preparedStatement.length, "prepared statement")
     preparedStatements.push(preparedStatement);
   }
+  chunkSize = 18;
   for (let i = 0; i < claimableForms.length; i += chunkSize) {
     const chunk = claimableForms.slice(i, i + chunkSize);
     const valuesPlaceholders = chunk.map(() => "(?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
