@@ -289,7 +289,7 @@ export async function getOriginalClaimants(
   const { DB } = context.env;
   const stmt1 = DB.prepare(`
     SELECT * 
-    FROM claimable
+    FROM balances
     WHERE issuer_id = ?1 AND asset_id = ?2 
     ORDER BY date_acquired ASC 
     LIMIT 1
@@ -325,8 +325,6 @@ export async function getOriginalClaimants(
   }
   const balanceForms: BalanceForm[] = [];
   const claimableForms: ClaimableForm[] = [];
-
-  console.log(filteredArray);
 
   const badgeOperations: Horizon.CreateClaimableBalanceOperationResponse[] = accountOperations
     .filter(
