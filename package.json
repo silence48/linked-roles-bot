@@ -26,7 +26,7 @@
     "react": "^17",
     "react-dom": "^17",
     "react-icons": "^4.8.0",
-    "stellar-base": "stellar/js-stellar-base#v9.0.0-beta.2"
+    "stellar-base": "^8.2.2"
   },
   "devDependencies": {
     "@albedo-link/intent": "latest",
