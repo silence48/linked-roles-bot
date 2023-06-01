@@ -734,5 +734,10 @@ export const badgeDetails = [
 ];
 
 export const seriesFourIssuers = badgeDetails
-  .filter(({ code }) => /^SQ040[1-6]$/.test(code))
-  .map(({ issuer }) => issuer);
+  .filter(( asset ) => {
+    
+    const codematch = /^SQ040[1-6]$/.test(asset.code)
+    return codematch
+    
+  })
+  

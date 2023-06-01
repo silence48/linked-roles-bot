@@ -287,7 +287,7 @@ export async function getOriginalClaimants(
 ) {
   let accountOperations = [];
   const { DB } = context.env;
-  console.log('before the stmt')
+
   const stmt = DB.prepare(`
     SELECT * 
     FROM balances
@@ -295,12 +295,11 @@ export async function getOriginalClaimants(
     ORDER BY date_acquired ASC 
     LIMIT 1
   `);
-  console.log('after the stmt')
+
   let cursor;
   let preparedStatements = [];
   const lastrecord = await stmt.bind(issuer, assetid).all();
-  console.log('after the bind')
-  console.log(lastrecord)
+
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "claimable cursor")
@@ -354,8 +353,8 @@ export async function getOriginalClaimants(
 
   for (let op in badgeOperations) {
     const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
-    console.log(effects)
-    const claimcreated = effects.filter((effect) => effect.type === "claimable_balance_created");
+
+    const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created");
 
     const claimable_ID = claimcreated[0].balance_id;
     const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
@@ -389,7 +388,6 @@ export async function getOriginalClaimants(
         date_acquired: badgeOperations[op].created_at,
       })
     );
-    console.log(claimableForm)
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
@@ -402,6 +400,7 @@ export async function getOriginalClaimants(
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
+    console.log(preparedStatement.length, "prepared statement")
     preparedStatements.push(preparedStatement);
   }
   for (let i = 0; i < claimableForms.length; i += chunkSize) {
