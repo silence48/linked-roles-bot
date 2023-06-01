@@ -1,6 +1,6 @@
 name = "scf-discord-bot"
 
-compatibility_date = "2022-11-30"
+compatibility_date = "2022-04-05"
 
 usage_model="unbound"
 

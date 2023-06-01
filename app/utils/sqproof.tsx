@@ -287,16 +287,20 @@ export async function getOriginalClaimants(
 ) {
   let accountOperations = [];
   const { DB } = context.env;
-  const stmt1 = DB.prepare(`
+  console.log('before the stmt')
+  const stmt = DB.prepare(`
     SELECT * 
     FROM balances
     WHERE issuer_id = ?1 AND asset_id = ?2 
     ORDER BY date_acquired ASC 
     LIMIT 1
   `);
+  console.log('after the stmt')
   let cursor;
   let preparedStatements = [];
-  const lastrecord = await stmt1.bind(issuer, assetid).all();
+  const lastrecord = await stmt.bind(issuer, assetid).all();
+  console.log('after the bind')
+  console.log(lastrecord)
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "claimable cursor")
@@ -350,7 +354,9 @@ export async function getOriginalClaimants(
 
   for (let op in badgeOperations) {
     const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
+    console.log(effects)
     const claimcreated = effects.filter((effect) => effect.type === "claimable_balance_created");
+
     const claimable_ID = claimcreated[0].balance_id;
     const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
     if (claimed) { continue }
@@ -383,6 +389,7 @@ export async function getOriginalClaimants(
         date_acquired: badgeOperations[op].created_at,
       })
     );
+    console.log(claimableForm)
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
