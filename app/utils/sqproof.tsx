@@ -408,7 +408,7 @@ export async function getOriginalClaimants(
     const valuesPlaceholders = chunk.map(() => "(?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
     const values = chunk.flatMap(form => [form.data.id, form.data.claimable_id, form.data.date_granted]);
     const preparedStatement = DB.prepare(`
-        INSERT OR IGNORE INTO balances (id, claimable_id, date_granted, created_at, updated_at)
+        INSERT OR IGNORE INTO claimable (id, claimable_id, date_granted, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
 
