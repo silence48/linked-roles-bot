@@ -3,25 +3,10 @@ import { badgeDetails } from '../utils/badge-details';
 import { ActionFunction, json, redirect, LoaderArgs } from "@remix-run/cloudflare";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
-import { fetchRegisteredAccounts, generateProofs, getOriginalClaimants, getOriginalPayees } from "../utils/sqproof";
-import { fetchOperations } from "../utils/sqproof";
-import { Page, Container } from "~/components";
+
 import { useLoaderData } from '@remix-run/react';
-import type { LinksFunction } from "@remix-run/cloudflare";
-import { Balance } from "../models";
-import { BalanceForm } from "~/forms";
-//import { Layout, TextLink, Button, Input, Icon, Avatar } from "../components";
-
-
-//import stylesHref from "app/xlmstyles.css";
 
 import React, { useState, useEffect } from 'react';
-//export const links: LinksFunction = () => {
-  //  return [{ rel: "stylesheet", href: stylesHref },];};
-
-
-//import { allBadges } from '../assets/badges/allBadges'; // import all the badges
-//import { BadgeGrid, BadgeButton, DetailModal, CloseButton, DataTable, DataRow } from './styledComponents'; // import the styled components
 
 const NavBar = styled.nav`
   display: flex;
