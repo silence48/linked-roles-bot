@@ -10,7 +10,7 @@ import { useLoaderData } from '@remix-run/react';
 import type { LinksFunction } from "@remix-run/cloudflare";
 import { Balance } from "../models";
 import { BalanceForm } from "~/forms";
-import { Layout, TextLink, Button, Input, Icon, Avatar } from "xlm-design-system";
+//import { Layout, TextLink, Button, Input, Icon, Avatar } from "../components";
 
 
 //import stylesHref from "app/xlmstyles.css";
@@ -435,30 +435,29 @@ export default function Index() {
       console.log('Opening menu...');
     };
     const [isModalVisible, setIsModalVisible] = useState(false);
-    return (<><Layout.Header
-      projectTitle="Stellar Quest Badge Explorer"
-      projectLink="https://github.com/communidao"
-      hasDarkModeToggle={true}
-      onDarkModeToggleEnd={handleDarkModeToggleEnd}
-      onSignOut={handleSignOut}
-      showButtonBorder={true}
-      menu={{
-        isEnabled: true,
-        onOpen: handleMenuOpen,
-      }}
-      contentCenter={<></>}
-      contentRight={<><Input
-        id="search-input"
-        label="Search"
-        placeholder="Search" /><Avatar
-          source={[
-            {
-              altText: 'Stellar logo',
-              image: <Icon.User />
-            }
-          ]} /></>}
-    />
-    <Layout.Content>
+    return (<><NavBar>
+      <LeftContainer>
+          <Logo src="/path/to/logo.png" alt="SDDB Logo" />
+          <Title>Stellar Quest Badge Explorer</Title>
+      </LeftContainer>
+      <CenterContainer>
+          <SearchBox type="search" placeholder="Search..." />
+      </CenterContainer>
+      <RightContainer>
+          <LoginContainer>
+              <LoginButton>Login with Discord</LoginButton>
+          </LoginContainer>
+          <ProfileImage src="/path/to/default-profile.png" alt="Profile" />
+      </RightContainer>
+  </NavBar>
+      <ExpandButton onClick={() => setIsExpanded(!isExpanded)}>
+          {isExpanded ? 'Collapse' : 'Expand'}
+      </ExpandButton>
+      {isExpanded && (
+          <div>
+              {/* Your expanded navigation items */}
+          </div>
+      )}
 
         <BadgeGrid>
 
@@ -513,15 +512,6 @@ export default function Index() {
                 </DetailModal>
             )}
         </BadgeGrid>
-        </Layout.Content>
-        <Layout.Footer
-          marginTop="2rem"
-          hideLegalLinks={false}
-          hideTopBorder={false}
-          gitHubLink="https://github.com/communidao"
-          gitHubLabel="My Project on GitHub"
-        >
-          
-        </Layout.Footer></>
+     </>
     );
 }
