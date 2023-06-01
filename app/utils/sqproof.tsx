@@ -347,8 +347,10 @@ export async function getOriginalClaimants(
       (operation) => {
         const optype = operation.type === "claim_claimable_balance";
         const asset = operation.asset;
-        if (optype === false || operation.asset === "native") { return }
-      }
+        
+        if (optype === false || asset === "native") { return false}
+        return true;
+      } 
     );
 
   for (let op in badgeOperations) {
