@@ -137,7 +137,7 @@ export async function getVerificationToken(
   if (opRes.status === 404) {
     return;
   }
-  console.log('opRes', opRes)
+  
   let iter = 0
   while (
     accountOperations.length % 200 === 0 ||
@@ -286,7 +286,7 @@ export async function getOriginalClaimants(
   assetid: any,
   subrequests: any,
 ) {
-  console.log(subrequests, "subrequests")
+  
   let accountOperations = [];
   const { DB } = context.env;
 
@@ -302,7 +302,7 @@ export async function getOriginalClaimants(
   let preparedStatements = [];
   const lastrecord = await stmt.bind(issuer, assetid).all();
   subrequests += 1
-  console.log(subrequests, "subrequests")
+  
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "claimable cursor")
@@ -313,7 +313,7 @@ export async function getOriginalClaimants(
 
   let operationResults = await fetchOperations("production", issuer, cursor);
   subrequests += 1
-  console.log(subrequests, "subrequests")
+  
   if (operationResults.status === 404) {
     return;
   }
@@ -325,13 +325,13 @@ export async function getOriginalClaimants(
     operationResults._embedded.records.length !== 0
   ) {
     //try only getting 800 records at a time
-    if (iter > 3) { break }
+    if (subrequests > 799) { break }
 
     accountOperations = accountOperations.concat(operationResults._embedded.records);
     operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
     iter += 1
     subrequests += 1
-    console.log(subrequests, "subrequests")
+    
   }
   const balanceForms: BalanceForm[] = [];
   const claimableForms: ClaimableForm[] = [];
@@ -365,12 +365,15 @@ export async function getOriginalClaimants(
     if (subrequests > 998) {break}
     const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
     subrequests += 1
-    console.log(subrequests, "subrequests")
+    //console.log(subrequests, "subrequests")
     const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created");
 
     const claimable_ID = claimcreated[0].balance_id;
     const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
-    if (claimed) { continue }
+
+    if (claimed) { 
+      console.log('it was claimed back');
+      continue }
 
     let claimants: Horizon.Claimant[] = badgeOperations[op].claimants;
     if (claimants.length > 1) {
@@ -382,7 +385,8 @@ export async function getOriginalClaimants(
       }
       );
       //console.log(claimants)
-      console.log( "claimants")
+      //console.log( "claimants")
+      
     }
     //if there was more than 2 claimants and the issuer was one of them, then this probably wasn't an SQ badge.
     if (claimants.length > 1) {
@@ -399,6 +403,7 @@ export async function getOriginalClaimants(
         date_granted: badgeOperations[op].created_at
       })
     )
+    
     const balanceForm = new BalanceForm(
       new Balance({
         id: createdClaimOpId,
@@ -413,6 +418,8 @@ export async function getOriginalClaimants(
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
+  console.log(balanceForms.length, "balance forms length");
+  console.log(claimableForms.length, "claimable forms length");
   let chunkSize = 9; 
   for (let i = 0; i < balanceForms.length; i += chunkSize) {
     const chunk = balanceForms.slice(i, i + chunkSize);
@@ -422,7 +429,7 @@ export async function getOriginalClaimants(
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
-    console.log(preparedStatements.length, "prepared statement")
+    //console.log(preparedStatements.length, "prepared statement")
     preparedStatements.push(preparedStatement);
   }
   chunkSize = 18;
@@ -437,7 +444,9 @@ export async function getOriginalClaimants(
 
     preparedStatements.push(preparedStatement);
   }
-  await DB.batch(preparedStatements);
+  
+  await DB.batch(preparedStatements)
+  
    return subrequests;
 }
 

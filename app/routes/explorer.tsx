@@ -363,8 +363,10 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     // this updates and caches all the data to the database, ignore it
     let subrequests = 0
     for (const badge in seriesFourIssuers) {
+      console.log(`badge: ${seriesFourIssuers[badge].code}`)
       const sr = await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
-      subrequests += sr;
+      subrequests = sr;
+      console.log(`subrequests: ${subrequests}, sr  ${sr}`)
       if (subrequests > 799) {
         break;
       }
