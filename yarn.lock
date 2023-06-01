@@ -1110,7 +1110,7 @@
   dependencies:
     "@emotion/memoize" "0.7.4"
 
-"@emotion/is-prop-valid@^1.2.1", "@emotion/is-prop-valid@latest":
+"@emotion/is-prop-valid@^1.2.1":
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-1.2.1.tgz#23116cf1ed18bfeac910ec6436561ecb1a3885cc"
   integrity sha512-61Mf7Ufx4aDxx1xlDeOm8aFFigGHE4z+0sKCa+IHCeZKiyP9RLD0Mmx7m8b9/Cf37f7NAvQOOJAbQQGVr5uERw==
@@ -3455,12 +3455,10 @@ comma-separated-tokens@^2.0.0:
   resolved "https://registry.yarnpkg.com/comma-separated-tokens/-/comma-separated-tokens-2.0.3.tgz#4e89c9458acb61bc8fef19f4529973b2392839ee"
   integrity sha512-Fu4hJdvzeylCfQPp9SGWidpzrMs7tTrlu6Vb8XGaRGck8QSNZJJp538Wrb60Lax4fPwR64ViY468OIUTbRlGZg==
 
-communi-design-system@^0.0.20:
-  version "0.0.20"
-  resolved "https://registry.yarnpkg.com/communi-design-system/-/communi-design-system-0.0.20.tgz#2e2bd403c0399d45ba3f370b6546da09e6fa3a73"
-  integrity sha512-rQUHMfQL3UEoN3+7Hk7GdB7Tmc3ohhQV07mlGJwN5diPBKZb5hcutJPuaK08+N/Wsxb9R5oLS4kD8RaLcbH1ZA==
+communi-design-system@communiDAO/communi-design-system#update:
+  version "0.0.21"
+  resolved "https://codeload.github.com/communiDAO/communi-design-system/tar.gz/e9fccf3404d5eda1a880bb57e9121af726c6f0c2"
   dependencies:
-    "@emotion/is-prop-valid" latest
     "@h6s/calendar" latest
     "@headlessui-float/react" "^0.8.0"
     "@headlessui/react" latest

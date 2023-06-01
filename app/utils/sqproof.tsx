@@ -319,8 +319,8 @@ export async function getOriginalClaimants(
     accountOperations.length % 200 === 0 ||
     operationResults._embedded.records.length !== 0
   ) {
-    //handle extremely large accounts
-    if (iter > 1000) { break }
+    //try only getting 800 records at a time
+    if (iter > 3) { break }
 
     accountOperations = accountOperations.concat(operationResults._embedded.records);
     operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
