@@ -38,7 +38,7 @@
     "@types/react-dom": "^18.0.8",
     "@walletconnect/sign-client": "latest",
     "better-sqlite3": "latest",
-    "communi-design-system": "^0.0.20",
+    "communi-design-system": "communiDAO/communi-design-system#update",
     "eslint": "^8.27.0",
     "npm-run-all": "^4.1.5",
     "react-qrcode-logo": "latest",
