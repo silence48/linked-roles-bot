@@ -5,8 +5,8 @@ import jwt from "@tsndr/cloudflare-worker-jwt";
 import { Horizon } from 'horizon-api';
 import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
-import { Balance, Cursor } from '~/models';
-import { BalanceForm, CursorForm } from '~/forms';
+import { Balance, Cursor, Claimable, Asset } from '~/models';
+import { BalanceForm, CursorForm, ClaimableForm, AssetForm } from '~/forms';
 import { Model } from '~/models/model-one';
 import { exist } from 'joi';
 
@@ -93,11 +93,21 @@ export const stellarExpertTxLink = (hash: string, env: any) =>
 export async function fetchOperations(
   env: any,
   account: string,
+  cursor?: string,
 ) {
-  return fetch(
-    horizonUrl(env) +
-    `/accounts/${account}/operations?limit=200&order=desc&include_failed=false`,
-  ).then(handleResponse);
+
+  if (cursor !== undefined) {
+    const url = horizonUrl(env) +
+      `/accounts/${account}/operations?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
+    console.log(url)
+    const response = await fetchWithRetry(url);
+    return handleResponse(response);
+  } else {
+    const url = horizonUrl(env) +
+      `/accounts/${account}/operations?limit=200&order=desc&include_failed=false`;
+    const response = await fetchWithRetry(url);
+    return handleResponse(response);
+  }
 }
 
 export async function fetchOperation(
@@ -220,7 +230,7 @@ async function getPrizeTransaction(hash: string, env: any) {
   return prizeRecord.length > 0 ? parseInt(prizeRecord[0].amount) : false;
 }
 
-async function fetchWithRetry(url, retries = 3, delay = 500) {
+async function fetchWithRetry(url: string, retries = 3, delay = 500): Promise<Response> {
   try {
     const response = await fetch(url);
     if (response.status !== 503) {
@@ -258,16 +268,139 @@ export async function fetchPayments(
 
 }
 
-export async function getOriginalClaimants(
+async function getOriginalClaimants(
   env: any,
   context: any,
   issuer: any,
   assetid: any,
 ) {
+  let accountOperations = [];
   const { DB } = context.env;
+  const stmt1 = DB.prepare(`
+    SELECT * 
+    FROM claimable
+    WHERE issuer_id = ?1 AND asset_id = ?2 
+    ORDER BY date_acquired ASC 
+    LIMIT 1
+  `);
+  let cursor;
+  let preparedStatements = [];
+  const lastrecord = await stmt1.bind(issuer, assetid).all();
+  if (lastrecord.results.length > 0) {
+    cursor = lastrecord.results[0].id;
+    console.log(cursor, "claimable cursor")
+  } else {
+    cursor = undefined
+    console.log(`there is no cursor for ${issuer} ${assetid}`)
+  }
+
+  let operationResults = await fetchOperations("production", issuer, cursor);
+  if (operationResults.status === 404) {
+    return;
+  }
 
 
-  return null
+  let iter = 0
+  while (
+    accountOperations.length % 200 === 0 ||
+    operationResults._embedded.records.length !== 0
+  ) {
+    //handle extremely large accounts
+    if (iter > 1000) { break }
+
+    accountOperations = accountOperations.concat(operationResults._embedded.records);
+    operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
+    iter += 1
+  }
+  const balanceForms: BalanceForm[] = [];
+  const claimableForms: ClaimableForm[] = [];
+
+  console.log(filteredArray);
+
+  const badgeOperations: Horizon.CreateClaimableBalanceOperationResponse[] = accountOperations
+    .filter(
+      (operation) => {
+        const optype = operation.type === "create_claimable_balance";
+        if (optype === false || operation.asset === "native") { return }
+        const asset = operation.asset;
+        const assetcode = asset.split(":")[0] === assetid;
+        const assetissuer = asset.split(":")[1] === issuer;
+        const amount = parseFloat(operation.amount) === 0.0000001 || parseFloat(operation.amount) === 1.0000000;
+        return amount && assetcode && assetissuer;
+      }
+    )
+
+  const claimBacks: Horizon.ClaimClaimableBalanceOperationResponse[] = accountOperations
+    .filter(
+      (operation) => {
+        const optype = operation.type === "claim_claimable_balance";
+        const asset = operation.asset;
+        if (optype === false || operation.asset === "native") { return }
+      }
+    );
+
+  for (let op in badgeOperations) {
+    const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
+    const claimcreated = effects.filter((effect) => effect.type === "claimable_balance_created");
+    const claimable_ID = claimcreated[0].balance_id;
+    const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
+    if (claimed) { continue }
+
+    let claimants: Horizon.Claimant[] = badgeOperations[op].claimants;
+    if (claimants.length > 1) {
+      claimants = claimants.filter((claimant) => claimant.destination != issuer);
+    }
+    //if there was more than 2 claimants and the issuer was one of them, then this probably wasn't an SQ badge.
+    if (claimants.length > 1) {
+      continue;
+    }
+
+    let createdClaimOpId = badgeOperations[op].id;
+    const claimableForm = new ClaimableForm(
+      new Claimable({
+        id: createdClaimOpId,
+        claimable_id: claimable_ID,
+        date_granted: badgeOperations[op].created_at
+      })
+    )
+    const balanceForm = new BalanceForm(
+      new Balance({
+        id: createdClaimOpId,
+        tx_id: badgeOperations[op].transaction_hash,
+        issuer_id: issuer,
+        asset_id: assetid,
+        account_id: claimants[0].destination,
+        balance: badgeOperations[op].amount,
+        date_acquired: badgeOperations[op].created_at,
+      })
+    );
+    claimableForms.push(claimableForm);
+    balanceForms.push(balanceForm);
+  }
+  const chunkSize = 9; 
+  for (let i = 0; i < balanceForms.length; i += chunkSize) {
+    const chunk = balanceForms.slice(i, i + chunkSize);
+    const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
+    const values = chunk.flatMap(form => [form.data.id, form.data.tx_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
+    const preparedStatement = DB.prepare(`
+        INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
+        VALUES ${valuesPlaceholders} RETURNING *;
+      `).bind(...values);
+    preparedStatements.push(preparedStatement);
+  }
+  for (let i = 0; i < claimableForms.length; i += chunkSize) {
+    const chunk = claimableForms.slice(i, i + chunkSize);
+    const valuesPlaceholders = chunk.map(() => "(?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
+    const values = chunk.flatMap(form => [form.data.id, form.data.claimable_id, form.data.date_granted]);
+    const preparedStatement = DB.prepare(`
+        INSERT OR IGNORE INTO balances (id, claimable_id, date_granted, created_at, updated_at)
+        VALUES ${valuesPlaceholders} RETURNING *;
+      `).bind(...values);
+
+    preparedStatements.push(preparedStatement);
+  }
+  await DB.batch(preparedStatements);
+   return void 0;
 }
 
 
@@ -286,6 +419,7 @@ export async function getOriginalPayees(
   LIMIT 1
 `);
   let cursor;
+
   const lastrecord = await stmt.bind(issuer, assetid).all();
   //console.log(lastrecord, "last record")
   if (lastrecord.results.length > 0) {
@@ -295,50 +429,31 @@ export async function getOriginalPayees(
     cursor = undefined
     console.log(`there is no cursor for ${issuer} ${assetid}`)
   }
-
-
-  //console.log(lastrecord.results, "last record")
   let accountPayments: any = [];
   let owners: [{ asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
   let paymentResponse: any = await fetchPayments(env, issuer, cursor);
   if (paymentResponse.status === 404) {
     return;
   }
-  //console.log('paymentResponse', paymentResponse._embedded.records)
-  // const assetExists = await Balance.findBy("issuer_id", issuer, DB )
-  // const stmt:D1PreparedStatement = await DB.prepare("SELECT * FROM balances WHERE issuer_id = ?1 AND asset_id = ?2 ");
-  //const existingRecords = await stmt.bind(issuer, assetid).all();
-
-  //console.log(existingRecords, "existing records")
   let iter = 0
   let needsNext = false
   let nextcursor = "blank"
-  //if (existingRecords>0){return {assetExists, nextcursor}}
   const preparedStatements = [];
   while (
     paymentResponse.length % 200 === 0 ||
     paymentResponse._embedded.records.length !== 0
   ) {
-    //handle extremely large accounts
-    //console.log(iter, "iter")
     if (iter > 1000) {
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
       break
     }
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
-    //console.log(assetid, iter)
     let balanceForms = [];
     for (let record in paymentResponse._embedded.records) {
       if (paymentResponse._embedded.records[record].asset_code === assetid) {
         const txid = paymentResponse._embedded.records[record].transaction_hash;
         const balanceid = paymentResponse._embedded.records[record].id;
-        // const paymentExists = existingRecords.results.some((balance) => {
-        //    return balance.balance_id === balanceid;
-        // });
-
-
-        //   if (!paymentExists){
         const balanceForm = new BalanceForm(
           new Balance({
             id: balanceid,
@@ -352,9 +467,6 @@ export async function getOriginalPayees(
         );
 
         balanceForms.push(balanceForm);
-        // await Balance.create(balanceForm, DB)
-        //}
-
         owners.push({
           asset_id: assetid,
           account_id: paymentResponse._embedded.records[record].to,
@@ -363,38 +475,23 @@ export async function getOriginalPayees(
         })
       }
     }
-    //const maxParametersPerStatement = 100; // d1 limit
-     //const parametersPerRecord = 9; // number of parameters in your record
-     //const chunkSize = Math.floor(maxParametersPerStatement / parametersPerRecord);
     const chunkSize = 9; // Change this to fit the actual number of parameters per record
 
 
     for (let i = 0; i < balanceForms.length; i += chunkSize) {
       const chunk = balanceForms.slice(i, i + chunkSize);
-      //console.log(chunk, 'chunk');
       const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
-
       const values = chunk.flatMap(form => [form.data.id, form.data.tx_id, form.data.issuer_id, form.data.asset_id, form.data.account_id, form.data.balance, form.data.date_acquired]);
-
       const preparedStatement = DB.prepare(`
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
-      //console.log(preparedStatement.D1PreparedStatement.params.length, "preparedStatement.length")
+
       preparedStatements.push(preparedStatement);
     }
-    if (preparedStatements.length > 0) {
-      //console.log(preparedStatements.length, "preparedStatements.length")
-      //console.log(preparedStatements)
-    }
-   // console.log(paymentResponse['_links'].next.href, "next")
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
     iter += 1
   }
   await DB.batch(preparedStatements);
-
-  //console.log('accountPayments', accountPayments)
-  //console.log('owners', owners)
-  //console.log(nextcursor)
   return { owners, nextcursor };
 }

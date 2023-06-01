@@ -60,3 +60,27 @@ CREATE TABLE cursor(
   created_at datetime,
   updated_at datetime
 );
+
+DROP TABLE IF EXISTS asset;
+
+CREATE TABLE asset(
+  id text PRIMARY KEY,
+  issuer_id text,
+  code text,
+  query text,
+  deleted_at datetime,
+  created_at datetime,
+  updated_at datetime
+);
+
+DROP TABLE IF EXISTS claimable;
+
+CREATE TABLE claimable(
+  id text PRIMARY KEY,
+  claimable_id text,
+  date_granted text,
+  date_claimed text,
+  deleted_at datetime,
+  created_at datetime,
+  updated_at datetime
+);

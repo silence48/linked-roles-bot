@@ -50,3 +50,27 @@ export interface CursorDataI {
 export interface CursorI extends Model {
   data: CursorDataI
 }
+export interface AssetI extends Model {
+  data: AssetDataI
+}
+
+export interface AssetDataI {
+  id?: string
+  issuer_id?: string
+  code?: string
+  query?: string
+}
+export interface AssetI extends Model {
+  data: AssetDataI
+}
+
+export interface ClaimableDataI {
+  id?: string
+  claimable_id?: string
+  date_granted?: string
+  date_claimed?: string
+}
+export interface ClaimableI extends Model {
+  data: ClaimableDataI
+}
+
