@@ -6,20 +6,39 @@ import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
 import { Balance, Claimable } from '~/models';
 import { BalanceForm, ClaimableForm } from '~/forms';
-
-
-export async function handleResponse(response: Response) {
+import { TypedResponse } from '@remix-run/cloudflare';
+import type { xlmAPI } from './types/xlmAPI';
+import { BaseEffectRecord, ClaimableBalanceClaimantCreated, ClaimableBalanceClaimed, ClaimableBalanceCreated } from './types/effects';
+export interface ResponseError {
+  status: number;
+  message: string;
+}
+export type HorizonOperationResponse = Horizon.ResponseCollection<Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>>;
+export type OperationsArray<T> = Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>[];
+export type ClaimableBalanceOpArray = Horizon.CreateClaimableBalanceOperationResponse[];
+export type ClaimedOperationArray = Horizon.ClaimClaimableBalanceOperationResponse[];
+export type OperationsArray1<T extends Horizon.OperationResponseType> = Horizon.BaseOperationResponse<T>[];
+export async function handleResponse(response: Response): Promise<any> {
   const { headers, ok } = response;
   const contentType = headers.get('content-type');
-  
-  const content = contentType
-    ? contentType.includes('json')
-      ? response.json()
-      : response.text()
-    : { status: response.status, message: response.statusText };
-  if (ok) return content;
-  else throw await content;
-}  
+  let content: Promise<string | JSON> | ResponseError;
+
+  if (contentType) {
+    if (contentType.includes('json')) {
+      content = response.json();
+    } else {
+      content = response.text();
+    }
+  } else {
+    content = { status: response.status, message: response.statusText };
+  }
+
+  if (ok) {
+    return content;
+  } else {
+    throw await content;
+  }
+}
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { DB } = context.env as any;
@@ -94,13 +113,29 @@ export const stellarExpertTxLink = (hash: string, env: any) =>
   ).toLowerCase()}/tx/${hash}`;
 
 
+export async function fetchWithRetry(url: string, retries = 3, delay = 500): Promise<Response> {
+  try {
+    const response = await fetch(url);
+    if (response.status !== 503) {
+      return response;
+    }
+    throw new Error('Service Unavailable');
+  } catch (error) {
+    if (retries > 0) {
+      console.log(`Retrying in ${delay}ms...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return fetchWithRetry(url, retries - 1, delay * 2);
+    } else {
+      throw error;
+    }
+  }
+}
 
 export async function fetchOperations(
   env: any,
   account: string,
   cursor?: string,
-) {
-
+): Promise<Horizon.ResponseCollection<Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>>> {
   if (cursor !== undefined) {
     const url = horizonUrl(env) +
       `/accounts/${account}/operations?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
@@ -118,7 +153,7 @@ export async function fetchOperations(
 export async function fetchOperation(
   env: any,
   operationId: string,
-) {
+): Promise<Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>> {
   return fetch(horizonUrl(env) + `/operations/${operationId}`).then(
     handleResponse,
   );
@@ -132,12 +167,12 @@ export async function getVerificationToken(
   message: any,
   signature: any,
 ) {
-  let accountOperations: any = [];
-  let opRes: any = await fetchOperations(env, pubkey);
+  let accountOperations: OperationsArray<any> = [];
+  let opRes: HorizonOperationResponse = await fetchOperations(env, pubkey);
   if (opRes.status === 404) {
     return;
   }
-  
+
   let iter = 0
   while (
     accountOperations.length % 200 === 0 ||
@@ -150,7 +185,7 @@ export async function getVerificationToken(
     iter += 1
   }
 
-  const badgePayments = accountOperations
+  const badgePayments: OperationsArray<Horizon.PaymentOperationResponse> = accountOperations
     .filter(
       (item: any) => item.type === 'payment' && item.asset_type !== 'native',
     )
@@ -160,13 +195,14 @@ export async function getVerificationToken(
       ),
     );
 
-  const badgeOperations = accountOperations
+  const badgeOperations: OperationsArray<Horizon.CreateClaimableBalanceOperationResponse> = accountOperations
     .filter(
-      (item: any) =>
+      (item: Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>) =>
         item.type === 'create_claimable_balance' &&
-        item.claimants.some((e: any) => e.destination === pubkey),
+        (item as Horizon.CreateClaimableBalanceOperationResponse).claimants.some((e: any) => e.destination === pubkey),
     )
-    .filter((item: any) =>
+    .map(item => item as Horizon.CreateClaimableBalanceOperationResponse)
+    .filter((item: Horizon.CreateClaimableBalanceOperationResponse) =>
       badgeDetails.find(
         ({ code, issuer }) =>
           item.asset.split(':')[0] === code &&
@@ -212,7 +248,7 @@ export async function getVerificationToken(
       return acc.concat(item.operation);
     }, []);
   };
-  
+
   let verificationObject = {
     p: pubkey,
     m: message,
@@ -241,29 +277,12 @@ async function getPrizeTransaction(hash: string, env: any) {
   return prizeRecord.length > 0 ? parseInt(prizeRecord[0].amount) : false;
 }
 
-async function fetchWithRetry(url: string, retries = 3, delay = 500): Promise<Response> {
-  try {
-    const response = await fetch(url);
-    if (response.status !== 503) {
-      return response;
-    }
-    throw new Error('Service Unavailable');
-  } catch (error) {
-    if (retries > 0) {
-      console.log(`Retrying in ${delay}ms...`);
-      await new Promise(resolve => setTimeout(resolve, delay));
-      return fetchWithRetry(url, retries - 1, delay * 2);
-    } else {
-      throw error;
-    }
-  }
-}
-
 export async function fetchPayments(
   env: any,
   issuer: string,
   cursor?: string,
-) {
+  //)Promise<Horizon.ResponseCollection< Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>>> {
+): Promise<Horizon.ResponseCollection<Horizon.PaymentOperationResponse>> {
   if (cursor !== undefined) {
     const url = horizonUrl(env) +
       `/accounts/${issuer}/payments?cursor=${cursor}&limit=200&order=desc&include_failed=false`;
@@ -286,8 +305,8 @@ export async function getOriginalClaimants(
   assetid: any,
   subrequests: any,
 ) {
-  
-  let accountOperations = [];
+
+  let accountOperations: OperationsArray<any> = [];
   const { DB } = context.env;
 
   const stmt = DB.prepare(`
@@ -302,7 +321,7 @@ export async function getOriginalClaimants(
   let preparedStatements = [];
   const lastrecord = await stmt.bind(issuer, assetid).all();
   subrequests += 1
-  
+
   if (lastrecord.results.length > 0) {
     cursor = lastrecord.results[0].id;
     console.log(cursor, "claimable cursor")
@@ -311,9 +330,9 @@ export async function getOriginalClaimants(
     console.log(`there is no cursor for ${issuer} ${assetid}`)
   }
 
-  let operationResults = await fetchOperations("production", issuer, cursor);
+  let operationResults: HorizonOperationResponse = await fetchOperations("production", issuer, cursor);
   subrequests += 1
-  
+
   if (operationResults.status === 404) {
     return;
   }
@@ -331,55 +350,62 @@ export async function getOriginalClaimants(
     operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
     iter += 1
     subrequests += 1
-    
+
   }
   const balanceForms: BalanceForm[] = [];
   const claimableForms: ClaimableForm[] = [];
 
-  const badgeOperations: Horizon.CreateClaimableBalanceOperationResponse[] = accountOperations
+  const badgeOperations: ClaimableBalanceOpArray = accountOperations
     .filter(
-      (operation) => {
+      (operation: Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>) => {
         const optype = operation.type === "create_claimable_balance";
-        if (optype === false || operation.asset === "native") { return false }
-        const asset = operation.asset;
-        const assetcode = asset.split(":")[0] === assetid;
-        const assetissuer = asset.split(":")[1] === issuer;
-        const amount = parseFloat(operation.amount) === 0.0000001 || parseFloat(operation.amount) === 1.0000000;
-        return amount && assetcode && assetissuer;
-      }
-    )
-
-  const claimBacks: Horizon.ClaimClaimableBalanceOperationResponse[] = accountOperations
-    .filter(
-      (operation) => {
-        const optype = operation.type === "claim_claimable_balance";
-        const asset = operation.asset;
-        if (optype === false || asset === "native") { return false}
+        if (optype === false || (operation as Horizon.CreateClaimableBalanceOperationResponse).asset === "native") { return false }
         return true;
-      } 
+      })
+    .map(operation => operation as Horizon.CreateClaimableBalanceOperationResponse)
+
+    .filter((operation: Horizon.CreateClaimableBalanceOperationResponse) => {
+      const asset = operation.asset;
+      const assetcode = asset.split(":")[0] === assetid;
+      const assetissuer = asset.split(":")[1] === issuer;
+      const amount = parseFloat(operation.amount) === 0.0000001 || parseFloat(operation.amount) === 1.0000000;
+      return amount && assetcode && assetissuer;
+    }
+    )
+  type ClaimableBalanceOp = Horizon.BaseOperationResponse<Horizon.OperationResponseType.claimClaimableBalance, Horizon.OperationResponseTypeI.claimClaimableBalance>;
+
+  const claimBacks: ClaimableBalanceOp[] = accountOperations
+    .filter(
+      (operation): operation is ClaimableBalanceOp => {
+        const optype = operation.type === "claim_claimable_balance";
+        if (optype === false) { return false }
+        return true;
+      }
     );
 
   for (let op in badgeOperations) {
 
-    if (subrequests > 799) {break}
-    const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
+    if (subrequests > 799) { break }
+    console.log('effecturl', badgeOperations[op]._links.effects.href)
+    const effects: Horizon.ResponseCollection<BaseEffectRecord> = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
     subrequests += 1
-    const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created");
+    const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created").map(effect => effect as ClaimableBalanceCreated);
 
     const claimable_ID = claimcreated[0].balance_id;
-    const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
+    const claimed = claimBacks.some((claim) => (claim as Horizon.ClaimClaimableBalanceOperationResponse).balance_id === claimable_ID);
 
-    if (claimed) { 
+    if (claimed) {
       console.log(`it was claimed back, claimable_ID: ${claimable_ID} `);
-      continue }
+      continue
+    }
 
     let claimants: Horizon.Claimant[] = badgeOperations[op].claimants;
     if (claimants.length > 1) {
-      claimants = claimants.filter((claimant) => 
-      {let precondition1 = claimant.destination != issuer;
-       let precondition2 = claimant.destination != badgeOperations[op].sponsor;
-       let precondition3 = claimant.destination != badgeOperations[op].source_account;
-       return precondition1 && precondition2 && precondition3;
+      claimants = claimants.filter((claimant) => {
+        let precondition1 = claimant.destination != issuer;
+        let precondition2 = claimant.destination != badgeOperations[op].sponsor;
+        let precondition3 = claimant.destination != badgeOperations[op].source_account;
+        return precondition1 && precondition2 && precondition3;
       }
       );
     }
@@ -412,7 +438,7 @@ export async function getOriginalClaimants(
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
-  let chunkSize = 9; 
+  let chunkSize = 9;
   for (let i = 0; i < balanceForms.length; i += chunkSize) {
     const chunk = balanceForms.slice(i, i + chunkSize);
     const valuesPlaceholders = chunk.map(() => "(?,?,?,?,?,?,?,datetime('now'),datetime('now'))").join(","); // Change the number of "?" placeholders to match the number of parameters per record
@@ -421,7 +447,7 @@ export async function getOriginalClaimants(
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
-    
+
     preparedStatements.push(preparedStatement);
   }
   chunkSize = 18;
@@ -436,10 +462,10 @@ export async function getOriginalClaimants(
 
     preparedStatements.push(preparedStatement);
   }
-  
+
   await DB.batch(preparedStatements)
-   console.log(`returning ${subrequests} subrequests`)
-   return subrequests;
+  console.log(`returning ${subrequests} subrequests`)
+  return subrequests;
 }
 
 
