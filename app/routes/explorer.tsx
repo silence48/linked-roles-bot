@@ -367,7 +367,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
       const sr = await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
       subrequests = sr;
       console.log(`subrequests: ${subrequests}, sr  ${sr}`)
-      if (subrequests > 799) {
+      if (subrequests > 500) {
         break;
       }
       }
