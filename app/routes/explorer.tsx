@@ -3,7 +3,7 @@ import { badgeDetails, seriesFourIssuers } from '../utils/badge-details';
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import styled from "@emotion/styled";
 import { keyframes } from "@emotion/react";
-import {getOriginalClaimants} from "../utils/sqproof"
+//import {getOriginalClaimants} from "../utils/sqproof"
 import { useLoaderData } from '@remix-run/react';
 
 import React, { useState, useEffect } from 'react';
@@ -353,6 +353,12 @@ const Spinner = styled.div`
 
 // Define your action function
 export let loader = async ({ request, context }: LoaderArgs) => {
+  const dynamicImport = async (env, context, issuer, code, subrequests) => {
+    const myModule = await import("../utils/sqproof");
+    const getOriginalClaimants = myModule.getOriginalClaimants;
+    return getOriginalClaimants(env,context, issuer, code, subrequests); // if it's a function
+  }
+
 
     const { sessionStorage } = context as any;
     const session = await sessionStorage.getSession(request.headers.get("Cookie"));
@@ -367,7 +373,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
         break;
       }
       console.log(`badge: ${seriesFourIssuers[badge].code}`)
-      const sr = await getOriginalClaimants("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
+      const sr = await dynamicImport("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
       subrequests = sr;
       console.log(`subrequests: ${subrequests}, sr  ${sr}`)
       if (subrequests > 699) {

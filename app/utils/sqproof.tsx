@@ -6,18 +6,15 @@ import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
 import { Balance, Claimable } from '~/models';
 import { BalanceForm, ClaimableForm } from '~/forms';
-import { TypedResponse } from '@remix-run/cloudflare';
-import type { xlmAPI } from './types/xlmAPI';
-import { BaseEffectRecord, ClaimableBalanceClaimantCreated, ClaimableBalanceClaimed, ClaimableBalanceCreated } from './types/effects';
-export interface ResponseError {
+import type { BaseEffectRecord, ClaimableBalanceCreated } from './types/effects';
+interface ResponseError {
   status: number;
   message: string;
 }
-export type HorizonOperationResponse = Horizon.ResponseCollection<Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>>;
-export type OperationsArray<T> = Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>[];
-export type ClaimableBalanceOpArray = Horizon.CreateClaimableBalanceOperationResponse[];
-export type ClaimedOperationArray = Horizon.ClaimClaimableBalanceOperationResponse[];
-export type OperationsArray1<T extends Horizon.OperationResponseType> = Horizon.BaseOperationResponse<T>[];
+type HorizonOperationResponse = Horizon.ResponseCollection<Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>>;
+type OperationsArray<T> = Horizon.BaseOperationResponse<Horizon.OperationResponseType, Horizon.OperationResponseTypeI>[];
+type ClaimableBalanceOpArray = Horizon.CreateClaimableBalanceOperationResponse[];
+
 export async function handleResponse(response: Response): Promise<any> {
   const { headers, ok } = response;
   const contentType = headers.get('content-type');
