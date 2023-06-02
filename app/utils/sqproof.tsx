@@ -325,7 +325,7 @@ export async function getOriginalClaimants(
     operationResults._embedded.records.length !== 0
   ) {
     //try only getting 800 records at a time
-    if (subrequests > 799) { break }
+    if (subrequests > 600) { break }
 
     accountOperations = accountOperations.concat(operationResults._embedded.records);
     operationResults = await fetch(operationResults['_links'].next.href).then(handleResponse);
@@ -340,7 +340,7 @@ export async function getOriginalClaimants(
     .filter(
       (operation) => {
         const optype = operation.type === "create_claimable_balance";
-        if (optype === false || operation.asset === "native") { return }
+        if (optype === false || operation.asset === "native") { return false }
         const asset = operation.asset;
         const assetcode = asset.split(":")[0] === assetid;
         const assetissuer = asset.split(":")[1] === issuer;
@@ -354,7 +354,6 @@ export async function getOriginalClaimants(
       (operation) => {
         const optype = operation.type === "claim_claimable_balance";
         const asset = operation.asset;
-        
         if (optype === false || asset === "native") { return false}
         return true;
       } 
@@ -362,17 +361,16 @@ export async function getOriginalClaimants(
 
   for (let op in badgeOperations) {
 
-    if (subrequests > 500) {break}
+    if (subrequests > 799) {break}
     const effects = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
     subrequests += 1
-    //console.log(subrequests, "subrequests")
     const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created");
 
     const claimable_ID = claimcreated[0].balance_id;
     const claimed = claimBacks.some((claim) => claim.balance_id === claimable_ID);
 
     if (claimed) { 
-      console.log('it was claimed back');
+      console.log(`it was claimed back, claimable_ID: ${claimable_ID} `);
       continue }
 
     let claimants: Horizon.Claimant[] = badgeOperations[op].claimants;
@@ -384,9 +382,6 @@ export async function getOriginalClaimants(
        return precondition1 && precondition2 && precondition3;
       }
       );
-      //console.log(claimants)
-      //console.log( "claimants")
-      
     }
     //if there was more than 2 claimants and the issuer was one of them, then this probably wasn't an SQ badge.
     if (claimants.length > 1) {
@@ -403,7 +398,6 @@ export async function getOriginalClaimants(
         date_granted: badgeOperations[op].created_at
       })
     )
-    
     const balanceForm = new BalanceForm(
       new Balance({
         id: createdClaimOpId,
@@ -418,8 +412,6 @@ export async function getOriginalClaimants(
     claimableForms.push(claimableForm);
     balanceForms.push(balanceForm);
   }
-  console.log(balanceForms.length, "balance forms length");
-  console.log(claimableForms.length, "claimable forms length");
   let chunkSize = 9; 
   for (let i = 0; i < balanceForms.length; i += chunkSize) {
     const chunk = balanceForms.slice(i, i + chunkSize);
@@ -429,7 +421,7 @@ export async function getOriginalClaimants(
         INSERT OR IGNORE INTO balances (id, tx_id, issuer_id, asset_id, account_id, balance, date_acquired, created_at, updated_at)
         VALUES ${valuesPlaceholders} RETURNING *;
       `).bind(...values);
-    //console.log(preparedStatements.length, "prepared statement")
+    
     preparedStatements.push(preparedStatement);
   }
   chunkSize = 18;
@@ -446,7 +438,7 @@ export async function getOriginalClaimants(
   }
   
   await DB.batch(preparedStatements)
-  
+   console.log(`returning ${subrequests} subrequests`)
    return subrequests;
 }
 
