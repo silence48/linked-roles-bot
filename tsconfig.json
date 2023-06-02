@@ -1,6 +1,6 @@
 {
   "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["functions/**/*", "node_modules/**/*", "**/*.spec.ts"],
+  "exclude": ["node_modules/**/*", "**/*.spec.ts"],
   "compilerOptions": {
     "lib": ["ESNext"],
     "isolatedModules": true,
