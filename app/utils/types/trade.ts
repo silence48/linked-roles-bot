@@ -1,4 +1,4 @@
-import { BaseEffectRecord } from "./effects";
+import type { BaseEffectRecord } from "./effects";
 
 export interface Trade extends BaseEffectRecord {
   seller: string;

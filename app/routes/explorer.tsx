@@ -2,8 +2,6 @@
 import { badgeDetails, seriesFourIssuers } from '../utils/badge-details';
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import styled from "@emotion/styled";
-import { keyframes } from "@emotion/react";
-//import {getOriginalClaimants} from "../utils/sqproof"
 import { useLoaderData } from '@remix-run/react';
 
 import React, { useState, useEffect } from 'react';
@@ -75,14 +73,6 @@ const ExpandButton = styled.button`
   }
 `;
 
-const NavItems = styled.div`
-  display: flex;
-
-  @media (max-width: 600px) {
-    display: none;
-  }
-`;
-
 const Logo = styled.img`
   height: 40px;
   margin-right: 1rem;
@@ -107,49 +97,6 @@ const Title = styled.h1`
   @media (min-width: 1024px) {
     font-size: 1.5rem;
   }
-`;
-
-const NavLink = styled.a`
-  color: #FFFFFF;
-  text-decoration: none;
-  margin-right: 1rem;
-  padding: 0.5rem;
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #FFD700;
-  }
-`;
-
-
-const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-`;
-
-const Loader = styled.div`
-  --Loader-color: var(--color-gray-80);
-  --Loader-size: 1rem;
-  position: relative;
-  width: var(--Loader-size);
-  height: var(--Loader-size);
-`;
-
-const LoaderInner = styled.div`
-  box-sizing: border-box;
-  display: block;
-  position: absolute;
-  width: calc(var(--Loader-size) * 0.8);
-  height: calc(var(--Loader-size) * 0.8);
-  margin: calc(var(--Loader-size) * 0.1);
-  border: calc(var(--Loader-size) * 0.1) solid var(--Loader-color);
-  border-radius: 50%;
-  animation: ${rotate} 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: var(--Loader-color) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0);
 `;
 
 const BadgeGrid = styled.div`
@@ -341,21 +288,19 @@ const TableHeader = styled.th`
   }
 `;
 
-
 const Spinner = styled.div`
   border: 16px solid  #ededef;
   border-top: 16px solid #28282c;
   border-radius: 50%;
   width: 60px;
   height: 60px;
-  animation: ${rotate} 2s linear infinite;
 `;
 
 // Define your action function
 export let loader = async ({ request, context }: LoaderArgs) => {
   const dynamicImport = async (env, context, issuer, code, subrequests) => {
-    const myModule = await import("../utils/sqproof");
-    const getOriginalClaimants = myModule.getOriginalClaimants;
+    const sqproof = await import("../utils/sqproof");
+    const getOriginalClaimants = sqproof.getOriginalClaimants;
     return getOriginalClaimants(env,context, issuer, code, subrequests); // if it's a function
   }
 
