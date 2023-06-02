@@ -7,7 +7,6 @@ import { Discord, StellarAccount } from '~/models';
 import { getUser } from './session.server';
 import { Balance, Claimable } from '~/models';
 import { BalanceForm, ClaimableForm } from '~/forms';
-import type { BaseEffectRecord, ClaimableBalanceCreated } from './types/effects';
 
 export enum Networks {
   PUBLIC = 'Public Global Stellar Network ; September 2015',
@@ -396,9 +395,9 @@ export async function getOriginalClaimants(
 
     if (subrequests > 799) { break }
     console.log('effecturl', badgeOperations[op]._links.effects.href)
-    const effects: Horizon.ResponseCollection<BaseEffectRecord> = await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
+    const effects: any= await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
     subrequests += 1
-    const claimcreated = effects._embedded.records.filter((effect) => effect.type === "claimable_balance_created").map(effect => effect as ClaimableBalanceCreated);
+    const claimcreated = effects._embedded.records.filter((effect: { type: string; }) => effect.type === "claimable_balance_created").map(effect => effect);
 
     const claimable_ID = claimcreated[0].balance_id;
     const claimed = claimBacks.some((claim) => (claim as Horizon.ClaimClaimableBalanceOperationResponse).balance_id === claimable_ID);
