@@ -11,6 +11,7 @@ module.exports = {
   serverModuleFormat: "esm",
   serverPlatform: "neutral",
   future: {
+    unstable_dev: true,
     v2_errorBoundary: true,
     v2_meta: true,
     v2_normalizeFormMethod: true,
