@@ -19,6 +19,7 @@
     "@remix-run/cloudflare-pages": "^1.16.1",
     "@remix-run/react": "^1.16.1",
     "@tsndr/cloudflare-worker-jwt": "^2.2.1",
+    "antd": "^5.5.2",
     "buffer-polyfill": "npm:buffer@^6.0.3",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
