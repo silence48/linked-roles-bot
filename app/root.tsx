@@ -17,7 +17,7 @@ import { ModalProvider } from '~/context';
 
 export const meta: V2_MetaFunction  = () => ([
   {title: "CommuniDAO"},  
-});
+]);
 
 export const links: LinksFunction = () => ([
   { rel: 'stylesheet', href: designStyle },
@@ -59,11 +59,11 @@ export default function App() {
         <Links />
       </head>
       <body>
+        <Scripts />
         <ModalProvider>
         <Outlet />
         </ModalProvider>
         <ScrollRestoration />
-        <Scripts />
       </body>
     </html>
   );
