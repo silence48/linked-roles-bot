@@ -82,12 +82,8 @@ export async function getrefreshtoken(transaction, request, context){
 
 
 export async function getaccesstoken(refreshtoken, request, context){
-  
-    const {
-      Networks,
-      TransactionBuilder,
-      
-    } = await import('stellar-base');
+   const {Networks, TransactionBuilder } = await import('stellar-base');
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   
   
   let validity = jwt.verify(refreshtoken, context.env.authsigningkey)
@@ -124,6 +120,7 @@ export async function getaccesstoken(refreshtoken, request, context){
 //this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
   const { User } = await import ('../models');
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
     const { DB } = context.env as any

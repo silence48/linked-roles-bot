@@ -1,13 +1,15 @@
 //import { Button } from "communi-design-system";
 import { Link, useLoaderData } from "@remix-run/react";
 import { type LoaderArgs, json } from "@remix-run/cloudflare";
-import { getUser } from "~/utils/session.server";
+
 import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 import { Page, Container, GridContainer, TableContainer, Table, TableRow, TableCell, TableHeader, AccountContainer, ProofContainer, Button, IconButton, IconText } from "~/components";
-import { fetchRegisteredAccounts } from "~/utils/sqproof";
+//import { fetchRegisteredAccounts } from "~/utils/sqproof";
 
 // Define your loader function
 export let loader = async ({ request, context }: LoaderArgs) => {
+  const {fetchRegisteredAccounts} = await import("~/utils/sqproof");
+  const { getUser } = await import("~/utils/session.server");
   const { sessionStorage } = context as any;
   const user = await getUser(request, sessionStorage);
   const { discord_user_id } = user ?? false;
@@ -28,6 +30,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
 };
 
 export default function Index() {
+  
   const { discord_user_id, accounts, proofs } = useLoaderData();
   const copyToClipboard = (token) => {
     navigator.clipboard.writeText(token);

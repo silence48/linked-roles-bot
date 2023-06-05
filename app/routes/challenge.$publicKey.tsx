@@ -1,10 +1,10 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
-import { getUser } from "~/utils/session.server";
-import { generateAuthChallenge } from '~/utils/stellarUtils.server';
-import { Keypair } from "stellar-base";
 
 // URL: /challenge/$public_key 
 export const loader = async ({ request, context, params }: LoaderArgs) => {
+  const {getUser} = await import("~/utils/session.server");
+  const {generateAuthChallenge} = await import("~/utils/stellarUtils.server");
+  const { Keypair } = await import("stellar-base");
   const { sessionStorage } = context as any;
   const { publicKey } = params
   console.log('challenge.$publickey loader', publicKey)

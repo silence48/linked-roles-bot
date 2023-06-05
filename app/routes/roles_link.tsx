@@ -1,12 +1,13 @@
 import { redirect, type LoaderFunction } from '@remix-run/cloudflare';
 // import { useLoaderData } from '@remix-run/react';
-import { Discord } from '~/models'
+
 
 // roles.link === /roles/link
 export let loader: LoaderFunction = async ({
     request,
     context,
   }) => {
+    const { Discord } = await import("~/models");
     const discord = await Discord.getOAuthUrl(context.env);
     const { url, state } = discord
     return redirect(url, {

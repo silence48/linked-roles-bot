@@ -1,8 +1,11 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
-import { checkRoles } from "~/utils/checkRoles.server";
-import { getUser } from "~/utils/session.server";
-import jwt from '@tsndr/cloudflare-worker-jwt';
+
 export const loader = async ({ context, request }: LoaderArgs) => {
+  const { checkRoles } = await import("~/utils/checkRoles.server");
+  const { getUser } = await import("~/utils/session.server");
+  const { jwt } = await import('@tsndr/cloudflare-worker-jwt');
+
+
   const { sessionStorage } = context as any;
   const { discord_user_id, token: access_token } = await getUser(request, sessionStorage) ?? {}
   const {payload} = jwt.decode(access_token) as any;

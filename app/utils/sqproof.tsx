@@ -1,12 +1,8 @@
 //import { Networks, TransactionBuilder } from 'stellar-base';
 //import { Networks } from 'stellar-base';
-import { badgeDetails } from './badge-details';
+
 //import jwt from "@tsndr/cloudflare-worker-jwt";
 import type { Horizon } from 'horizon-api';
-import { Discord, StellarAccount } from '~/models';
-import { getUser } from './session.server';
-import { Balance, Claimable } from '~/models';
-import { BalanceForm, ClaimableForm } from '~/forms';
 
 export enum Networks {
   PUBLIC = 'Public Global Stellar Network ; September 2015',
@@ -44,21 +40,30 @@ export async function handleResponse(response: Response): Promise<any> {
 }
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
+  const {StellarAccount } = await import("~/models");
+  const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   const { discord_user_id } = await getUser(request, context.sessionStorage);
   const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
   return stellarAccounts;
 }
+
 export async function getAccessToken(account: string, request: Request, context: any) {
+  const {StellarAccount } = await import("~/models");
+  // const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
-  const { discord_user_id } = await getUser(request, context.sessionStorage);
+  // const { discord_user_id } = await getUser(request, context.sessionStorage);
   const record = await StellarAccount.findBy("public_key", account, DB);
   return record[0].refresh_token;
 }
+
 export async function generateProofs(request: Request, context: any, accounts: string[]) {
-  const stellarbase = await import("stellar-base");
+  const { Discord } = await import("~/models");
+  const { getUser } = await import("~/utils/session.server");
+  const {TransactionBuilder, Networks} = await import("stellar-base");
   const jwt = await import("@tsndr/cloudflare-worker-jwt")
-  const TransactionBuilder = stellarbase.TransactionBuilder;
+
+  //const TransactionBuilder = stellarbase.TransactionBuilder;
 
 
   const { sessionStorage } = context as any;
@@ -71,7 +76,7 @@ export async function generateProofs(request: Request, context: any, accounts: s
   for (const account of accounts) {
     const accesstoken = await getAccessToken(account, request, context);
     const decoded = await jwt.decode(accesstoken)
-    let passphrase: Networks = stellarbase.Networks.PUBLIC;
+    let passphrase = Networks.PUBLIC;
     let transaction = new (TransactionBuilder.fromXDR as any)(decoded.payload.xdr, passphrase);
     const signature = transaction.signatures[0].signature().toString("base64");
     const token = await getVerificationToken(account, 'production', transaction, signature);
@@ -175,6 +180,8 @@ export async function getVerificationToken(
   message: any,
   signature: any,
 ) {
+  const {badgeDetails} = await import('./badge-details');
+  
   let accountOperations: OperationsArray<any> = [];
   let opRes: HorizonOperationResponse = await fetchOperations(env, pubkey);
   if (opRes.status === 404) {
@@ -313,7 +320,8 @@ export async function getOriginalClaimants(
   assetid: any,
   subrequests: any,
 ) {
-
+const {Balance, Claimable } = await import('../models');
+const { BalanceForm, ClaimableForm } = await import('../forms');
   let accountOperations: OperationsArray<any> = [];
   const { DB } = context.env;
 
@@ -483,6 +491,9 @@ export async function getOriginalPayees(
   issuer: any,
   assetid: any,
 ) {
+
+  const {Balance } = await import('../models');
+const { BalanceForm } = await import('../forms');
   const { DB } = context.env;
   const stmt = DB.prepare(`
   SELECT * 

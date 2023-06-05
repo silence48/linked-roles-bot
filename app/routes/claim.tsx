@@ -1,17 +1,24 @@
 import * as React from "react";
 import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare";
-import { getUser } from "~/utils/session.server";
-import { User } from "~/models";
+//import { getUser } from "~/utils/session.server";
+//import { User } from "~/models";
 import { useModal } from "~/context";
 import { Layout, Button } from "communi-design-system";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-import { checkRoles } from "~/utils/checkRoles.server";
-import { verifyAndRenewAccess } from "~/utils/auth.server";
-import { generateDefaultClaimTransaction } from "~/utils/stellarUtils.server";
-import jwt from "@tsndr/cloudflare-worker-jwt";
+
 
 export const loader = async ({ request, context }: LoaderArgs) => {
+
+  const { getUser } = await import("~/utils/session.server");
+  const { checkRoles } = await import("~/utils/checkRoles.server");
+  const { generateDefaultClaimTransaction } = await import("~/utils/stellarUtils.server");
+  const { User } = await import("~/models");
+
+  //const {verifyAndRenewAccess} = await import("~/utils/auth.server");
+  const {jwt} = await import("@tsndr/cloudflare-worker-jwt");  
+
+
   const { sessionStorage } = context as any;
   const { DB } = context.env as any;
   const { authsigningkey } = context.env as any;
@@ -51,6 +58,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 };
 
 export default function Claim() {
+
   const { closeModal, isOpen, openModal } = useModal();
   const { xdr, isClaimed, provider } = useLoaderData() ?? {};
   const fetcher = useFetcher();

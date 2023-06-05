@@ -1,10 +1,11 @@
 // routes/delink.tsx
 
 import { type ActionFunction, redirect } from "@remix-run/cloudflare";
-import { fetchRegisteredAccounts, generateProofs } from "../utils/sqproof";
 
 // Define your action function
 export const action: ActionFunction = async ({ request, context }) => {
+  const { fetchRegisteredAccounts, generateProofs } = await import("../utils/sqproof");
+
   const { sessionStorage } = context as any;
   const stellarAccounts = await fetchRegisteredAccounts(request, context);
   const accounts = stellarAccounts.map((account) => account.public_key);

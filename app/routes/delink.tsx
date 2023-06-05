@@ -1,9 +1,13 @@
 import { type ActionFunction, redirect } from "@remix-run/cloudflare";
-import { fetchRegisteredAccounts } from "../utils/sqproof";
-import { StellarAccount } from "../models";
+
 // Define your action function
 export const action: ActionFunction = async ({ request, context }) => {
+  const { StellarAccount }  = await import("~/models");
+  const  { fetchRegisteredAccounts }  = await import("../utils/sqproof");
+
   const { sessionStorage } = context as any;
+  
+
   const accounts = await fetchRegisteredAccounts(request, context);
   if (request.method === "POST") {
     const formData = await request.formData();

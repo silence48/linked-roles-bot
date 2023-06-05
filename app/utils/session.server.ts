@@ -1,6 +1,6 @@
 import { redirect, json } from "@remix-run/cloudflare";
 
-interface SessionI {
+export interface SessionI {
   id?: string;
   discord_user_id?: string;
   user?: any;
@@ -12,7 +12,7 @@ interface SessionI {
   provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
 }
 
-interface UserSessionResponseI {
+export interface UserSessionResponseI {
   redirectTo?: string;
   message?: string;
 }
@@ -46,7 +46,7 @@ export async function createUserSession(
   }
 }
 
-async function getUserSession(request: Request, sessionStorage: Storage) {
+export async function getUserSession(request: Request, sessionStorage: Storage) {
   return sessionStorage.getSession(request.headers.get("Cookie"));
 }
 

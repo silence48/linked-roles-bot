@@ -1,9 +1,10 @@
-import { UserForm } from "~/forms";
-import { Discord, User } from "~/models";
-import { createUserSession } from "~/utils/session.server";
+
 import { type ActionArgs } from "@remix-run/cloudflare";
 
 export async function action({ request, context, params }: ActionArgs) {
+  const { createUserSession } = await import("~/utils/session.server");
+  const { UserForm } = await import("~/forms");
+  const { Discord, User } = await import("~/models");
   const { env, sessionStorage } = context as any;
   const { DB } = env;
   const form = await request.formData();

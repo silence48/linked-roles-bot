@@ -2,7 +2,7 @@
 import React from 'react';
 import type { LoaderFunction, LoaderArgs } from "@remix-run/cloudflare";
 import { useLoaderData, useFetcher } from '@remix-run/react';
-import { parse } from "cookie";
+
 
 
 export interface Env {
@@ -14,7 +14,7 @@ export const loader: LoaderFunction = async ({
   request,
   params,
 }: LoaderArgs) => {
-
+  const {parse} = require('cookie');
   try {
     // 1. Uses the code and state to acquire Discord OAuth2 tokens
     // const { sessionStorage } = context as any;
