@@ -38,8 +38,6 @@ export default function Index() {
   // Render proofs if they are available
   let renderProofs = null;
   if (proofs) {
-    throw new Error("there's an error in proofs for testing");
-    
     renderProofs = true;
   }
 
