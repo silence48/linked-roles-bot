@@ -393,7 +393,7 @@ export async function getOriginalClaimants(
 
   for (let op in badgeOperations) {
 
-    if (subrequests > 799) { break }
+    if (subrequests > 599) { break }
     console.log('effecturl', badgeOperations[op]._links.effects.href)
     const effects: any= await fetch(badgeOperations[op]._links.effects.href).then(handleResponse);
     subrequests += 1

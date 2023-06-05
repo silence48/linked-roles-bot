@@ -314,14 +314,14 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     // this updates and caches all the data to the database, ignore it
     let subrequests = 0
     for (const badge in seriesFourIssuers) {
-      if (subrequests > 699) {
+      if (subrequests > 499) {
         break;
       }
       console.log(`badge: ${seriesFourIssuers[badge].code}`)
       const sr = await dynamicImport("production", context, seriesFourIssuers[badge].issuer, seriesFourIssuers[badge].code, subrequests);
       subrequests = sr;
       console.log(`subrequests: ${subrequests}, sr  ${sr}`)
-      if (subrequests > 699) {
+      if (subrequests > 499) {
         break;
       }
       }
