@@ -1,14 +1,5 @@
-
-import {
-  Keypair,
-  TransactionBuilder,
-  Networks
-} from 'stellar-base';
-import { User } from '../models';
-import jwt from '@tsndr/cloudflare-worker-jwt'
-
-
 export async function gatherTxSigners(transaction, signers) {
+  const { Keypair } = await import('stellar-base');
   const hashedSignatureBase = transaction.hash();
   const signersFound = new Set();
   for (const signer of signers) {
@@ -60,6 +51,8 @@ export async function verifyTxSignedBy(transaction, accountID) {
  }
 
 export async function getrefreshtoken(transaction, request, context){
+  //import jwt from '@tsndr/cloudflare-worker-jwt'
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   console.log('trying to make a refresh token')
  // console.log(transaction)
   const decoder = new TextDecoder();
@@ -89,6 +82,14 @@ export async function getrefreshtoken(transaction, request, context){
 
 
 export async function getaccesstoken(refreshtoken, request, context){
+  
+    const {
+      Networks,
+      TransactionBuilder,
+      
+    } = await import('stellar-base');
+  
+  
   let validity = jwt.verify(refreshtoken, context.env.authsigningkey)
   if (!validity){
     throw('the token is not valid')
@@ -122,6 +123,7 @@ export async function getaccesstoken(refreshtoken, request, context){
 
 //this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
+  const { User } = await import ('../models');
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
     const { DB } = context.env as any
