@@ -29,6 +29,12 @@ const body = [
     "description":"This role is for the number of stellar quests completed.",
     "type":2
 },
+{
+  "key":"scftier",
+  "name":"Stellar Community Fund Tier",
+  "description":"This role is for what tier you are.",
+  "type":2
+},
 ];
 
 const response = await fetch(url, {

@@ -4,9 +4,9 @@ module.exports = {
   ignoredRouteFiles: ["**/.*"],
   server: "./server.js",
   serverBuildPath: "functions/[[path]].js",
-  serverConditions: ["worker"],
+  serverConditions: "worker",
   serverDependenciesToBundle: "all",
-  serverMainFields: ["browser", "module", "main"],
+  serverMainFields: "browser", "module", "main",
   serverMinify: true,
   serverModuleFormat: "esm",
   serverPlatform: "neutral",
@@ -15,8 +15,8 @@ module.exports = {
   // publicPath: "/build/",
   future: {
     v2_errorBoundary: true,
-    v2_meta: false,
-    v2_normalizeFormMethod: false,
+    v2_meta: true,
+    v2_normalizeFormMethod: true,
     v2_routeConvention: true,
   },
 };
