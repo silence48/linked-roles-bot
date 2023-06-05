@@ -1,7 +1,3 @@
-//import { Networks, TransactionBuilder } from 'stellar-base';
-//import { Networks } from 'stellar-base';
-
-//import jwt from "@tsndr/cloudflare-worker-jwt";
 import type { Horizon } from 'horizon-api';
 
 export enum Networks {

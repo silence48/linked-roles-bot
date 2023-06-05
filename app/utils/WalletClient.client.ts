@@ -1,5 +1,5 @@
-//import albedo from '@albedo-link/intent';
-//import { getPublicKey, signTransaction as signTx } from '@stellar/freighter-api';
+import albedo from '@albedo-link/intent';
+import { getPublicKey, signTransaction as signTx } from '@stellar/freighter-api';
 
 type Client = 'albedo' | 'rabet' | 'freighter' | 'wallet_connect'
 type Network = 'PUBLIC'
@@ -17,7 +17,6 @@ class WalletClient {
   }
 
   async getPublicKey() {
-
     const { name } = this
     try {
       // const { name, timestamp } = provider
@@ -60,9 +59,6 @@ class WalletClient {
   }
 
   private async signAlbedo(xdr: string, submit: boolean) {
-    const alb = await import('@albedo-link/intent');
-    const albedo = alb.default;
-    
     const { network } = this
     const { signed_envelope_xdr } = await albedo.tx({xdr, network, submit: false})
     if (submit) {
@@ -74,9 +70,6 @@ class WalletClient {
   }
 
   private async signFreighter(xdr: string, submit: boolean) {
-    //const { signTransaction as signTx } = await import('@stellar/freighter-api')
-    const { signTransaction: signTx } = await import('@stellar/freighter-api');
-
     const { network } = this
     console.log('in sign freighter the network is', network)
     const signed_envelope_xdr = await signTx(xdr, { network })
@@ -107,22 +100,7 @@ class WalletClient {
   }
 
   private async getAlbedoKey() {
-    const alb = await import('@albedo-link/intent');
-    const albedo = alb.default;
-    
-    // Use the 'albedo' variable to access the default export
-    // Example: albedo.publicKey(params);
-    
-    //const albedo = new intentInterface();
-    
-    const pubkey = albedo.publicKey({
-    token: 'r9gbUuThXLr/wOrg2dxWHOO4DQsvQsTpkv1OtfETB3c='
-  }).then(res => {
-    console.log(res)
-    return res
-  })
-
-    return await pubkey;
+    return await albedo.publicKey({})
   }
 
   private async getXBullKey() {
@@ -137,7 +115,6 @@ class WalletClient {
   }
 
   private async getFreighterKey() {
-    const { getPublicKey } = await import('@stellar/freighter-api');
     return async () => {
       try {
         return await getPublicKey()

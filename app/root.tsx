@@ -16,10 +16,11 @@ import designStyle from 'communi-design-system/styles/index.css';
 import { ModalProvider } from '~/context';
 
 export const meta: V2_MetaFunction  = () => ([
-  {title: "CommuniDAO"},  
+  {title: "CommuniDAO"},
 ]);
 
 export const links: LinksFunction = () => ([
+
   { rel: 'stylesheet', href: designStyle },
 ]);
 
@@ -50,9 +51,11 @@ export default function App() {
     <html lang="en" className="light">
       <head>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.9.4/lottie.min.js" integrity="sha512-ilxj730331yM7NbrJAICVJcRmPFErDqQhXJcn+PLbkXdE031JJbcK87Wt4VbAK+YY6/67L+N8p7KdzGoaRjsTg==" crossOrigin="anonymous" referrerPolicy="no-referrer"></script>
-
-        <Meta charSet="utf-8"/>
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta charSet="utf-8" />
+        <meta
+          name="viewport"
+          content="width=device-width,initial-scale=1"
+        />
         <Meta />
         <Links />
       </head>
