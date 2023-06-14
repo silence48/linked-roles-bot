@@ -140,59 +140,74 @@ export default function Index() {
         </div>
       ))}
 
-{selectedBadge && (
+      {selectedBadge && (
         <>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-10" onClick={() => setSelectedBadge(null)}>ggg</div>
-          <dialog ref={modalRef} id="my_modal" className="modal modal-open backdrop-blur fixed inset-0 flex items-center justify-center w-80% h-80% z-20">
-            <div className="modal-box w-80% h-80% overflow-auto">
-              <div className="flex justify-between items-center p-2">
-                <h2>{selectedBadge.filename.substring(0, 32)}</h2>
-                <button className="btn" onClick={() => setSelectedBadge(null)}>Close</button>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-10"
+            onClick={() => setSelectedBadge(null)}
+          ></div>
+          <dialog ref={modalRef} id="my_modal" className="modal modal-open backdrop-blur z-20">
+            <div className="modal-box w-5/6 h-4/5 flex flex-col max-w-full">
+              <div className="p-2">
+                <div className="flex justify-between items-center">
+                  <h2>{selectedBadge.filename}</h2>
+                  <button
+                    className="btn"
+                    onClick={() => setSelectedBadge(null)}
+                  >
+                    Close
+                  </button>
+                </div>
               </div>
-              {isLoading ? (
-                <span className="loading loading-spinner loading-md"></span> // display the spinner while isLoading is true
-              ) : Data && Data.length > 0 ? ( // only try to map over Data if it's an array with length > 0
-                <>
-                  <div className="overflow-x-auto">
-                  <span className="loading loading-spinner loading-md"></span>
-                    <table className="table w-full table-xs table-striped table-pin-rows">
-                      <thead>
-                        <tr>
-                          <th>ID</th>
-                          <th>Transaction ID</th>
-                          <th>Asset ID</th>
-                          <th>Account ID</th>
-                          <th>Balance</th>
-                          <th>Date Acquired</th>
-                          <th>Verified Ownership</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Data.map((record, index) => (
-                          <tr key={index}>
-                            <td>{record.id}</td>
-                            <td>{record.tx_id}</td>
-                            <td>{record.asset_id}</td>
-                            <td>
-                              <button
-                                className="btn btn-secondary btn-md"
-                                onClick={() => handleAddressClick(record.account_id)}
-                              >
-                                {record.account_id}
-                              </button>
-                            </td>
-                            <td>{record.balance}</td>
-                            <td>{record.date_acquired}</td>
-                            <td>{record.verified_ownership}</td>
+              <div className="overflow-auto flex-grow">
+                {isLoading ? (
+                  <span className="loading loading-spinner loading-md"></span> // display the spinner while isLoading is true
+                ) : Data && Data.length > 0 ? ( // only try to map over Data if it's an array with length > 0
+                  <>
+                    <div className="overflow-x-auto">
+                      <table className="table table-xs">
+                    
+                        <thead>
+                          <tr>
+                            <th className="lg:table-cell hidden">ID</th>
+                            <th className="xl:table-cell hidden">Transaction ID</th>
+                            <th>Asset ID</th>
+                            <th>Account ID</th>
+                            <th className="xl:table-cell hidden">Balance</th>
+                            <th className="2xl:table-cell hidden">Date Acquired</th>
+                            
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </>
-              ) : (
-                <p>No data to display</p> // display a message if Data is an empty array
-              )}
+                        </thead>
+                      
+                        <tbody>
+                          {Data.map((record, index) => (
+                            <tr key={index}>
+                              <td className="lg:table-cell hidden">{record.id}</td>
+                              <td className="xl:table-cell hidden">{record.tx_id}</td>
+                              <td>{record.asset_id}</td>
+                              <td>
+                                <button
+                                  className="btn btn-secondary btn-xs"
+                                  onClick={() =>
+                                    handleAddressClick(record.account_id)
+                                  }
+                                >
+                                  {record.account_id}
+                                </button>
+                              </td>
+                              <td className="xl:table-cell hidden">{record.balance}</td>
+                              <td className="whitespace-nowrap 2xl:table-cell hidden">{record.date_acquired}</td>
+                              
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p>No data to display</p> // display a message if Data is an empty array
+                )}
+              </div>
             </div>
           </dialog>
         </>
