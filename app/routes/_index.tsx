@@ -1,6 +1,8 @@
 //import { Button } from "communi-design-system";
 import { Link, useLoaderData } from "@remix-run/react";
 import { type LoaderArgs, json } from "@remix-run/cloudflare";
+import { useWallet } from "~/context";
+
 
 import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 import { Page, Container, GridContainer, TableContainer, Table, TableRow, TableCell, TableHeader, AccountContainer, ProofContainer, Button, IconButton, IconText } from "~/components";
@@ -8,8 +10,11 @@ import { Page, Container, GridContainer, TableContainer, Table, TableRow, TableC
 
 // Define your loader function
 export let loader = async ({ request, context }: LoaderArgs) => {
+  const { getUser, getUserAuthProgress } = await import("~/utils/session.server");
   const {fetchRegisteredAccounts} = await import("~/utils/sqproof");
-  const { getUser } = await import("~/utils/session.server");
+//  const { useWallet } = await import("~/context");
+
+  
   const { sessionStorage } = context as any;
   const user = await getUser(request, sessionStorage);
   const { discord_user_id } = user ?? false;
@@ -20,18 +25,22 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     accounts = []
   }
   
+  const authProgress = await getUserAuthProgress(request, sessionStorage);
 
   // Get the session and then get proofs from session
   const session = await sessionStorage.getSession(request.headers.get("Cookie"));
   const proofs = session.get("proofs");
 
 
-  return json({ discord_user_id, accounts, proofs });
+  return json({ authProgress, discord_user_id, accounts, proofs });
 };
 
 export default function Index() {
   
-  const { discord_user_id, accounts, proofs } = useLoaderData();
+  const { discord_user_id, accounts, proofs, authProgress } = useLoaderData();
+  const { view } = authProgress ?? {};
+  const { newSession, signTransaction } = useWallet();
+
   const copyToClipboard = (token) => {
     navigator.clipboard.writeText(token);
   };
@@ -81,7 +90,7 @@ export default function Index() {
           ))}
 
           <div className="flex justify-center mt-2">
-            <Button as={Link} to="/connect">
+            <Button onClick={() => newSession()}>
               Add a public key
             </Button>
           </div>

@@ -1,6 +1,6 @@
 import { redirect, json } from "@remix-run/cloudflare";
 
-export interface SessionI {
+interface SessionI {
   id?: string;
   discord_user_id?: string;
   user?: any;
@@ -12,9 +12,10 @@ export interface SessionI {
   provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
 }
 
-export interface UserSessionResponseI {
+interface UserSessionResponseI {
   redirectTo?: string;
   message?: string;
+  body?: any;
 }
 
 export async function createUserSession(
@@ -46,23 +47,54 @@ export async function createUserSession(
   }
 }
 
-export async function getUserSession(request: Request, sessionStorage: Storage) {
+async function getUserSession(request: Request, sessionStorage: Storage) {
   return sessionStorage.getSession(request.headers.get("Cookie"));
 }
 
 export async function getUser(request: Request, sessionStorage: Storage) {
-  console.log("sessionStorage", sessionStorage);
-
   const session = await getUserSession(request, sessionStorage);
-  console.log("session", session);
   return session.get("data");
+}
+
+type Require = 'discord_auth' | 'wallet_auth'
+
+export async function getUserAuthProgress(
+  request: Request,
+  sessionStorage: Storage
+) {
+  const { provider, discord_user_id, account } = await getUser(
+    request,
+    sessionStorage
+  ) ?? {};
+  console.log({ provider, discord_user_id, account }, 'session-server')
+  let authProgress: { requires: Require[]; view: string } = {
+    requires: [],
+    view: "",
+  };
+
+  if (!provider && !account) {
+    authProgress.requires.push("wallet_auth");
+    authProgress.view = "loginWalletView";
+  }
+
+  if (!discord_user_id) {
+    authProgress.requires.push("discord_auth");
+    authProgress.view = "loginDiscordView";
+  }
+
+  if (authProgress.requires.length === 0) {
+    authProgress.view = "defaultView";
+  }
+
+  // Return the authProgress object
+  return authProgress;
 }
 
 export async function updateUserSession(
   request: Request,
   sessionStorage: Storage,
   sessionData: SessionI,
-  { redirectTo, message }: UserSessionResponseI
+  { redirectTo, message = undefined, body = undefined }: UserSessionResponseI
 ) {
   let session = await getUser(request, sessionStorage);
   let newSession = await sessionStorage.getSession();
@@ -79,7 +111,7 @@ export async function updateUserSession(
     });
   } else {
     return json(
-      { message },
+      { message, body },
       {
         status: 200,
         headers: {

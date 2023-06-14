@@ -10,6 +10,7 @@ module.exports = {
   serverMinify: true,
   serverModuleFormat: "esm",
   serverPlatform: "neutral",
+  tailwind: true,
   future: {
     unstable_dev: true,
     v2_errorBoundary: true,

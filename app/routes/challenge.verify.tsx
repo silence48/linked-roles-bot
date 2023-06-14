@@ -20,6 +20,7 @@ export async function action({ request, context, params }: ActionArgs) {
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
+console.log(`in challenge verify ${discord_user_id}`)
   let areq = {
     Transaction: signedEnvelope,
     NETWORK_PASSPHRASE: Networks.PUBLIC,
@@ -30,6 +31,8 @@ export async function action({ request, context, params }: ActionArgs) {
   if (NETWORK_PASSPHRASE) {
     passphrase = NETWORK_PASSPHRASE;
   }
+
+
   const { DB } = context.env as any;
   let transaction = new (TransactionBuilder.fromXDR as any)(Transaction, passphrase);
   //verify the state.

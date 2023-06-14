@@ -20,13 +20,18 @@
     "@remix-run/cloudflare-pages": "^1.16.1",
     "@remix-run/react": "^1.16.1",
     "@tsndr/cloudflare-worker-jwt": "^2.2.1",
+    "class-variance-authority": "^0.6.0",
+    "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
+    "lucide-react": "^0.241.0",
     "model-one": "^0.0.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "stellar-base": "9.0.0-soroban.3"
+    "stellar-base": "9.0.0-soroban.3",
+    "tailwind-merge": "^1.13.0",
+    "tailwindcss-animate": "^1.0.5"
   },
   "devDependencies": {
     "@albedo-link/intent": "latest",
@@ -39,9 +44,11 @@
     "@walletconnect/sign-client": "latest",
     "better-sqlite3": "latest",
     "communi-design-system": "communiDAO/communi-design-system#update",
+    "daisyui": "^3.0.3",
     "eslint": "^8.27.0",
     "npm-run-all": "^4.1.5",
     "react-qrcode-logo": "latest",
+    "tailwindcss": "^3.3.2",
     "typescript": "^4.9.5",
     "wrangler": "^2.2.1"
   },
