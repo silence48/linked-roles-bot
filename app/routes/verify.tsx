@@ -1,6 +1,5 @@
 import { redirect, type LoaderFunction } from "@remix-run/cloudflare";
 
-
 export let loader: LoaderFunction = async ({ request, context }) => {
   //const { createUserSession } = await import("~/utils/session.server");
   const { Discord } = await import("~/models");

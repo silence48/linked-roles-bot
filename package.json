@@ -13,8 +13,6 @@
     "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol https"
   },
   "dependencies": {
-    "@emotion/react": "^11.11.0",
-    "@emotion/styled": "^11.11.0",
     "@remix-run/cloudflare": "^1.16.1",
     "@remix-run/cloudflare-pages": "^1.16.1",
     "@remix-run/react": "^1.16.1",
@@ -23,14 +21,12 @@
     "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
-    "lucide-react": "^0.241.0",
     "model-one": "^0.0.7",
+    "postcss-preset-env": "^8.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "stellar-base": "9.0.0-soroban.3",
-    "tailwind-merge": "^1.13.0",
-    "tailwindcss-animate": "^1.0.5"
+    "stellar-base": "9.0.0-soroban.3"
   },
   "devDependencies": {
     "@albedo-link/intent": "latest",
@@ -41,13 +37,15 @@
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@walletconnect/sign-client": "latest",
+    "autoprefixer": "latest",
     "better-sqlite3": "latest",
     "communi-design-system": "communiDAO/communi-design-system#update",
-    "daisyui": "^3.0.3",
+    "daisyui": "^3.1.0",
     "eslint": "^8.27.0",
     "npm-run-all": "^4.1.5",
+    "postcss": "latest",
     "react-qrcode-logo": "latest",
-    "tailwindcss": "^3.3.2",
+    "tailwindcss": "latest",
     "typescript": "^4.9.5",
     "wrangler": "^2.2.1"
   },

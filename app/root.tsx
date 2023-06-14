@@ -28,7 +28,7 @@ export const meta: V2_MetaFunction  = () => ([
 
 export const links: LinksFunction = () => ([
   { rel: 'stylesheet', href: tailwind },
-  { rel: 'stylesheet', href: designStyle },
+  //{ rel: 'stylesheet', href: designStyle },
   
 ]);
 
