@@ -1,6 +1,11 @@
 {
   "private": true,
   "sideEffects": false,
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "IE 10"
+  ],
   "scripts": {
     "build": "remix build",
     "dev:remix": "remix watch",
