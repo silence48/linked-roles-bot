@@ -1,7 +1,7 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import { useLoaderData, Link } from "@remix-run/react";
 import React, { useState, useEffect, useRef } from "react";
-
+import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 const loadingModal = React.forwardRef((props, ref) => {
   const { data, selectedBadge, onClose } = props;
 
@@ -45,15 +45,14 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     accounts = []
   }
   
-  const authProgress = await getUserAuthProgress(request, sessionStorage);
   // Get the session and then get proofs from session
   const proofs = session.get("proofs");
 
-  return json({ badgeDetails, discord_user_id, accounts, proofs, authProgress });
+  return json({ badgeDetails, discord_user_id, accounts, proofs });
 };
 
 export default function Index() {
-  const { badgeDetails, discord_user_id, accounts, proofs, authProgress } = useLoaderData();
+  const { badgeDetails, discord_user_id, accounts, proofs } = useLoaderData();
 
   const [Data, setData] = useState([]); // initialize Data as an empty array
   const [selectedBadge, setSelectedBadge] = useState(null);
@@ -203,7 +202,12 @@ export default function Index() {
                   </button>
                 </div>
               </div>
-
+              {discord_user_id &&
+          <div className="flex items-center justify-center mb-6">
+            <FiUser size={24} className="mr-2" />
+            <p>Connected as: {discord_user_id}</p>
+          </div>
+        }
               <div className="flex justify-center mb-4">
                 <Link
                   className="btn btn-primary normal-case text-xl"

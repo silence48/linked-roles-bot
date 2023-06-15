@@ -10,6 +10,7 @@ import { useWallet } from "~/context";
 
 import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 import { Page, Container, GridContainer, TableContainer, Table, TableRow, TableCell, TableHeader, AccountContainer, ProofContainer, Button, IconButton, IconText } from "~/components";
+import type { WalletContextType } from "~/context/Wallet";
 //import { fetchRegisteredAccounts } from "~/utils/sqproof";
 
 // Define your loader function
@@ -28,11 +29,11 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   }else{
     accounts = []
   }
-  
+  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
   const authProgress = await getUserAuthProgress(request, sessionStorage);
 
   // Get the session and then get proofs from session
-  const session = await sessionStorage.getSession(request.headers.get("Cookie"));
+
   const proofs = session.get("proofs");
 
 
@@ -43,6 +44,7 @@ export default function Index() {
   
   const { discord_user_id, accounts, proofs, authProgress } = useLoaderData();
   const { view } = authProgress ?? {};
+  const wal: WalletContextType = useWallet();
   const { newSession, signTransaction } = useWallet();
 
   const copyToClipboard = (token) => {

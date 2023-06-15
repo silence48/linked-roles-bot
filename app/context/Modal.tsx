@@ -1,6 +1,6 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { useTheme } from "./Theme";
-import { Modal as ModalComponent } from "communi-design-system";
+import { Modal as ModalComponent } from "~/components/comp/Modal";
 import { TxSuccess } from "~/templates/TxSuccess";
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {

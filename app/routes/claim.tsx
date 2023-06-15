@@ -3,7 +3,7 @@ import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare";
 //import { getUser } from "~/utils/session.server";
 //import { User } from "~/models";
 import { useModal } from "~/context";
-import { Layout, Button } from "communi-design-system";
+import { Layout, Button } from "~/components/comp";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { useFetcher, useLoaderData } from "@remix-run/react";
 

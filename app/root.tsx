@@ -16,7 +16,8 @@ import React from "react";
 import { json } from "@remix-run/cloudflare";
 import { getUserAuthProgress, getUser } from "~/utils/session.server";
 
-import designStyle from 'communi-design-system/styles/index.css';
+//import designStyle from 'communi-design-system/styles/index.css';
+
 import tailwind from '~/styles/apptailwind.css'
 //import designStyle from 'xlm-design-system/build/styles.min.css';
 
@@ -58,6 +59,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   if (authProgress === null) return null;
   const discordAuthed = checkRequirement(authProgress, "discord_auth");
   const walletAuthed = checkRequirement(authProgress, "wallet_auth");
+  console.log('authed progress', authProgress)
   console.log({
     discordAuthed,
     walletAuthed,

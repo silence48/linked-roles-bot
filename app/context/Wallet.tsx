@@ -1,13 +1,13 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Modal, QRCode } from "communi-design-system";
+import { Button, Loader, Icon, Modal, QRCode } from '~/components/comp';
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
-import { Button, Loader, Icon } from "communi-design-system";
+
 import { isBrowser } from "~/utils/misc.client";
 
 type Status = "connected" | "disconnected" | "challenge";
-type WalletProviderProps = {
+export type WalletProviderProps = {
   children: ReactElement;
   walletAuthed: boolean;
   provider: Provider;
@@ -17,7 +17,7 @@ type WalletProviderProps = {
 type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
 type Client = any | null;
 
-type WalletContextType = {
+export type WalletContextType = {
   provider: Provider | null;
   url: string | null;
   publicKey: string | null;
@@ -313,6 +313,7 @@ const Challenge: React.FC<{
     </>
   );
 };
+
 const Footer: React.FC = ({}) => {
   return (
     <div>
@@ -329,6 +330,9 @@ const Footer: React.FC = ({}) => {
     </div>
   );
 };
+
+
+
 const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   const { publicKey, signChallenge, status } = useWallet();
   const [view, setView] = React.useState("");
