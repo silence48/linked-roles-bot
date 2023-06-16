@@ -15,7 +15,7 @@
     "typecheck": "tsc",
     "db:seeds": "npx wrangler d1 execute DB --file ./db/schema.sql",
     "db:seeds:local": "npx wrangler d1 execute DB --file ./db/schema.sql --local",
-    "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol http"
+    "wrangler": "wrangler pages dev ./public --ip 0.0.0.0 --local --persist --local-protocol https"
   },
   "dependencies": {
     "@headlessui/react": "latest",
