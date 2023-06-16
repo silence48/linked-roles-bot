@@ -96,7 +96,7 @@ export const Modal: React.FC<ModalProps> = ({
             >
               {/* Modal Style */}
               <Dialog.Panel className={modalStyle}>
-                <div className={`bg-background ${!expanded ? 'rounded-[16px]': 'h-full'} ${!!overflow ? 'overflow-hidden' : ''}`}>
+                <div className={`bg-[#2c2a57] ${!expanded ? 'rounded-[16px]': 'h-full'} ${!!overflow ? 'overflow-hidden' : ''}`}>
                   {/* Modal Options */}
                   {showBar && (
                     <div className={barStyle}>

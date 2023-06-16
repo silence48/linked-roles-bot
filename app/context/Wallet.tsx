@@ -1,9 +1,8 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button, Loader, Icon, Modal, QRCode } from '~/components/comp';
+import { Button, Loader, Icon, Modal, QRCode } from '~/components';
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
-
 import { isBrowser } from "~/utils/misc.client";
 
 type Status = "connected" | "disconnected" | "challenge";
@@ -317,16 +316,7 @@ const Challenge: React.FC<{
 const Footer: React.FC = ({}) => {
   return (
     <div>
-      <div className="text-caption-medium text-center">
-        <span>By continuing you accept our </span>
-        <span className="text-caption-underlined text-primary-700">
-          term of conditioons
-        </span>
-        <span> and our </span>
-        <span className="text-caption-underlined text-primary-700">
-          privacy policy
-        </span>
-      </div>
+      
     </div>
   );
 };

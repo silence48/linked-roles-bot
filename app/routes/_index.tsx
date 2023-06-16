@@ -1,68 +1,109 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData } from "@remix-run/react";
 import React, { useState, useEffect, useRef } from "react";
-import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
-const loadingModal = React.forwardRef((props, ref) => {
-  const { data, selectedBadge, onClose } = props;
+import { Logo } from "~/components/Logo";
+// import {
+//   FiUser,
+//   FiKey,
+//   FiLink,
+//   FiCheckCircle,
+//   FiTrash2,
+//   FiClipboard,
+// } from "react-icons/fi";
 
-  return (
-    <>
-      <dialog
-        ref={ref}
-        id="loading_modal"
-        className="modal modal-open backdrop-blur z-20"
-      >
-        <div className="modal-box w-5/6 h-4/5 flex flex-col max-w-full">
-          <div className="flex justify-center items-center flex-grow">
-            <span className="loading loading-spinner loading-md"></span>
-          </div>
-        </div>
-      </dialog>
-    </>
-  );
-});
+// const loadingModal = React.forwardRef((props, ref) => {
+//   const { data, selectedBadge, onClose } = props;
+
+//   return (
+//     <>
+//       <dialog
+//         ref={ref}
+//         id="loading_modal"
+//         className="modal modal-open backdrop-blur z-20"
+//       >
+//         <div className="modal-box w-5/6 h-4/5 flex flex-col max-w-full">
+//           <div className="flex justify-center items-center flex-grow">
+//             <span className="loading loading-spinner loading-md"></span>
+//           </div>
+//         </div>
+//       </dialog>
+//     </>
+//   );
+// });
 
 // Define your action function
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { badgeDetails, seriesFourIssuers } = await import(
     "../utils/badge-details"
   );
-  const { getOriginalClaimants, getOriginalPayees } = await import("../utils/sqproof");
-  const { getUser, getUserAuthProgress } = await import("~/utils/session.server");
+  const { getOriginalClaimants, getOriginalPayees } = await import(
+    "../utils/sqproof"
+  );
+  const { getUser, getUserAuthProgress } = await import(
+    "~/utils/session.server"
+  );
   const { fetchRegisteredAccounts } = await import("~/utils/sqproof");
 
-
   const { sessionStorage } = context as any;
-  const session = await sessionStorage.getSession( request.headers.get("Cookie") );
+  const session = await sessionStorage.getSession(
+    request.headers.get("Cookie")
+  );
 
-  const { DB } = context.env as any;
+  // const { DB } = context.env as any;
   const user = await getUser(request, sessionStorage);
   const { discord_user_id } = user ?? false;
   var accounts;
   if (discord_user_id) {
     accounts = await fetchRegisteredAccounts(request, context);
-  }else{
-    accounts = []
+  } else {
+    accounts = [];
   }
-  
+
   // Get the session and then get proofs from session
   const proofs = session.get("proofs");
 
   return json({ badgeDetails, discord_user_id, accounts, proofs });
 };
 
+const BadgeGrid = ({
+  badgeDetails,
+  handleBadgeClick,
+}: {
+  badgeDetails: any;
+  handleBadgeClick: (badge: any) => void;
+}) => {
+  return (
+    <>
+      {badgeDetails.length > 0 &&
+        badgeDetails.map((badge: any, index: number) => (
+          <div
+            className="flex w-full min-w-[120px] max-w-[240px] m-[1vw] sm:m-1"
+            key={index}
+          >
+            <button
+              className="relative w-full bg-transparent border-none cursor-pointer overflow-hidden transition-colors duration-300 bg-cover bg-center flex items-center justify-center"
+              style={{
+                backgroundImage: `url(/assets/badges/${badge.filename})`,
+                paddingTop: "100%", // This makes the aspect ratio 1:1
+              }}
+              onClick={() => handleBadgeClick(badge)}
+            >
+              <div className="absolute bottom-0 w-full p-2 text-center bg-black bg-opacity-60 text-white text-sm">
+                {badge.filename}
+              </div>
+              <div className="absolute top-0 left-0 w-full h-full bg-purple-500 opacity-0 z-10 hover:opacity-70 transition-opacity duration-300"></div>
+            </button>
+          </div>
+        ))}{" "}
+    </>
+  );
+};
 export default function Index() {
   const { badgeDetails, discord_user_id, accounts, proofs } = useLoaderData();
-
   const [Data, setData] = useState([]); // initialize Data as an empty array
   const [selectedBadge, setSelectedBadge] = useState(null);
   const [isLoginVisable, setIsLoginVisable] = useState(null);
-
-  const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
-  const [accountData, setAccountData] = useState(null);
-
   const [isLoading, setIsLoading] = useState(false); // initialize isLoading as false
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const tableModalRef = useRef(null);
   const loginModalRef = useRef(null);
@@ -113,73 +154,14 @@ export default function Index() {
   };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
-
   return (
     <div className="flex flex-wrap justify-center bg-gray-800 p-4 w-full">
-      <div className="navbar bg-base-100">
-        <div className="flex-1">
-          <Link className="btn btn-ghost normal-case text-xl" to="/">
-            Stellar Linked Roles
-          </Link>
-        </div>
-        <div className="flex-none gap-2">
-          <button
-            className="btn btn-primary normal-case text-xl"
-            onClick={() => handleLoginClick()}
-          >
-            Login
-          </button>
+      <BadgeGrid
+        badgeDetails={badgeDetails}
+        handleBadgeClick={handleBadgeClick}
+      />
 
-          <div className="dropdown dropdown-end">
-            <label
-              tabIndex={0}
-              className="btn btn-ghost btn-circle avatar placeholder"
-            >
-              <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
-            </label>
-            <ul
-              tabIndex={0}
-              className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
-              </li>
-              <li>
-                <a>Settings</a>
-              </li>
-              <li>
-                <a>Logout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      {badgeDetails.map((badge, index) => (
-        <div
-          className="flex w-full min-w-[120px] max-w-[240px] m-[1vw] sm:m-1"
-          key={index}
-        >
-          <button
-            className="relative w-full bg-transparent border-none cursor-pointer overflow-hidden transition-colors duration-300 bg-cover bg-center flex items-center justify-center"
-            style={{
-              backgroundImage: `url(/assets/badges/${badge.filename})`,
-              paddingTop: "100%", // This makes the aspect ratio 1:1
-            }}
-            onClick={() => handleBadgeClick(badge)}
-          >
-            <div className="absolute bottom-0 w-full p-2 text-center bg-black bg-opacity-60 text-white text-sm">
-              {badge.filename}
-            </div>
-            <div className="absolute top-0 left-0 w-full h-full bg-purple-500 opacity-0 z-10 hover:opacity-70 transition-opacity duration-300"></div>
-          </button>
-        </div>
-      ))}
-
-      {isLoginVisable && (
+      {/* {isLoginVisable && (
         <>
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20"
@@ -244,15 +226,15 @@ export default function Index() {
                 ))}
 
                 <div className="flex justify-center mt-2">
-                  <button onClick={() => newSession()}>Add a public key</button>
+                  <button onClick={() => openModal({ type: '' })}>Add a public key</button>
                 </div>
               </div>
             </div>
           </dialog>
         </>
-      )}
+      )} */}
 
-      {selectedBadge && (
+      {/* {selectedBadge && (
         <>
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-20"
@@ -336,7 +318,7 @@ export default function Index() {
             </div>
           </dialog>
         </>
-      )}
+      )} */}
     </div>
   );
 }

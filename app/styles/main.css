@@ -1,0 +1,48 @@
+@import url("https://p.typekit.net/p.css?s=1&k=wdd6isw&ht=tk&f=137.139.175.5474.25136&a=46063616&app=typekit&e=css");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer base {
+    body {
+        font-family: ibm-plex-sans, sans-serif; 
+    }
+}
+
+/*
+Stellar color guide
+brand-primary: #5332e6;
+brand-primary-hover: #937eef;
+brand-primary-on: #ffffff;
+background-primary: #292d3e;
+background-secondary: #303448;
+background-tertiary: #222634;
+background-tooltip: #191b25;
+success: #26db7b;
+success-background: #284445;
+success-border: #257554;
+success-on: #ffffff;
+error: #ee5a74;
+error-background: #482f42;
+error-border: #89344c;
+error-on: #ffffff;
+warning: #f8c252;
+warning-background: #4a433c;
+warning-border: #8f7138;
+warning-on: #ffffff;
+info: #6260eb;
+info-background: #2c2a57;
+info-border: #33248c;
+info-on: #ffffff;
+text-primary: #ffffff;
+text-secondary: #d4d5d8;
+text-tertiary: #a9abb2;
+text-link: #6260eb;
+text-link-hover: #937eef;
+border-primary: #3a3e4d;
+border-secondary: #4b4f5d;
+shadow-rbg: 0, 0, 0;
+example-details: #303448;
+example-code: #222634;
+*/

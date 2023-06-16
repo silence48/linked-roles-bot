@@ -1,5 +1,5 @@
 import React from 'react';
-import { Layout } from '~/components/comp/Layout';
+import { Layout } from './Layout';
 
 type ConnectWalletProps = {};
 
