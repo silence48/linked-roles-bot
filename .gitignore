@@ -20,4 +20,4 @@ linked-roles-bot
 yarn.lock
 /.yarn
 .yarnrc.yml
-
+package-lock.json
