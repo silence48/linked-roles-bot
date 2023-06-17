@@ -1,4 +1,5 @@
-return (
+
+/*return (
   <div className="flex flex-wrap justify-center bg-gray-800 p-4 w-full">
   {badgeDetails.map((badge, index) => (
    <div
@@ -92,3 +93,4 @@ onClick={() => handleBadgeClick(badge)}
 
   </div>
 );
+*/

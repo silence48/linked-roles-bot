@@ -40,6 +40,7 @@
     "@remix-run/dev": "^1.16.1",
     "@remix-run/eslint-config": "^1.16.1",
     "@stellar/freighter-api": "latest",
+    "@tailwindcss/forms": "^0.5.3",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",
     "@walletconnect/sign-client": "latest",

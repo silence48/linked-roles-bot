@@ -1,6 +1,6 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button, Loader, Icon, Modal, QRCode } from '~/components/comp';
+import { Button, Loader, Icon, Modal, QRCode } from '~/components';
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
 
