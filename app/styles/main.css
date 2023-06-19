@@ -3,11 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
-    body {
-        font-family: ibm-plex-sans, sans-serif; 
-    }
+  body {
+    font-family: ibm-plex-sans, sans-serif;
+  }
 }
 
 /*

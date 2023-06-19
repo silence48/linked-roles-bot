@@ -3,6 +3,7 @@ import type {
   LinksFunction,
   LoaderArgs,
 } from "@remix-run/cloudflare";
+import * as React from "react";
 import {
   Links,
   useRouteError,
@@ -66,9 +67,6 @@ export const loader = async ({ request, context }: LoaderArgs) => {
 
 const Menu = () => {
   const { openModal } = useModal();
-
-  // const { newSession } = useWallet();
-
   return (
     <>
       <div className="navbar bg-base-100">
@@ -116,10 +114,41 @@ const Menu = () => {
   );
 };
 
+const Layout = ({
+  authProgress,
+  discordAuthed,
+  walletAuthed,
+}: {
+  authProgress: any;
+  discordAuthed: boolean;
+  walletAuthed: boolean;
+}) => {
+  const { newSession } = useWallet();
+
+  React.useEffect(() => {
+    if (!discordAuthed && walletAuthed) {
+      newSession();
+    }
+  }, [authProgress, discordAuthed, walletAuthed]);
+
+  return (
+    <>
+      <Menu />
+      <Outlet />;
+    </>
+  );
+};
+
 export default function App() {
   let routeError = useRouteError();
-  const { walletAuthed, provider, account, STELLAR_NETWORK } =
-    useLoaderData() ?? {};
+  const {
+    authProgress,
+    discordAuthed,
+    walletAuthed,
+    provider,
+    account,
+    STELLAR_NETWORK,
+  } = useLoaderData() ?? {};
 
   if (routeError) {
     if (isRouteErrorResponse(routeError)) {
@@ -162,10 +191,11 @@ export default function App() {
           network={STELLAR_NETWORK}
         >
           <ModalProvider>
-            <>
-              <Menu />
-              <Outlet />
-            </>
+            <Layout
+              authProgress={authProgress}
+              discordAuthed={discordAuthed}
+              walletAuthed={walletAuthed}
+            />
           </ModalProvider>
         </WalletProvider>
 

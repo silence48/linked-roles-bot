@@ -5,7 +5,7 @@ type LoaderProps = {};
 export const Loader: React.FC<LoaderProps> = () => {
   const isBrowser = typeof window !== "undefined"
   const lottieContainer = React.useRef<HTMLDivElement>(null);;
-
+  // There is a bug in React 18 that creates a second animation below.
   React.useEffect(() => {
     if (!!isBrowser) {
       const w: any = window

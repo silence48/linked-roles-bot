@@ -98,6 +98,7 @@ const BadgeGrid = ({
     </>
   );
 };
+
 export default function Index() {
   const { badgeDetails, discord_user_id, accounts, proofs } = useLoaderData();
   const [Data, setData] = useState([]); // initialize Data as an empty array
@@ -114,6 +115,7 @@ export default function Index() {
     }
   }, [badgeDetails]);
 
+  
   const handleBadgeClick = async (badge: React.SetStateAction<null>) => {
     setSelectedBadge(badge);
     setIsLoading(true);

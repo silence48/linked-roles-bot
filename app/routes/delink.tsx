@@ -11,7 +11,7 @@ export const action: ActionFunction = async ({ request, context }) => {
     const publicKey = formData.get("publicKey");
     console.log(publicKey);
     const { DB } = context.env as any;
-    //should we make this account not be active or something else rather than deleting it?
+    // should we make this account not be active or something else rather than deleting it?
     const account = await StellarAccount.findBy("public_key", publicKey, DB);
 
     await StellarAccount.delete(account[0].id, DB);
