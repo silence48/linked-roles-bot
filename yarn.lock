@@ -8534,15 +8534,16 @@ statuses@2.0.1:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-2.0.1.tgz#55cb000ccf1d48728bd23c685a063998cf1a1b63"
   integrity sha512-RwNA9Z/7PrK06rYLIzFMlaF+l73iwpzsqRIFgbMLbTcLD6cOao82TaWefPXQvB2fOC4AjuYSEndS7N/mTCbkdQ==
 
-stellar-base@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/stellar-base/-/stellar-base-9.0.0.tgz#af29349e011ee88657d9a62534388b50b3002d88"
-  integrity sha512-rnc0P28C2TlDoKpiL/Xw+4DyNqZ+hLxfcXub9gOH3FyPnGTr7QbGBiP0gYnRAndPp6xzX1F+hcCcPl31ce47/w==
+stellar-base@9.0.0-beta.3:
+  version "9.0.0-beta.3"
+  resolved "https://registry.yarnpkg.com/stellar-base/-/stellar-base-9.0.0-beta.3.tgz#54c5fa5316690f4ccd90ec5a752a58840a783aef"
+  integrity sha512-EP0eG7K2L2D1LILtbjhq79VVNzrmmG7BenfcNOixLEUtQBEr/+1RRXNCHVGbVmYsNutmWyU6lpGaPs48GlDAcw==
   dependencies:
     base32.js "^0.1.0"
     bignumber.js "^9.1.1"
     crypto-browserify "^3.12.0"
     js-xdr "^2.0.0"
+    lodash "^4.17.21"
     sha.js "^2.3.6"
     tweetnacl "^1.0.3"
   optionalDependencies:

@@ -58,7 +58,7 @@ export const WalletProvider: FunctionComponent<WalletProviderProps> = ({
     setIsOpen(false);
   };
 
-  const initClient = (provider: Provider) => {
+  const initClient = (provider: Provider): void => {
     if (provider === null) return;
     setProvider(provider);
 
@@ -275,11 +275,12 @@ const IconHeading = ({ text, icon }: any) => {
   );
 };
 
-const Challenge: React.FC<{
+export const Challenge: React.FC<{
   signChallenge: (xdr: string) => void;
   challenge: string | null;
   publicKey: string | null;
-}> = ({ signChallenge, challenge, publicKey }) => {
+  provider: string | null;
+}> = ({ signChallenge, challenge, publicKey, provider }) => {
   return (
     <>
       <div className="text-h3-semi-bold">Challenge</div>
@@ -304,7 +305,7 @@ const Challenge: React.FC<{
         {challenge && (
           <Button
             customCss="w-full"
-            icon="WalletConnect"
+            icon={provider}
             text="Sign Challenge"
             onClick={() => signChallenge(challenge)}
           />
@@ -333,20 +334,26 @@ const Footer: React.FC = ({}) => {
 
 
 
-const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
-  const { publicKey, signChallenge, status } = useWallet();
+export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
+  const { publicKey, signChallenge, status, provider } = useWallet();
   const [view, setView] = React.useState("");
   const fetcher = useFetcher();
+  const [lastFetchedKey, setLastFetchedKey] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    if (
-      publicKey !== null &&
-      fetcher.state === "idle" &&
-      fetcher.data == null
+   /* if (
+      publicKey !== null 
+      && fetcher.state === "idle" 
+      && fetcher.data == null
     ) {
       fetcher.load(`/challenge/${publicKey}`);
     }
-  }, [fetcher, publicKey]);
+  }, [fetcher, publicKey]);*/
+  if (publicKey !== null && publicKey !== lastFetchedKey) {
+    fetcher.load(`/challenge/${publicKey}`);
+    setLastFetchedKey(publicKey);
+  }
+}, [fetcher, publicKey, lastFetchedKey]);
 
   const { challenge } = fetcher.data ?? {};
 
@@ -359,6 +366,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
               signChallenge={signChallenge}
               challenge={challenge}
               publicKey={publicKey}
+              provider={provider}
             />
           )}
           {status === "disconnected" && view === "" && (
@@ -373,7 +381,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     return (
                       <div key={key}>
                         <Button
-                          customCss="w-full"
+                          customCss="btn btn-primary w-full"
                           variant="basic"
                           icon={item.icon}
                           text={item.name}
