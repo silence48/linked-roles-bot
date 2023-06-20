@@ -13,7 +13,9 @@ export const loader = async ({ request, context, params }: LoaderArgs) => {
   const { discord_user_id, clientState } = await getUser(request, sessionStorage)
   console.log('challenge.$publickey loader', discord_user_id, clientState)
   const { authsigningkey } = context.env as any;
+  console.log("authsigningkey", authsigningkey)
   const uri = new URL(request.url).origin
+  console.log('Keypair', Keypair)
   let serverKeypair = Keypair.fromSecret(String(authsigningkey));
   const challenge = await generateAuthChallenge(serverKeypair, publicKey, discord_user_id, uri, clientState)
   return json({ challenge });

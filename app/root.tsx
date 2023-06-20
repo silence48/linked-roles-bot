@@ -3,6 +3,7 @@ import type {
   LinksFunction,
   LoaderArgs,
 } from "@remix-run/cloudflare";
+import * as React from "react";
 import {
   Links,
   useRouteError,
@@ -51,12 +52,12 @@ export const loader = async ({ request, context }: LoaderArgs) => {
     (await getUserAuthProgress(request, sessionStorage)) ?? {};
   const { provider, account } = (await getUser(request, sessionStorage)) ?? {};
   if (authProgress === null) return null;
-  const discordAuthed = checkRequirement(authProgress, "discord_auth");
-  const walletAuthed = checkRequirement(authProgress, "wallet_auth");
+  const requiresDiscord = checkRequirement(authProgress, "discord_auth");
+  const requiresWallet = checkRequirement(authProgress, "wallet_auth");
 
   return json({
-    discordAuthed,
-    walletAuthed,
+    requiresDiscord,
+    requiresWallet,
     authProgress,
     provider,
     account,
@@ -64,10 +65,8 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   });
 };
 
-const Menu = () => {
+const Menu = ({ walletAuthed, discordAuthed }: any) => {
   const { openModal } = useModal();
-
-  // const { newSession } = useWallet();
 
   return (
     <>
@@ -78,48 +77,81 @@ const Menu = () => {
           </Link>
         </div>
         <div className="flex-none gap-2">
-          <button
-            className="btn btn-primary normal-case text-xl"
-            onClick={() => openModal({ type: "discord_login" })}
-          >
-            Login
-          </button>
-
-          <div className="dropdown dropdown-end">
-            <label
-              tabIndex={0}
-              className="btn btn-ghost btn-circle avatar placeholder"
+          {discordAuthed ? (
+            <button
+              className="btn btn-primary normal-case text-xl"
+              onClick={() => openModal({ type: "discord_login" })}
             >
-              <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
-            </label>
-            <ul
-              tabIndex={0}
-              className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-            >
-              <li>
-                <a className="justify-between">
-                  Profile
-                  <span className="badge">New</span>
-                </a>
-              </li>
-              <li>
-                <a>Settings</a>
-              </li>
-              <li>
-                <a>Logout</a>
-              </li>
-            </ul>
-          </div>
+              Login
+            </button>
+          ) : (
+            <div className="dropdown dropdown-end">
+              <label
+                tabIndex={0}
+                className="btn btn-ghost btn-circle avatar placeholder"
+              >
+                <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
+              </label>
+              <ul
+                tabIndex={0}
+                className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
+              >
+                <li>
+                  <a className="justify-between">
+                    Profile
+                    <span className="badge">New</span>
+                  </a>
+                </li>
+                <li>
+                  <a>Settings</a>
+                </li>
+                <li>
+                  <a>Logout</a>
+                </li>
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </>
   );
 };
 
+const Layout = ({
+  authProgress,
+  discordAuthed,
+  walletAuthed,
+}: {
+  authProgress: any;
+  discordAuthed: boolean;
+  walletAuthed: boolean;
+}) => {
+  const { newSession } = useWallet();
+
+  React.useEffect(() => {
+    if (!discordAuthed && walletAuthed) {
+      newSession();
+    }
+  }, [authProgress, discordAuthed, walletAuthed]);
+
+  return (
+    <>
+      <Menu discordAuthed={discordAuthed} walletAuthed={walletAuthed} />
+      <Outlet />
+    </>
+  );
+};
+
 export default function App() {
   let routeError = useRouteError();
-  const { walletAuthed, provider, account, STELLAR_NETWORK } =
-    useLoaderData() ?? {};
+  const {
+    authProgress,
+    requiresDiscord,
+    requiresWallet,
+    provider,
+    account,
+    STELLAR_NETWORK,
+  } = useLoaderData() ?? {};
 
   if (routeError) {
     if (isRouteErrorResponse(routeError)) {
@@ -156,16 +188,17 @@ export default function App() {
       </head>
       <body>
         <WalletProvider
-          walletAuthed={!walletAuthed}
+          walletAuthed={!requiresWallet}
           publicKey={account}
           provider={provider}
           network={STELLAR_NETWORK}
         >
           <ModalProvider>
-            <>
-              <Menu />
-              <Outlet />
-            </>
+            <Layout
+              authProgress={authProgress}
+              discordAuthed={requiresDiscord}
+              walletAuthed={requiresWallet}
+            />
           </ModalProvider>
         </WalletProvider>
 

@@ -1,9 +1,11 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { useTheme } from "./Theme";
 import { Modal as ModalComponent } from "~/components/Modal";
-import { DiscordLogin } from '~/components/DiscordLogin';
-import { BadgeViewer } from '~/components/BadgeViewer';
+import { DiscordLogin } from "~/components/DiscordLogin";
+import { BadgeViewer } from "~/components/BadgeViewer";
 import { TxSuccess } from "~/templates/TxSuccess";
+import { AddAccount } from "~/templates/AddAccount";
+
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {
   isOpen: boolean;
@@ -22,7 +24,8 @@ type ModalContextType = {
 enum ModalTypeE {
   DISCORD_LOGIN = "discord_login",
   TX_SUCCESS = "tx_success",
-  BADGE_VIEWER = "badge_viewer"
+  BADGE_VIEWER = "badge_viewer",
+  ADD_ACCOUNT = "add_account",
 }
 
 const modalAssert = (action: { type: string; content: any }) => {
@@ -33,6 +36,8 @@ const modalAssert = (action: { type: string; content: any }) => {
       return <DiscordLogin />;
     case ModalTypeE.BADGE_VIEWER:
       return <BadgeViewer />;
+    case ModalTypeE.ADD_ACCOUNT:
+      return <AddAccount />;
     default:
       return <></>;
   }
@@ -61,19 +66,18 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
     type: string;
     content?: any;
     padding?: any;
-    size?: "large" | "medium" | "small" | "fit" ;
+    size?: "large" | "medium" | "small" | "fit";
     showBar?: any;
     overflow?: any;
     onClose?: any;
-  }
-  ) => {
+  }) => {
     setIsOpen(true);
     setState({
       type: action.type,
       content: action.content,
       onClose: action.onClose,
       padding: action.padding,
-      size: action.size === undefined ? 'medium' : action.size,
+      size: action.size === undefined ? "medium" : action.size,
       showBar: action.showBar,
       overflow: action.overflow,
     });
@@ -95,7 +99,7 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
       {children}
       <ModalComponent
         initialState={isOpen}
-        closeModal={closeModal} 
+        closeModal={closeModal}
         theme={theme}
         padding={state.padding}
         size={state.size}

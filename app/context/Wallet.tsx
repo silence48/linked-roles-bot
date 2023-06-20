@@ -1,9 +1,12 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button, Loader, Icon, Modal, QRCode } from '~/components';
+import { Button, Loader, Icon, Modal, QRCode } from "~/components";
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
 import { isBrowser } from "~/utils/misc.client";
+import { Challenge } from "~/components/Challenge";
+import { type IconKeys } from "~/components/Icon";
+import { IconHeading } from "~/components/IconHeading";
 
 type Status = "connected" | "disconnected" | "challenge";
 export type WalletProviderProps = {
@@ -228,7 +231,7 @@ const Rabet = ({}: any) => {
   return <Loader />;
 };
 
-const options = [
+const options: { name: string; icon: IconKeys }[] = [
   {
     name: "Albedo",
     icon: "Albedo",
@@ -263,65 +266,6 @@ const walletAssert = (view: any) => {
       return <></>;
   }
 };
-
-// Move to DS Headings.
-const IconHeading = ({ text, icon }: any) => {
-  return (
-    <div className="flex flex-row">
-      <Icon name={icon} size="large" />
-      <div className="text-h4-bold">{text}</div>
-    </div>
-  );
-};
-
-const Challenge: React.FC<{
-  signChallenge: (xdr: string) => void;
-  challenge: string | null;
-  publicKey: string | null;
-}> = ({ signChallenge, challenge, publicKey }) => {
-  return (
-    <>
-      <div className="text-h3-semi-bold">Challenge</div>
-      <div className="text-p3-medium">
-        Complete the following challenge to finish your authentification.
-      </div>
-      <div className="text-p2-medium">Public Key</div>
-      <div
-        className="text-caption-bold truncate text-neutral-700 bg-neutral-400 rounded-md"
-        style={{ padding: "20px", marginTop: "8px" }}
-      >
-        <p className="truncate">{publicKey}</p>
-      </div>
-      <div className="text-p2-medium">Challenge XDR</div>
-      <div
-        className="text-caption-bold truncate text-neutral-700 bg-neutral-400 rounded-md"
-        style={{ padding: "20px", marginTop: "8px" }}
-      >
-        <p className="truncate">{challenge}</p>
-      </div>
-      <div className="mt-[20px]">
-        {challenge && (
-          <Button
-            customCss="w-full"
-            icon="WalletConnect"
-            text="Sign Challenge"
-            onClick={() => signChallenge(challenge)}
-          />
-        )}
-      </div>
-    </>
-  );
-};
-
-const Footer: React.FC = ({}) => {
-  return (
-    <div>
-      
-    </div>
-  );
-};
-
-
 
 const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   const { publicKey, signChallenge, status } = useWallet();
@@ -374,7 +318,6 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                   })}
                 </div>
               </div>
-              <Footer />
             </>
           )}
           {status === "disconnected" && view !== "" && (
