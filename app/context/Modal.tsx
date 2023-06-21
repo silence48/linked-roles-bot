@@ -2,6 +2,7 @@ import React, { type ReactElement, type FunctionComponent } from "react";
 import { useTheme } from "./Theme";
 import { Modal as ModalComponent } from "~/components/Modal";
 import { DiscordLogin } from '~/components/DiscordLogin';
+import { StellarAccounts } from '~/components/StellarAccounts';
 import { BadgeViewer } from '~/components/BadgeViewer';
 import { TxSuccess } from "~/templates/TxSuccess";
 type ModalProviderProps = { children: ReactElement };
@@ -22,6 +23,8 @@ type ModalContextType = {
 enum ModalTypeE {
   DISCORD_LOGIN = "discord_login",
   TX_SUCCESS = "tx_success",
+  STELLAR_ACCOUNTS = "stellar_accounts",
+  ACCOUNT_HANDLER = "account_handler",
 }
 
 const modalAssert = (action: { type: string; content: any }) => {
@@ -30,6 +33,8 @@ const modalAssert = (action: { type: string; content: any }) => {
       return <TxSuccess content={action.content} />;
     case ModalTypeE.DISCORD_LOGIN:
       return <DiscordLogin />;
+    case ModalTypeE.STELLAR_ACCOUNTS:
+        return <StellarAccounts />;
     default:
       return <></>;
   }

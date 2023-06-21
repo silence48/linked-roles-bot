@@ -16,7 +16,7 @@ import React from "react";
 import { ModalProvider, WalletProvider, useWallet, useModal } from "~/context";
 
 import { json } from "@remix-run/cloudflare";
-import { getUserAuthProgress, getUser } from "~/utils/session.server";
+import { getUserAuthProgress, getUser, isDiscordAuthed } from "~/utils/session.server";
 
 import tailwind from '~/styles/main.css'
 
@@ -50,12 +50,31 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { STELLAR_NETWORK } = env;
   const authProgress =
     (await getUserAuthProgress(request, sessionStorage)) ?? {};
-  const { provider, account } = (await getUser(request, sessionStorage)) ?? {};
+  const discordAuthed = await isDiscordAuthed(request, sessionStorage)
+  console.log(authProgress, 'authProgress in root')
+  const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   if (authProgress === null) return null;
-  const discordAuthed = checkRequirement(authProgress, "discord_auth");
+
+//  const discordAuthed = checkRequirement(authProgress, "discord_auth");
   const walletAuthed = checkRequirement(authProgress, "wallet_auth");
-  
+
+  let discordUser = null;
+  if (discordAuthed) {
+    const userId = discord_user_id; 
+    const botToken = env.DISCORD_BOT_TOKEN; 
+    const response = await fetch(`https://discord.com/api/v8/users/${userId}`, {
+      headers: {
+        Authorization: `Bot ${botToken}`
+      }
+    });
+    discordUser = await response.json();
+    console.log(discordUser, 'sdiscordUser in root')
+  }
+
+
+  console.log(discordAuthed, 'discordAuthed in root')
   return json({
+    discordUser,
     discordAuthed,
     walletAuthed,
     authProgress,
@@ -65,7 +84,39 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   });
 };
 
-const Menu = () => {
+const UserMenu = ({ discordUser }) => {
+  return (
+    <div className="dropdown dropdown-end">
+      <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
+        {discordUser ? (
+          <div className="avatar">
+            <div className="w-24 rounded-full">
+              <img src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`} alt={discordUser.username} />
+            </div>
+          </div>
+        ) : (
+          <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
+        )}
+      </label>
+      <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52" style={{ zIndex: 9999 }}>
+        <li>
+          <a className="justify-between">
+            Profile
+            <span className="badge">New</span>
+          </a>
+        </li>
+        <li>
+          <a>Settings</a>
+        </li>
+        <li>
+          <a>Logout</a>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
+const Menu = ({ discordUser }) => {
   const { openModal } = useModal();
 return (
   <>
@@ -76,38 +127,23 @@ return (
         </Link>
       </div>
       <div className="flex-none gap-2">
-        <button
+      {!discordUser ? (
+        <div><button
           className="btn btn-primary normal-case text-xl"
           onClick={() => openModal({ type: "discord_login" })}
         >
           Login
-        </button>
+        </button></div>) : 
+        ( <div><button
+          className="btn btn-primary normal-case text-xl"
+          onClick={() => openModal({ type: "stellar_accounts" })}
+        >
+          Link Stellar Accounts
+        </button></div>)
+        }
 
-        <div className="dropdown dropdown-end">
-          <label
-            tabIndex={0}
-            className="btn btn-ghost btn-circle avatar placeholder"
-          >
-            <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
-          </label>
-          <ul
-            tabIndex={0}
-            className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-          >
-            <li>
-              <a className="justify-between">
-                Profile
-                <span className="badge">New</span>
-              </a>
-            </li>
-            <li>
-              <a>Settings</a>
-            </li>
-            <li>
-              <a>Logout</a>
-            </li>
-          </ul>
-        </div>
+        <UserMenu discordUser={discordUser} />
+
       </div>
     </div>
   </>
@@ -118,7 +154,7 @@ return (
 export default function App() {
 
   let routeError = useRouteError();
-  const {  walletAuthed, provider, account, STELLAR_NETWORK } = useLoaderData() ?? {};
+  const {  discordUser, discordAuthed, walletAuthed, provider, account, STELLAR_NETWORK } = useLoaderData() ?? {};
   
   if (routeError) {
     if (isRouteErrorResponse(routeError)) {
@@ -158,7 +194,7 @@ export default function App() {
         >
           <ModalProvider>
           <>
-              <Menu />
+              <Menu discordUser={discordUser} className="z-30" />
               <Outlet />
           </>
 

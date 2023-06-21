@@ -71,6 +71,7 @@ console.log(`in challenge verify ${discord_user_id}`)
         });
       } else {
         const user = await User.findBy("discord_user_id", discord_user_id, DB);
+        console.log(user)
         const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
         const userOwnedAccounts = stellarAccounts.length;
         console.log(`the ${userOwnedAccounts} accounts are ${JSON.stringify(stellarAccounts)}`)
@@ -80,7 +81,7 @@ console.log(`in challenge verify ${discord_user_id}`)
         console.log(`the accountRecord is ${JSON.stringify(accountRecord)}`)
         // check if the account has already been registered to a different user.
         if ((accountRecord.length != 0) && (accountRecord[0].discord_user_id != discord_user_id)) {
-
+          console.log('the discord userid didnt match', accountRecord[0].discord_user_id, discord_user_id)
           //take other action like ban the user.
           const errmsg = JSON.stringify("Account is owned by a different discord user!");
           return new Response(errmsg, {
@@ -90,9 +91,13 @@ console.log(`in challenge verify ${discord_user_id}`)
             },
           });
         };
+        console.log('the discord userid matched', accountRecord[0].discord_user_id, discord_user_id)
         // then update or create the registration.
+        console.log('userowned')
+        console.log(stellarAccounts[0])
         if (accountRecord.length != 0) {
           stellarAccounts[userOwnedAccounts].discord_user_id = discord_user_id;
+          console.log('it worked')
           stellarAccounts[userOwnedAccounts].public_key = publickey;
           stellarAccounts[userOwnedAccounts].access_token = accesstoken;
           stellarAccounts[userOwnedAccounts].refresh_token = refreshtoken;

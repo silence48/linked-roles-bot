@@ -3,7 +3,7 @@ import { useLoaderData, Link } from "@remix-run/react";
 import React, { useState, useEffect, useRef } from "react";
 import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
 
-import { Loader } from "~/components";
+//import { Loader } from "~/components";
 
 const loadingModal = React.forwardRef((props, ref) => {
   const { data, selectedBadge, onClose } = props;
@@ -119,7 +119,7 @@ export default function Index() {
 
   return (
     <div className="flex flex-wrap justify-center bg-gray-800 p-4 w-full">
-      <Loader></Loader>
+      
 
       {badgeDetails.map((badge, index) => (
         <div

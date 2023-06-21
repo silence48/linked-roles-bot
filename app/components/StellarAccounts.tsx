@@ -56,7 +56,7 @@ const WalletConnect = () => {
     </> : null;
 };
 
-export default function Index() {
+export const StellarAccounts: React.FC = ({}) => {
     const { publicKey } = useWallet();
     const [selectedProvider, setSelectedProvider] = useState(null);
     type WalletButton = {

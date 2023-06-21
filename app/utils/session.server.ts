@@ -1,4 +1,9 @@
 import { redirect, json } from "@remix-run/cloudflare";
+interface Storage {
+  getSession: (cookie?: string | null) => Promise<any>;
+  commitSession: (session: any) => Promise<string>;
+  destroySession: (session: any) => Promise<string>;
+}
 
 interface SessionI {
   id?: string;
@@ -48,7 +53,8 @@ export async function createUserSession(
 }
 
 async function getUserSession(request: Request, sessionStorage: Storage) {
-  return sessionStorage.getSession(request.headers.get("Cookie"));
+  const cookie = request.headers.get("Cookie");
+  return sessionStorage.getSession(cookie);
 }
 
 export async function getUser(request: Request, sessionStorage: Storage) {
@@ -88,6 +94,26 @@ export async function getUserAuthProgress(
 
   // Return the authProgress object
   return authProgress;
+}
+
+export async function isDiscordAuthed(
+  request: Request,
+  sessionStorage: Storage
+){
+  const { discord_user_id } = await getUser(
+    request,
+    sessionStorage
+  ) ?? {};
+ 
+    console.log(discord_user_id, 'discord_user_id in isdiscordauthed')
+  //this should get an access token from the refresh token using the discordapi?
+  let discordAuthed = false;
+
+  if (discord_user_id) {
+    discordAuthed = true
+  }
+  // Return the authProgress object
+  return discordAuthed;
 }
 
 export async function updateUserSession(
