@@ -13,7 +13,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { getUser } = await import("~/utils/session.server");
   const { checkRoles } = await import("~/utils/checkRoles.server");
   const { generateDefaultClaimTransaction } = await import("~/utils/stellarUtils.server");
-  const { User } = await import("~/models");
+  const { User } = await import("linked-roles-core");
 
   //const {verifyAndRenewAccess} = await import("~/utils/auth.server");
   const {jwt} = await import("@tsndr/cloudflare-worker-jwt");  

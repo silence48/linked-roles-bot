@@ -19,3 +19,4 @@ old
 linked-roles-bot
 /.yarn
 package-lock.json
+.prettierrc

@@ -4,7 +4,7 @@ import {
   TransactionBuilder,
   Networks
 } from 'stellar-base';
-import { User } from '../models';
+import { User } from 'linked-roles-core';
 import jwt from '@tsndr/cloudflare-worker-jwt'
 
 

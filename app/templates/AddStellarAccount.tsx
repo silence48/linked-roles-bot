@@ -12,9 +12,6 @@ const WalletConnect = ({ initClient, url }: any) => {
     }
   }, []);
 
-  React.useEffect(() => {
-    console.log("URL", url);
-  }, [url]);
 
   return !url ? (
     <Loader />
@@ -135,7 +132,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
     ) {
       fetcher.submit(
         { signed_envelope_xdr },
-        { method: "post", action: `/challenge/verify?provider=${provider}?` }
+        { method: "post", action: `/challenge/verify?provider=${provider}&addAccount=true` }
       );
     }
   };
@@ -222,10 +219,6 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
   );
 };
 
-export const AddAccount = ({ network }: any) => {
-  return (
-    <>
-      <ImportAccount />
-    </>
-  );
+export const AddStellarAccount = ({ network }: any) => {
+  return (<ImportAccount />);
 };

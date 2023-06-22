@@ -4,7 +4,7 @@ import { Modal as ModalComponent } from "~/components/Modal";
 import { DiscordLogin } from "~/components/DiscordLogin";
 import { BadgeViewer } from "~/components/BadgeViewer";
 import { TxSuccess } from "~/templates/TxSuccess";
-import { AddAccount } from "~/templates/AddAccount";
+import { AddStellarAccount } from "~/templates/AddStellarAccount";
 
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {
@@ -37,7 +37,7 @@ const modalAssert = (action: { type: string; content: any }) => {
     case ModalTypeE.BADGE_VIEWER:
       return <BadgeViewer />;
     case ModalTypeE.ADD_ACCOUNT:
-      return <AddAccount />;
+      return <AddStellarAccount />;
     default:
       return <></>;
   }
