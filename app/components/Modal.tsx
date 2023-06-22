@@ -24,7 +24,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'small',
   align = 'center',
   overlay = false,
-  showBar = false,
+  showBar = true,
   overflow = false,
   closeModal,
   closable = true,
@@ -52,7 +52,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const barStyle = clsx(
     !expanded && 'rounded-tl-[16px] rounded-tr-[16px]',
-    'bg-neutral-100 w-full h-8 flex p-2'
+    'bg-neutral-800 w-full h-8 flex p-2'
   );
 
   return (

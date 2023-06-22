@@ -1,4 +1,5 @@
 import { redirect, json } from "@remix-run/cloudflare";
+import type { SessionData, SessionStorage } from "@remix-run/cloudflare";
 interface Storage {
   getSession: (cookie?: string | null) => Promise<any>;
   commitSession: (session: any) => Promise<string>;
@@ -14,6 +15,7 @@ interface SessionI {
   metadata?: any;
   isClaimed?: boolean;
   account?: string | null;
+  proofs?: string[];
   provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
 }
 
@@ -24,7 +26,7 @@ interface UserSessionResponseI {
 }
 
 export async function createUserSession(
-  sessionStorage: Storage,
+  sessionStorage: SessionStorage<SessionData, SessionData>,
   sessionData: SessionI,
   response?: UserSessionResponseI
 ) {
@@ -52,12 +54,12 @@ export async function createUserSession(
   }
 }
 
-async function getUserSession(request: Request, sessionStorage: Storage) {
+async function getUserSession(request: Request, sessionStorage: SessionStorage) {
   const cookie = request.headers.get("Cookie");
   return sessionStorage.getSession(cookie);
 }
 
-export async function getUser(request: Request, sessionStorage: Storage) {
+export async function getUser(request: Request, sessionStorage: SessionStorage) {
   const session = await getUserSession(request, sessionStorage);
   return session.get("data");
 }
@@ -66,7 +68,7 @@ type Require = 'discord_auth' | 'wallet_auth'
 
 export async function getUserAuthProgress(
   request: Request,
-  sessionStorage: Storage
+  sessionStorage: SessionStorage
 ) {
   const { provider, discord_user_id, account } = await getUser(
     request,
@@ -98,7 +100,7 @@ export async function getUserAuthProgress(
 
 export async function isDiscordAuthed(
   request: Request,
-  sessionStorage: Storage
+  sessionStorage: SessionStorage
 ){
   const { discord_user_id } = await getUser(
     request,
@@ -118,7 +120,7 @@ export async function isDiscordAuthed(
 
 export async function updateUserSession(
   request: Request,
-  sessionStorage: Storage,
+  sessionStorage: SessionStorage,
   sessionData: SessionI,
   { redirectTo, message = undefined, body = undefined }: UserSessionResponseI
 ) {
@@ -148,7 +150,7 @@ export async function updateUserSession(
   }
 }
 
-export async function logout(request: Request, sessionStorage: Storage) {
+export async function logout(request: Request, sessionStorage: SessionStorage) {
   let session = await getUserSession(request, sessionStorage);
   return redirect(`/`, {
     headers: {

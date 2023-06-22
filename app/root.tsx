@@ -12,12 +12,11 @@ import {
   Link,
 } from "@remix-run/react";
 import React from "react";
-
-import { ModalProvider, WalletProvider, useWallet, useModal } from "~/context";
-
+import { ModalProvider, WalletProvider, useModal } from "~/context";
 import { json } from "@remix-run/cloudflare";
 import { getUserAuthProgress, getUser, isDiscordAuthed } from "~/utils/session.server";
 
+import {fetchRegisteredAccounts} from '~/utils/sqproof'
 import tailwind from '~/styles/main.css'
 
 export const meta: V2_MetaFunction  = () => ([
@@ -28,52 +27,39 @@ export const links: LinksFunction = () => ([
   { rel: "stylesheet", href: tailwind },
 ]);
 
-
-type Require = "discord_auth" | "wallet_auth";
-
-function checkRequirement(
-  authProgress: { requires: Require[]; view: string },
-  requirement: Require
-) {
-  if (
-    authProgress &&
-    authProgress.requires &&
-    Array.isArray(authProgress.requires)
-  ) {
-    return authProgress.requires.includes(requirement);
-  }
-  return false;
-}
-
 export const loader = async ({ request, context }: LoaderArgs) => {
+
   const { sessionStorage, env } = context as any;
   const { STELLAR_NETWORK } = env;
   const authProgress =
     (await getUserAuthProgress(request, sessionStorage)) ?? {};
   const discordAuthed = await isDiscordAuthed(request, sessionStorage)
-  console.log(authProgress, 'authProgress in root')
   const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
-  if (authProgress === null) return null;
+  console.log(account, 'account in root')
+  
 
 //  const discordAuthed = checkRequirement(authProgress, "discord_auth");
-  const walletAuthed = checkRequirement(authProgress, "wallet_auth");
-
+  let userStellarAccounts
   let discordUser = null;
   if (discordAuthed) {
-    const userId = discord_user_id; 
-    const botToken = env.DISCORD_BOT_TOKEN; 
-    const response = await fetch(`https://discord.com/api/v8/users/${userId}`, {
+    userStellarAccounts = await fetchRegisteredAccounts(request, context);
+    console.log('fetchhing discord stuff')
+    const response = await fetch(`https://discord.com/api/v8/users/${discord_user_id}`, {
       headers: {
-        Authorization: `Bot ${botToken}`
+        Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`
       }
     });
+    if (!response.ok) throw new Error('Discord API error');
     discordUser = await response.json();
-    console.log(discordUser, 'sdiscordUser in root')
+  } else {
+    userStellarAccounts = []
   }
-
-
+  const walletAuthed=true
+  console.log(userStellarAccounts, 'userStellarAccounts in root')
   console.log(discordAuthed, 'discordAuthed in root')
   return json({
+    userStellarAccounts,
+//    proofs,
     discordUser,
     discordAuthed,
     walletAuthed,
@@ -116,9 +102,16 @@ const UserMenu = ({ discordUser }) => {
   );
 };
 
-const Menu = ({ discordUser }) => {
+type MenuProps = {
+  discordUser: any; 
+  userAccounts: any[]; 
+};
+
+const Menu: React.FC<MenuProps> = ({ discordUser, userAccounts }) => {
   const { openModal } = useModal();
-return (
+  console.log(userAccounts, 'userAccounts in menu')
+  return (
+  
   <>
     <div className="navbar bg-base-100">
       <div className="flex-1">
@@ -136,7 +129,7 @@ return (
         </button></div>) : 
         ( <div><button
           className="btn btn-primary normal-case text-xl"
-          onClick={() => openModal({ type: "stellar_accounts" })}
+          onClick={() => openModal({ type: "stellar_accounts", size: "fit", content: { userAccounts } })}
         >
           Link Stellar Accounts
         </button></div>)
@@ -154,8 +147,16 @@ return (
 export default function App() {
 
   let routeError = useRouteError();
-  const {  discordUser, discordAuthed, walletAuthed, provider, account, STELLAR_NETWORK } = useLoaderData() ?? {};
-  
+  const { userStellarAccounts, discordUser, walletAuthed, discordAuthed, provider, account, STELLAR_NETWORK } = useLoaderData() ?? {};
+  const copyToClipboard = (token) => {
+    navigator.clipboard.writeText(token);
+  };
+  // Render proofs if they are available
+  /*let renderProofs = null;
+  if (proofs) {
+    renderProofs = true;
+  }*/
+
   if (routeError) {
     if (isRouteErrorResponse(routeError)) {
       // This was an error from a route loader or action
@@ -194,7 +195,9 @@ export default function App() {
         >
           <ModalProvider>
           <>
-              <Menu discordUser={discordUser} className="z-30" />
+              <Menu 
+                discordUser={discordUser}
+                userAccounts={userStellarAccounts} />
               <Outlet />
           </>
 

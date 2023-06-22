@@ -35,6 +35,8 @@ if (process.env.NODE_ENV === "development") {
   logDevReady(build);
 }
 
+
+
 export const onRequest = createPagesFunctionHandler({
   build,
   mode: process.env.NODE_ENV,

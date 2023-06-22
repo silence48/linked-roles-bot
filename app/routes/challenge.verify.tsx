@@ -96,12 +96,10 @@ console.log(`in challenge verify ${discord_user_id}`)
         console.log('userowned')
         console.log(stellarAccounts[0])
         if (accountRecord.length != 0) {
-          stellarAccounts[userOwnedAccounts].discord_user_id = discord_user_id;
-          console.log('it worked')
-          stellarAccounts[userOwnedAccounts].public_key = publickey;
-          stellarAccounts[userOwnedAccounts].access_token = accesstoken;
-          stellarAccounts[userOwnedAccounts].refresh_token = refreshtoken;
-          console.log(await StellarAccount.update(stellarAccounts[userOwnedAccounts], DB));
+          console.log(accountRecord[0])
+          accountRecord[0].access_token = accesstoken;
+          accountRecord[0].refresh_token = refreshtoken;
+          console.log(await StellarAccount.update(accountRecord[0], DB));
         } else {
           const accountForm = new AccountForm(
             new StellarAccount({
@@ -114,7 +112,6 @@ console.log(`in challenge verify ${discord_user_id}`)
           console.log(`the accountForm is ${JSON.stringify(accountForm)}`)
 
           console.log(await StellarAccount.create(accountForm, DB));
-
         }
 
         let responsetext = JSON.stringify({ token: accesstoken });

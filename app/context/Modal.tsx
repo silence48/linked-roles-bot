@@ -3,7 +3,7 @@ import { useTheme } from "./Theme";
 import { Modal as ModalComponent } from "~/components/Modal";
 import { DiscordLogin } from '~/components/DiscordLogin';
 import { StellarAccounts } from '~/components/StellarAccounts';
-import { BadgeViewer } from '~/components/BadgeViewer';
+//import { BadgeViewer } from '~/components/BadgeViewer';
 import { TxSuccess } from "~/templates/TxSuccess";
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {
@@ -34,7 +34,8 @@ const modalAssert = (action: { type: string; content: any }) => {
     case ModalTypeE.DISCORD_LOGIN:
       return <DiscordLogin />;
     case ModalTypeE.STELLAR_ACCOUNTS:
-        return <StellarAccounts />;
+      //console.log(action.content.userAccounts, 'action.content.userAccounts in modal')
+        return <StellarAccounts userAccounts={action.content.userAccounts}/>;
     default:
       return <></>;
   }
