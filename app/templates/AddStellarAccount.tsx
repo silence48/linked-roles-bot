@@ -82,11 +82,11 @@ const options: { name: string; icon: IconKeys }[] = [
   },
 ];
 
-type ImportAccountProps = {};
+type ImportAccountProps = { network: 'TESTNET' | 'PUBLIC' };
 type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
 type Client = any | null;
 
-const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
+const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
   const [publicKey, setPublicKey] = React.useState<string | null>(null);
   const [provider, setProvider] = React.useState<Provider | null>(null);
   const [view, setView] = React.useState("");
@@ -94,8 +94,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
   const [url, setUrl] = React.useState<string | null>(null);
 
   const fetcher = useFetcher();
-
-  const network = "TESTNET";
+  const payload = useFetcher();
 
   const initClient = (provider: Provider) => {
     if (provider === null) return;
@@ -127,10 +126,10 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
     const { signed_envelope_xdr } = await client.signTransaction(xdr, false);
     if (
       !!signed_envelope_xdr &&
-      fetcher.state === "idle" &&
-      fetcher.data == null
+      payload.state === "idle" &&
+      payload.data == null
     ) {
-      fetcher.submit(
+      payload.submit(
         { signed_envelope_xdr },
         { method: "post", action: `/challenge/verify?provider=${provider}&addAccount=true` }
       );
@@ -177,9 +176,9 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
           )}
           {view === "" && (
             <>
-              <IconHeading text="Wallets" icon="Extension" />
+              <IconHeading text="Add account" icon="Extension" />
               <div className="text-p2-medium">
-                Choose one of the following login options to continue.
+                Choose one of the following apps to add another account.
               </div>
               <div className="my-8">
                 <div className="flex flex-col space-y-4">
@@ -220,5 +219,5 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}: any) => {
 };
 
 export const AddStellarAccount = ({ network }: any) => {
-  return (<ImportAccount />);
+  return (<ImportAccount network={network} />);
 };

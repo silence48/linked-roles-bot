@@ -6,6 +6,7 @@ export const Challenge: React.FC<{
     challenge: string | null;
     publicKey: string | null;
   }> = ({ signChallenge, challenge, publicKey }) => {
+    console.log("signChallenge", signChallenge, challenge, publicKey)
     return (
       <>
         <div className="text-h3-semi-bold">Challenge</div>
@@ -30,7 +31,6 @@ export const Challenge: React.FC<{
           {challenge && (
             <Button
               customCss="w-full"
-              icon="WalletConnect"
               text="Sign Challenge"
               onClick={() => signChallenge(challenge)}
             />

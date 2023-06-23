@@ -1565,6 +1565,11 @@
     "@types/node" "*"
     "@types/responselike" "^1.0.0"
 
+"@types/cookie@^0.5.1":
+  "integrity" "sha512-COUnqfB2+ckwXXSFInsFdOAWQzCCx+a5hq2ruyj+Vjund94RJQd4LG2u9hnvJrTgunKAaax7ancBYlDrNYxA0g=="
+  "resolved" "https://registry.npmjs.org/@types/cookie/-/cookie-0.5.1.tgz"
+  "version" "0.5.1"
+
 "@types/debug@^4.0.0":
   "version" "4.1.8"
   dependencies:

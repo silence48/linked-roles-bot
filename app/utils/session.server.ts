@@ -1,6 +1,6 @@
 import { redirect, json } from "@remix-run/cloudflare";
 
-interface SessionI {
+export interface SessionI {
   id?: string;
   discord_user_id?: string;
   user?: any;
@@ -66,7 +66,6 @@ export async function getUserAuthProgress(
     request,
     sessionStorage
   ) ?? {};
-  console.log({ provider, discord_user_id, account }, 'session-server')
   let authProgress: { requires: Require[]; view: string } = {
     requires: [],
     view: "",

@@ -5,6 +5,7 @@ import { DiscordLogin } from "~/components/DiscordLogin";
 import { BadgeViewer } from "~/components/BadgeViewer";
 import { TxSuccess } from "~/templates/TxSuccess";
 import { AddStellarAccount } from "~/templates/AddStellarAccount";
+import { RemoveStellarAccount } from "~/templates/RemoveStellarAccount";
 
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {
@@ -26,6 +27,7 @@ enum ModalTypeE {
   TX_SUCCESS = "tx_success",
   BADGE_VIEWER = "badge_viewer",
   ADD_ACCOUNT = "add_account",
+  REMOVE_ACCOUNT = "remove_account",
 }
 
 const modalAssert = (action: { type: string; content: any }) => {
@@ -37,7 +39,9 @@ const modalAssert = (action: { type: string; content: any }) => {
     case ModalTypeE.BADGE_VIEWER:
       return <BadgeViewer />;
     case ModalTypeE.ADD_ACCOUNT:
-      return <AddStellarAccount />;
+      return <AddStellarAccount network={action.content} />;
+    case ModalTypeE.REMOVE_ACCOUNT:
+      return <RemoveStellarAccount public_key={action.content} />;
     default:
       return <></>;
   }
