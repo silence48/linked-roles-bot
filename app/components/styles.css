@@ -1,0 +1,367 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind variants;
+
+/*
+ * The Typekit service used to deliver this font or fonts for use on websites
+ * is provided by Adobe and is subject to these Terms of Use
+ * http://www.adobe.com/products/eulas/tou_typekit. For font license
+ * information, see the list below.
+ *
+ * proxima-nova:
+ *   - http://typekit.com/eulas/00000000000000007735e602
+ *   - http://typekit.com/eulas/00000000000000007735e603
+ *   - http://typekit.com/eulas/00000000000000007735e609
+ *   - http://typekit.com/eulas/00000000000000007735e606
+ *   - http://typekit.com/eulas/00000000000000007735e605
+ *
+ * © 2009-2022 Adobe Systems Incorporated. All Rights Reserved.
+ */
+/*{"last_published":"2021-08-04 20:25:08 UTC"}*/
+
+@import url("https://p.typekit.net/p.css?s=1&k=wdd6isw&ht=tk&f=137.139.175.5474.25136&a=46063616&app=typekit&e=css");
+
+@font-face {
+font-family:"proxima-nova";
+src:url("https://use.typekit.net/af/e3ed45/00000000000000007735e602/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n9&v=3") format("woff2"),url("https://use.typekit.net/af/e3ed45/00000000000000007735e602/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n9&v=3") format("woff"),url("https://use.typekit.net/af/e3ed45/00000000000000007735e602/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n9&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:900;font-stretch:normal;
+}
+
+@font-face {
+font-family:"proxima-nova";
+src:url("https://use.typekit.net/af/2555e1/00000000000000007735e603/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff2"),url("https://use.typekit.net/af/2555e1/00000000000000007735e603/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("woff"),url("https://use.typekit.net/af/2555e1/00000000000000007735e603/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n7&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:700;font-stretch:normal;
+}
+
+@font-face {
+font-family:"proxima-nova";
+src:url("https://use.typekit.net/af/efe4a5/00000000000000007735e609/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/efe4a5/00000000000000007735e609/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/efe4a5/00000000000000007735e609/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
+}
+
+@font-face {
+font-family:"proxima-nova";
+src:url("https://use.typekit.net/af/1be3c2/00000000000000007735e606/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("woff2"),url("https://use.typekit.net/af/1be3c2/00000000000000007735e606/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("woff"),url("https://use.typekit.net/af/1be3c2/00000000000000007735e606/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n3&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:300;font-stretch:normal;
+}
+
+@font-face {
+font-family:"proxima-nova";
+src:url("https://use.typekit.net/af/23e139/00000000000000007735e605/30/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff2"),url("https://use.typekit.net/af/23e139/00000000000000007735e605/30/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("woff"),url("https://use.typekit.net/af/23e139/00000000000000007735e605/30/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n5&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:500;font-stretch:normal;
+}
+
+.tk-proxima-nova { font-family: "proxima-nova",sans-serif; }
+
+
+
+@layer base {
+  
+  .text-display-bold {
+    @apply text-[72.2px] font-bold;
+  }
+  .text-display-semi-bold {
+    @apply text-[72.2px] font-semibold;
+  }
+  .text-display-extra-bold {
+    @apply text-[72.2px] font-extrabold;
+  }
+
+  .text-h1-bold {
+    @apply text-[60.2px] font-bold;
+  }
+  .text-h1-semi-bold {
+    @apply text-[60.2px] font-semibold;
+  }
+  .text-h1-extra-bold {
+    @apply text-[60.2px] font-extrabold;
+  }
+
+  .text-h2-bold {
+    @apply text-[41.8px] font-bold;
+  }
+  .text-h2-semi-bold {
+    @apply text-[41.8px] font-semibold;
+  }
+  .text-h2-extra-bold {
+    @apply text-[41.8px] font-extrabold;
+  }
+
+  .text-h3-bold {
+    @apply text-[34.8px] font-bold;
+  }
+  .text-h3-semi-bold {
+    @apply text-[34.8px] font-semibold;
+  }
+  .text-h3-extra-bold {
+    @apply text-[34.8px] font-extrabold;
+  }
+
+  .text-h4-bold {
+    @apply text-[29px] font-bold;
+  }
+  .text-h4-semi-bold {
+    @apply text-[29px] font-semibold;
+  }
+  .text-h4-extra-bold {
+    @apply text-[29px] font-extrabold;
+  }
+
+  .text-subheading-medium {
+    @apply text-[24.2px] font-medium;
+  }
+  .text-subheading-bold {
+    @apply text-[24.2px] font-bold;
+  }
+  .text-subheading-underlined {
+    @apply text-[24.2px] underline;
+  }
+  .text-subheading-light {
+    @apply text-[24.2px] font-light;
+  }
+
+
+  .text-p1-medium {
+    @apply text-[20.2px] font-medium;
+  }
+  .text-p1-bold {
+    @apply text-[20.2px] font-bold;
+  }
+  .text-p1-underlined {
+    @apply text-[20.2px] underline;
+  }
+  .text-p1-light {
+    @apply text-[20.2px] font-light;
+  }
+
+  .text-p2-medium {
+    @apply text-[16.8px] font-medium;
+  }
+  .text-p2-bold {
+    @apply text-[16.8px] font-bold;
+  }
+  .text-p2-underlined {
+    @apply text-[16.8px] underline;
+  }
+  .text-p2-light {
+    @apply text-[16.8px] font-light;
+  }
+
+  .text-p3-medium {
+    @apply text-[14px] font-medium;
+  }
+  .text-p3-bold {
+    @apply text-[14px] font-bold;
+  }
+  .text-p3-underlined {
+    @apply text-[14px] underline;
+  }
+  .text-p3-light {
+    @apply text-[14px] font-light;
+  }
+
+  .text-caption-medium {
+    @apply text-[11.7px] font-medium;
+  }
+  .text-caption-bold {
+    @apply text-[11.7px] font-bold;
+  }
+  .text-caption-underlined {
+    @apply text-[11.7px] underline;
+  }
+  .text-caption-light {
+    @apply text-[11.7px] font-light;
+  }
+  .text-caption-bold-underlined {
+    @apply text-[11.7px] font-bold underline;
+  }
+
+  .text-footer-medium {
+    @apply text-[9.7px] font-medium;
+  }
+  .text-footer-bold {
+    @apply text-[9.7px] font-bold;
+  }
+  .text-footer-underlined {
+    @apply text-[9.7px] underline;
+  }
+  .text-footer-light {
+    @apply text-[9.7px] font-light;
+  }
+  .text-footer-bold-underlined {
+    @apply text-[9.7px] font-bold underline;
+  }
+
+
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "proxima-nova";
+}
+
+@keyframes play-hero {
+	0% {
+		transform: rotateX(45deg) translateY(-50%);
+	}
+	100% {
+		transform: rotateX(45deg) translateY(0);
+	}
+}
+
+a[disabled] {
+  pointer-events: none;
+}
+
+::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+
+.light {
+  --color-primary-100: #F6EFF1;
+  --color-primary-200: #EFDFE4;
+  --color-primary-300: #ECCCD5;
+  --color-primary-400: #E8A9BB;
+  --color-primary-500: #E988A4;
+  --color-primary-600: #ED4073;
+  --color-primary-700: #F30049;
+  --color-primary-800: #C0003E;
+  --color-primary-900: #990835;
+  --color-primary-1000: #68102B;
+  --color-primary-1100: #3E121E;
+  --color-primary-1200: #230F15;
+  --color-primary-1300: #12090C;
+
+  --color-secondary-100: #F2EFF7;
+  --color-secondary-200: #E7E0F1;
+  --color-secondary-300: #D7C7ED;
+  --color-secondary-400: #C9B0EC;
+  --color-secondary-500: #AC79EE;
+  --color-secondary-600: #9039F3;
+  --color-secondary-700: #7100F4;
+  --color-secondary-800: #6000D7;
+  --color-secondary-900: #5000AC;
+  --color-secondary-1000: #2E0D54;
+  --color-secondary-1100: #24113C;
+  --color-secondary-1200: #1C112B;
+  --color-secondary-1300: #0C0811;
+
+  --color-tertiary-100: #FFF6E4;
+  --color-tertiary-200: #FCEAC9;
+  --color-tertiary-300: #F3CF89;
+  --color-tertiary-400: #E9B041;
+  --color-tertiary-500: #D59414;
+  --color-tertiary-600: #B47A09;
+  --color-tertiary-700: #724C03;
+  --color-tertiary-800: #402A01;
+
+  --color-neutral-100: #E7EDFA;
+  --color-neutral-200: #DCE3F6;
+  --color-neutral-300: #CDD6EA;
+  --color-neutral-400: #BCC5DC;
+  --color-neutral-500: #9CA2AF;
+  --color-neutral-600: #99A4BC;
+  --color-neutral-700: #676C78;
+  --color-neutral-800: #363B49;
+  --color-neutral-900: #262D3D;
+  --color-neutral-1000: #111725;
+  --color-neutral-1100: #050811;
+  --color-neutral-1200: #03050B;
+  --color-neutral-1300: #000104;
+
+  --color-green-100: #E5FDD6;
+  --color-green-200: #C3F6A4;
+  --color-green-300: #9BEA6A;
+  --color-green-400: #62CA21;
+  --color-green-500: #499B17;
+  --color-green-600: #2E630D;
+  --color-green-700: #193806;
+
+  --color-red-100: #F9D4CC;
+  --color-red-200: #F5AC9D;
+  --color-red-300: #EF7962;
+  --color-red-400: #D4482C;
+  --color-red-500: #AE2F15;
+  --color-red-600: #7D1B08;
+  --color-red-700: #5F1102;
+
+  --color-white: #f7f7f7;
+  --color-black: #1C181E;
+
+  --color-silver: #D2E0E4;
+  
+  --color-background: #F5F4F7;
+}
+
+
+.midnight {
+  --color-primary-700: #CEEDFF;
+  --color-primary-600: #AFE0FC;
+  --color-primary-500: #79C9F6;
+  --color-primary-400: #37ACEE;
+  --color-primary-300: #0F8FD6;
+  --color-primary-200: #06679D;
+  --color-primary-100: #004166;
+
+  --color-secondary-700: #FECDD9;
+  --color-secondary-600: #FDA6BC;
+  --color-secondary-500: #F77898;
+  --color-secondary-400: #D81344;
+  --color-secondary-300: #C0113D;
+  --color-secondary-200: #72031F;
+  --color-secondary-100: #570016;
+
+  --color-tertiary-700: #FFF6E4;
+  --color-tertiary-600: #FCEAC9;
+  --color-tertiary-500: #F3CF89;
+  --color-tertiary-400: #E9B041;
+  --color-tertiary-300: #D59414;
+  --color-tertiary-200: #B47A09;
+  --color-tertiary-100: #724C03;
+  --color-tertiary-50: #402A01;
+
+  --color-neutral-900: #fcfdfd;
+  --color-neutral-800: #f4f8fa;
+  --color-neutral-700: rgb(249, 252, 255);
+  --color-neutral-600: #eff4f6;
+  --color-neutral-500: #AFD3DF;
+  --color-neutral-400: #86B3C1;
+  --color-neutral-300: #6F98A5;
+  --color-neutral-200: rgb(100, 130, 140);
+  --color-neutral-150: #5B5C5C;
+  --color-neutral-100: rgb(44, 51, 53);
+  --color-neutral-50: #191A1B;
+
+  --color-green-700: #E5FDD6;
+  --color-green-600: #C3F6A4;
+  --color-green-500: #9BEA6A;
+  --color-green-400: #62CA21;
+  --color-green-300: #499B17;
+  --color-green-200: #2E630D;
+  --color-green-100: #193806;
+
+  --color-red-700: #F9D4CC;
+  --color-red-600: #F5AC9D;
+  --color-red-500: #EF7962;
+  --color-red-400: #D4482C;
+  --color-red-300: #AE2F15;
+  --color-red-200: #7D1B08;
+  --color-red-100: #5F1102;
+
+  --color-white: #f7f7f7;
+  --color-black: #1C181E;
+
+  --color-silver: #D2E0E4;
+
+  --color-background: #1c181e;
+  /* #1C181E */
+}

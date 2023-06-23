@@ -40,6 +40,7 @@ export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   const { discord_user_id } = await getUser(request, context.sessionStorage);
+  if (discord_user_id === null){return null;}
   const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
   return stellarAccounts;
 }
@@ -476,6 +477,7 @@ const { BalanceForm, ClaimableForm } = await import('../forms');
   }
 
   await DB.batch(preparedStatements)
+  subrequests += 1
   console.log(`returning ${subrequests} subrequests`)
   return subrequests;
 }
@@ -486,6 +488,7 @@ export async function getOriginalPayees(
   context: any,
   issuer: any,
   assetid: any,
+  subrequests: any,
 ) {
 
   const {Balance } = await import('../models');
@@ -498,6 +501,7 @@ const { BalanceForm } = await import('../forms');
   ORDER BY date_acquired ASC 
   LIMIT 1
 `);
+subrequests += 1
   let cursor;
 
   const lastrecord = await stmt.bind(issuer, assetid).all();
@@ -512,6 +516,7 @@ const { BalanceForm } = await import('../forms');
   let accountPayments: any = [];
   let owners: [{ asset_id?: string, account_id?: string, balance?: string, date_acquired?: string }] = [{}];
   let paymentResponse: any = await fetchPayments(env, issuer, cursor);
+  subrequests += 1
   if (paymentResponse.status === 404) {
     return;
   }
@@ -523,9 +528,10 @@ const { BalanceForm } = await import('../forms');
     paymentResponse.length % 200 === 0 ||
     paymentResponse._embedded.records.length !== 0
   ) {
-    if (iter > 1000) {
+    if (subrequests > 800) {
       needsNext = true;
       nextcursor = paymentResponse['_links'].next.href
+      subrequests += 1
       break
     }
     accountPayments = accountPayments.concat(paymentResponse._embedded.records);
@@ -570,8 +576,9 @@ const { BalanceForm } = await import('../forms');
       preparedStatements.push(preparedStatement);
     }
     paymentResponse = await fetch(paymentResponse['_links'].next.href).then(handleResponse);
-    iter += 1
+    subrequests+=1
   }
   await DB.batch(preparedStatements);
-  return { owners, nextcursor };
+subrequests += 1
+  return subrequests ;
 }

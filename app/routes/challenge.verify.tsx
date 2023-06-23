@@ -20,6 +20,7 @@ export async function action({ request, context, params }: ActionArgs) {
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
+console.log(`in challenge verify ${discord_user_id}`)
   let areq = {
     Transaction: signedEnvelope,
     NETWORK_PASSPHRASE: Networks.PUBLIC,
@@ -30,6 +31,8 @@ export async function action({ request, context, params }: ActionArgs) {
   if (NETWORK_PASSPHRASE) {
     passphrase = NETWORK_PASSPHRASE;
   }
+
+
   const { DB } = context.env as any;
   let transaction = new (TransactionBuilder.fromXDR as any)(Transaction, passphrase);
   //verify the state.
@@ -68,6 +71,7 @@ export async function action({ request, context, params }: ActionArgs) {
         });
       } else {
         const user = await User.findBy("discord_user_id", discord_user_id, DB);
+        console.log(user)
         const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
         const userOwnedAccounts = stellarAccounts.length;
         console.log(`the ${userOwnedAccounts} accounts are ${JSON.stringify(stellarAccounts)}`)
@@ -77,7 +81,7 @@ export async function action({ request, context, params }: ActionArgs) {
         console.log(`the accountRecord is ${JSON.stringify(accountRecord)}`)
         // check if the account has already been registered to a different user.
         if ((accountRecord.length != 0) && (accountRecord[0].discord_user_id != discord_user_id)) {
-
+          console.log('the discord userid didnt match', accountRecord[0].discord_user_id, discord_user_id)
           //take other action like ban the user.
           const errmsg = JSON.stringify("Account is owned by a different discord user!");
           return new Response(errmsg, {
@@ -87,13 +91,15 @@ export async function action({ request, context, params }: ActionArgs) {
             },
           });
         };
+        console.log('the discord userid matched', accountRecord[0].discord_user_id, discord_user_id)
         // then update or create the registration.
+        console.log('userowned')
+        console.log(stellarAccounts[0])
         if (accountRecord.length != 0) {
-          stellarAccounts[userOwnedAccounts].discord_user_id = discord_user_id;
-          stellarAccounts[userOwnedAccounts].public_key = publickey;
-          stellarAccounts[userOwnedAccounts].access_token = accesstoken;
-          stellarAccounts[userOwnedAccounts].refresh_token = refreshtoken;
-          console.log(await StellarAccount.update(stellarAccounts[userOwnedAccounts], DB));
+          console.log(accountRecord[0])
+          accountRecord[0].access_token = accesstoken;
+          accountRecord[0].refresh_token = refreshtoken;
+          console.log(await StellarAccount.update(accountRecord[0], DB));
         } else {
           const accountForm = new AccountForm(
             new StellarAccount({
@@ -106,7 +112,6 @@ export async function action({ request, context, params }: ActionArgs) {
           console.log(`the accountForm is ${JSON.stringify(accountForm)}`)
 
           console.log(await StellarAccount.create(accountForm, DB));
-
         }
 
         let responsetext = JSON.stringify({ token: accesstoken });

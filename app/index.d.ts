@@ -1,1 +1,1 @@
-declare module 'communi-design-system';
+//declare module 'communi-design-system';

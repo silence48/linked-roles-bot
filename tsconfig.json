@@ -1,5 +1,5 @@
 {
-  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["remix.env.d.ts", "**/*.ts", "**/*.tsx", "tailwind.config.ts.old"],
   "exclude": ["node_modules/**/*", "**/*.spec.ts"],
   "compilerOptions": {
     "lib": ["ESNext"],
@@ -15,7 +15,8 @@
     "forceConsistentCasingInFileNames": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./app/*"]
+      "~/*": ["./app/*"],
+      "@/*": ["./*"]
     },
     "types": [
       "@cloudflare/workers-types",
