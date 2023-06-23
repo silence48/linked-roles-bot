@@ -1,4 +1,4 @@
-import type { V2_MetaFunction , LinksFunction, LoaderArgs, json } from "@remix-run/cloudflare";
+import type { V2_MetaFunction , LinksFunction, LoaderArgs } from "@remix-run/cloudflare";
 
 import {
   Links,
@@ -13,6 +13,7 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import { ModalProvider, WalletProvider, useModal } from "~/context";
+import { json } from "@remix-run/cloudflare";
 
 
 import {fetchRegisteredAccounts} from '~/utils/sqproof'
