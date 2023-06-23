@@ -28,38 +28,15 @@ export const links: LinksFunction = () => ([
 ]);
 
 
-type Require = "discord_auth" | "wallet_auth";
-
-function checkRequirement(
-  authProgress: { requires: Require[]; view: string },
-  requirement: Require
-) {
-  if (
-    authProgress &&
-    authProgress.requires &&
-    Array.isArray(authProgress.requires)
-  ) {
-    return authProgress.requires.includes(requirement);
-  }
-  return false;
-}
-
 export const loader = async ({ request, context }: LoaderArgs) => {
-  const { getUserAuthProgress, getUser, isDiscordAuthed } = await import("~/utils/session.server");
+  const { getUser, isDiscordAuthed } = await import("~/utils/session.server");
   const { sessionStorage, env } = context as any;
   const { STELLAR_NETWORK } = env;
-  const authProgress =
-    (await getUserAuthProgress(request, sessionStorage)) ?? {};
+
   const discordAuthed = await isDiscordAuthed(request, sessionStorage)
-  console.log(authProgress, 'auth progress in root')
   const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   console.log(account, 'account in root')
   
-
-  const discordAuthed1 = checkRequirement(authProgress, "discord_auth");
-  const walletAuthed = checkRequirement(authProgress, "wallet_auth");
-
-  console.log(discordAuthed1)
   let userStellarAccounts
   let discordUser = null;
   if (discordAuthed) {
@@ -75,7 +52,7 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   } else {
     userStellarAccounts = []
   }
-  //const walletAuthed=true
+  const walletAuthed=true
   console.log(userStellarAccounts, 'userStellarAccounts in root')
   console.log(discordAuthed, 'discordAuthed in root')
   return json({
@@ -84,7 +61,6 @@ export const loader = async ({ request, context }: LoaderArgs) => {
     discordUser,
     discordAuthed,
     walletAuthed,
-    authProgress,
     provider,
     account,
     STELLAR_NETWORK,

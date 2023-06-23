@@ -124,7 +124,6 @@ export const WalletProvider: FunctionComponent<WalletProviderProps> = ({
       const { body } = fetcher.data;
       const { account, provider } = body;
       if (account === publicKey && provider === provider) {
-        console.log('in the wallet use effect')
         setStatus("connected");
         setIsOpen(false);
       }
@@ -353,12 +352,9 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   if (publicKey !== null && publicKey !== lastFetchedKey && fetcher.state === "idle") {
     fetcher.load(`/challenge/${publicKey}`);
     setLastFetchedKey(publicKey);
-    console.log(publicKey, lastFetchedKey, 'in import account useeffect')
   }
 }, [fetcher, publicKey, lastFetchedKey]);
-  console.log(fetcher.data, 'fetcher data in import')
   const { challenge } = fetcher.data ?? {};
-  console.log(challenge, 'challenge in import account')
   return (
     <div className="flex flex-col">
       <div className="flex flex-row w-full">
