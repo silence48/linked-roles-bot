@@ -27,18 +27,16 @@ export const links: LinksFunction = () => ([
   { rel: "stylesheet", href: tailwind },
 ]);
 
+
 export const loader = async ({ request, context }: LoaderArgs) => {
-  const { getUserAuthProgress, getUser, isDiscordAuthed } = await import("~/utils/session.server");
+  const { getUser, isDiscordAuthed } = await import("~/utils/session.server");
   const { sessionStorage, env } = context as any;
   const { STELLAR_NETWORK } = env;
-  const authProgress =
-    (await getUserAuthProgress(request, sessionStorage)) ?? {};
+
   const discordAuthed = await isDiscordAuthed(request, sessionStorage)
   const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   console.log(account, 'account in root')
   
-
-//  const discordAuthed = checkRequirement(authProgress, "discord_auth");
   let userStellarAccounts
   let discordUser = null;
   if (discordAuthed) {
@@ -63,7 +61,6 @@ export const loader = async ({ request, context }: LoaderArgs) => {
     discordUser,
     discordAuthed,
     walletAuthed,
-    authProgress,
     provider,
     account,
     STELLAR_NETWORK,
@@ -129,7 +126,7 @@ const Menu: React.FC<MenuProps> = ({ discordUser, userAccounts }) => {
         </button></div>) : 
         ( <div><button
           className="btn btn-primary normal-case text-xl"
-          onClick={() => openModal({ type: "stellar_accounts", size: "fit", content: { userAccounts } })}
+          onClick={() => openModal({ type: "stellar_accounts", size: "large", content: { userAccounts } })}
         >
           Link Stellar Accounts
         </button></div>)

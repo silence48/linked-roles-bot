@@ -1,9 +1,9 @@
 import React from "react";
-import { useWallet, Challenge } from "~/context/Wallet";
+import { useWallet, Challenge, ImportAccount } from "~/context/Wallet";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { QRCode } from '~/components/QRCode';
 import { useEffect, useState, useContext } from "react";
-import { ImportAccount } from '~/context/Wallet';
+
 import { Icon, type IconKeys } from '~/components/Icon';
 import { FiTrash2 } from "react-icons/fi";
 
