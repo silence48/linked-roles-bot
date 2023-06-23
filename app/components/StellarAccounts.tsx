@@ -115,8 +115,8 @@ if (uAccounts === null || uAccounts === undefined || uAccounts.length === 0) {
     ];
     return (
         <div >
-            <AccountsContainer userAccounts={uAccounts}/>
-
+            <AccountsContainer uAccounts={uAccounts}/>
+          <div className="flex justify-between items-center p-1 mb-2 border-red-500 rounded-md drop-shadow-md">
             {walletButtons.map(({ iconname, provider }) => (
                 <ConnectWalletButton
                     key={provider}
@@ -125,7 +125,7 @@ if (uAccounts === null || uAccounts === undefined || uAccounts.length === 0) {
                     setSelectedProvider={setSelectedProvider}
                 />
             ))}
-
+            </div>
             {selectedProvider === "wallet_connect" && <WalletConnect />}
             {publicKey && (
                 <>

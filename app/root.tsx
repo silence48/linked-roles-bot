@@ -1,4 +1,4 @@
-import type { V2_MetaFunction , LinksFunction, LoaderArgs } from "@remix-run/cloudflare";
+import type { V2_MetaFunction , LinksFunction, LoaderArgs, json } from "@remix-run/cloudflare";
 
 import {
   Links,
@@ -13,8 +13,7 @@ import {
 } from "@remix-run/react";
 import React from "react";
 import { ModalProvider, WalletProvider, useModal } from "~/context";
-import { json } from "@remix-run/cloudflare";
-import { getUserAuthProgress, getUser, isDiscordAuthed } from "~/utils/session.server";
+
 
 import {fetchRegisteredAccounts} from '~/utils/sqproof'
 import tailwind from '~/styles/main.css'
@@ -28,7 +27,7 @@ export const links: LinksFunction = () => ([
 ]);
 
 export const loader = async ({ request, context }: LoaderArgs) => {
-
+  const { getUserAuthProgress, getUser, isDiscordAuthed } = await import("~/utils/session.server");
   const { sessionStorage, env } = context as any;
   const { STELLAR_NETWORK } = env;
   const authProgress =
@@ -109,7 +108,7 @@ type MenuProps = {
 
 const Menu: React.FC<MenuProps> = ({ discordUser, userAccounts }) => {
   const { openModal } = useModal();
-  console.log(userAccounts, 'userAccounts in menu')
+  //console.log(userAccounts, 'userAccounts in menu')
   return (
   
   <>

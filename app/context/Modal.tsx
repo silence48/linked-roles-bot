@@ -35,7 +35,7 @@ const modalAssert = (action: { type: string; content: any }) => {
       return <DiscordLogin />;
     case ModalTypeE.STELLAR_ACCOUNTS:
       //console.log(action.content.userAccounts, 'action.content.userAccounts in modal')
-        return <StellarAccounts userAccounts={action.content.userAccounts}/>;
+        return <StellarAccounts uAccounts={action.content.userAccounts}/>;
     default:
       return <></>;
   }

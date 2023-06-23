@@ -1,74 +1,28 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import { useLoaderData, Link } from "@remix-run/react";
 import React, { useState, useEffect, useRef } from "react";
-import { FiUser, FiKey, FiLink, FiCheckCircle, FiTrash2, FiClipboard } from 'react-icons/fi';
-
-//import { Loader } from "~/components";
-
-const loadingModal = React.forwardRef((props, ref) => {
-  const { data, selectedBadge, onClose } = props;
-
-  return (
-    <>
-      <dialog
-        ref={ref}
-        id="loading_modal"
-        className="modal modal-open backdrop-blur z-20"
-      >
-        <div className="modal-box w-5/6 h-4/5 flex flex-col max-w-full">
-          <div className="flex justify-center items-center flex-grow">
-            <span className="loading loading-spinner loading-md"></span>
-          </div>
-        </div>
-      </dialog>
-    </>
-  );
-});
 
 // Define your action function
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { badgeDetails, seriesFourIssuers } = await import(
     "../utils/badge-details"
   );
-  const { getOriginalClaimants, getOriginalPayees } = await import("../utils/sqproof");
-  const { getUser, getUserAuthProgress } = await import("~/utils/session.server");
-  const { fetchRegisteredAccounts } = await import("~/utils/sqproof");
 
-
-  const { sessionStorage } = context as any;
-  const session = await sessionStorage.getSession( request.headers.get("Cookie") );
-
-  const { DB } = context.env as any;
-  const user = await getUser(request, sessionStorage);
-  const { discord_user_id } = user ?? false;
-  var accounts;
-  if (discord_user_id) {
-    accounts = await fetchRegisteredAccounts(request, context);
-  }else{
-    accounts = []
-  }
-  
-  // Get the session and then get proofs from session
-  const proofs = session.get("proofs");
-
-  return json({ badgeDetails, discord_user_id, accounts, proofs });
+  return json({ badgeDetails});
 };
 
 export default function Index() {
-  const { badgeDetails, discord_user_id, accounts, proofs } = useLoaderData();
+  const { badgeDetails} = useLoaderData();
 
   const [Data, setData] = useState([]); // initialize Data as an empty array
   const [selectedBadge, setSelectedBadge] = useState(null);
-  const [isLoginVisable, setIsLoginVisable] = useState(null);
 
   const [selectedAccount, setSelectedAccount] = useState<string | null>(null);
   const [accountData, setAccountData] = useState(null);
 
   const [isLoading, setIsLoading] = useState(false); // initialize isLoading as false
-  const [isExpanded, setIsExpanded] = useState(false);
 
   const tableModalRef = useRef(null);
-  const loginModalRef = useRef(null);
 
   useEffect(() => {
     if (badgeDetails) {
@@ -98,11 +52,6 @@ export default function Index() {
     tableModalRef.current.showModal();
   };
 
-  const handleLoginClick = async () => {
-    setIsLoginVisable(true);
-
-    loginModalRef.current.showModal();
-  };
   const handleDarkModeToggleEnd = (isDarkMode: boolean) => {
     console.log(`Dark mode is now ${isDarkMode ? "enabled" : "disabled"}`);
   };
@@ -111,9 +60,6 @@ export default function Index() {
     console.log("Signing out...");
   };
 
-  const handleMenuOpen = () => {
-    console.log("Opening menu...");
-  };
 
   const [isModalVisible, setIsModalVisible] = useState(false);
 
@@ -141,79 +87,6 @@ export default function Index() {
           </button>
         </div>
       ))}
-
-      {isLoginVisable && (
-        <>
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-20"
-            onClick={() => setIsLoginVisable(null)}
-          ></div>
-          <dialog
-            ref={loginModalRef}
-            id="login_modal"
-            className="modal modal-open backdrop-blur z-20"
-          >
-            <div className="modal-box w-5/6 h-4/5 flex flex-col max-w-md">
-              <div className="p-2">
-                <div className="flex justify-between items-center">
-                  <h2>Prove Yourself!</h2>
-                  <button
-                    className="btn"
-                    onClick={() => setIsLoginVisable(null)}
-                  >
-                    Close
-                  </button>
-                </div>
-              </div>
-              {discord_user_id &&
-          <div className="flex items-center justify-center mb-6">
-            <FiUser size={24} className="mr-2" />
-            <p>Connected as: {discord_user_id}</p>
-          </div>
-        }
-              <div className="flex justify-center mb-4">
-                <Link
-                  className="btn btn-primary normal-case text-xl"
-                  to="/verify"
-                >
-                  Connect Your Discord
-                </Link>
-              </div>
-
-              <div className="mb-4">
-                <div className="flex items-center justify-center mb-4">
-                  
-                  <p>You have {accounts.length} accounts linked.</p>
-                </div>
-
-                {accounts.map((account) => (
-                  <div className="flex p-1 m-1" key={account.id}>
-                    <p className="break-all flex-shrink">
-                      {account.public_key}
-                    </p>
-                    <form method="post" action="/delink">
-                      <input
-                        type="hidden"
-                        name="publicKey"
-                        value={account.public_key}
-                      />
-                      <button className="btn btn-circle btn-outline" type="submit">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </form>
-                  </div>
-                ))}
-
-                <div className="flex justify-center mt-2">
-                  <button onClick={() => newSession()}>Add a public key</button>
-                </div>
-              </div>
-            </div>
-          </dialog>
-        </>
-      )}
 
       {selectedBadge && (
         <>
