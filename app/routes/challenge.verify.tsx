@@ -91,7 +91,7 @@ console.log(`in challenge verify ${discord_user_id}`)
             },
           });
         };
-        console.log('the discord userid matched', accountRecord[0].discord_user_id, discord_user_id)
+       // console.log('the discord userid matched', accountRecord[0].discord_user_id, discord_user_id)
         // then update or create the registration.
         console.log('userowned')
         console.log(stellarAccounts[0])
