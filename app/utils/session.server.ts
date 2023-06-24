@@ -1,5 +1,5 @@
 import { redirect, json } from "@remix-run/cloudflare";
-
+import { type SessionStorage as Storage} from '@remix-run/cloudflare'
 export interface SessionI {
   id?: string;
   discord_user_id?: string;
@@ -10,6 +10,7 @@ export interface SessionI {
   isClaimed?: boolean;
   account?: string | null;
   provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
+  proofs?: string[];
 }
 
 interface UserSessionResponseI {

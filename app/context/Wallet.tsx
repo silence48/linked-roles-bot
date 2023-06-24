@@ -16,7 +16,7 @@ export type WalletProviderProps = {
   publicKey: string;
   network: "PUBLIC" | "TESTNET";
 };
-type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
+type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
 type Client = any | null;
 
 export type WalletContextType = {
@@ -231,6 +231,14 @@ const Rabet = ({}: any) => {
   return <Loader />;
 };
 
+const XBull = ({}: any) => {
+  const { initClient } = useWallet();
+  React.useEffect(() => {
+    initClient("x_bull");
+  }, []);
+  //return <Loader />;
+}
+
 const options: { name: string; icon: IconKeys }[] = [
   {
     name: "Albedo",
@@ -243,6 +251,10 @@ const options: { name: string; icon: IconKeys }[] = [
   {
     name: "Freighter",
     icon: "Freighter",
+  },
+  {
+    name: "X-Bull",
+    icon: "X_bull",
   },
   {
     name: "Wallet Connect",
@@ -260,6 +272,8 @@ const walletAssert = (view: any) => {
       return <Freighter />;
     case "Albedo":
       return <Albedo />;
+    case "X-Bull":
+      return <XBull />;
     case "Wallet Connect":
       return <WalletConnect />;
     default:

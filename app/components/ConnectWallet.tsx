@@ -20,6 +20,10 @@ const options = [
     name: 'Freighter',
     icon: 'freighter',
   },
+  {
+    name: 'X-Bull',
+    icon: 'X_Bull'
+  }
 ];
 
 export const ConnectWallet: React.FC<ConnectWalletProps> = ({}) => {
