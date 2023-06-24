@@ -19,9 +19,9 @@
   },
   "dependencies": {
     "@headlessui/react": "latest",
-    "@remix-run/cloudflare": "^1.16.1",
-    "@remix-run/cloudflare-pages": "^1.16.1",
-    "@remix-run/react": "^1.16.1",
+    "@remix-run/cloudflare": "1.16.1",
+    "@remix-run/cloudflare-pages": "1.16.1",
+    "@remix-run/react": "1.16.1",
     "@tsndr/cloudflare-worker-jwt": "^2.2.1",
     "buffer-polyfill": "npm:buffer@^6.0.3",
     "clsx": "^1.2.1",
@@ -39,8 +39,8 @@
   "devDependencies": {
     "@albedo-link/intent": "latest",
     "@cloudflare/workers-types": "^3.19.0",
-    "@remix-run/dev": "^1.16.1",
-    "@remix-run/eslint-config": "^1.16.1",
+    "@remix-run/dev": "1.16.1",
+    "@remix-run/eslint-config": "1.16.1",
     "@stellar/freighter-api": "latest",
     "@tailwindcss/forms": "^0.5.3",
     "@types/cookie": "^0.5.1",

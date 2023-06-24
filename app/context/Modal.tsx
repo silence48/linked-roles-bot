@@ -6,7 +6,7 @@ import { BadgeViewer } from "~/components/BadgeViewer";
 import { TxSuccess } from "~/templates/TxSuccess";
 import { AddStellarAccount } from "~/templates/AddStellarAccount";
 import { RemoveStellarAccount } from "~/templates/RemoveStellarAccount";
-
+import { Settings } from '~/components/Settings';
 type ModalProviderProps = { children: ReactElement };
 type ModalContextType = {
   isOpen: boolean;
@@ -28,6 +28,7 @@ enum ModalTypeE {
   BADGE_VIEWER = "badge_viewer",
   ADD_ACCOUNT = "add_account",
   REMOVE_ACCOUNT = "remove_account",
+  SETTINGS = "settings",
 }
 
 const modalAssert = (action: { type: string; content: any }) => {
@@ -42,6 +43,8 @@ const modalAssert = (action: { type: string; content: any }) => {
       return <AddStellarAccount network={action.content} />;
     case ModalTypeE.REMOVE_ACCOUNT:
       return <RemoveStellarAccount public_key={action.content} />;
+    case ModalTypeE.SETTINGS:
+      return <Settings />;
     default:
       return <></>;
   }

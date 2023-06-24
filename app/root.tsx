@@ -15,11 +15,12 @@ import {
   useLoaderData,
   Link,
 } from "@remix-run/react";
+import { Button } from '~/components';
 import { useModal, useWallet } from "~/context";
 import { json } from "@remix-run/cloudflare";
 import { getUserAuthProgress, getUser } from "~/utils/session.server";
 import tailwind from "~/styles/main.css";
-
+import { Discord } from 'linked-roles-core';
 import { ModalProvider, WalletProvider } from "~/context";
 
 export const meta: V2_MetaFunction = () => [{ title: "CommuniDAO" }];
@@ -50,12 +51,25 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { STELLAR_NETWORK } = env;
   const authProgress =
     (await getUserAuthProgress(request, sessionStorage)) ?? {};
-  const { provider, account } = (await getUser(request, sessionStorage)) ?? {};
+  const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
   if (authProgress === null) return null;
   const requiresDiscord = checkRequirement(authProgress, "discord_auth");
   const requiresWallet = checkRequirement(authProgress, "wallet_auth");
+  let discordUser = null;
+  //console.log(token, 'token in root')
+  if (!requiresDiscord) {
+    const response = await fetch(`https://discord.com/api/v8/users/${discord_user_id}`, {
+      headers: {
+        Authorization: `Bot ${env.DISCORD_BOT_TOKEN}`
+      }
+    });
+    if (!response.ok) throw new Error('Discord API error');
+    discordUser = await response.json();
+
+  }
 
   return json({
+    discordUser,
     requiresDiscord,
     requiresWallet,
     authProgress,
@@ -65,7 +79,8 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   });
 };
 
-const Menu = ({ walletAuthed, discordAuthed }: any) => {
+
+const Menu = ({ walletAuthed, discordAuthed, discordUser }: any) => {
   const { openModal } = useModal();
 
   return (
@@ -86,16 +101,18 @@ const Menu = ({ walletAuthed, discordAuthed }: any) => {
             </button>
           ) : (
             <div className="dropdown dropdown-end">
-              <label
-                tabIndex={0}
-                className="btn btn-ghost btn-circle avatar placeholder"
-              >
-                <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
+              <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
+                {discordUser ? (
+                  <div className="avatar">
+                    <div className="w-24 rounded-full">
+                      <img src={`https://cdn.discordapp.com/avatars/${discordUser.id}/${discordUser.avatar}.png`} alt={discordUser.username} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-neutral-focus text-neutral-content rounded-full w-12"></div>
+                )}
               </label>
-              <ul
-                tabIndex={0}
-                className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
-              >
+              <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52" style={{ zIndex: 9999 }}>
                 <li>
                   <a className="justify-between">
                     Profile
@@ -103,7 +120,7 @@ const Menu = ({ walletAuthed, discordAuthed }: any) => {
                   </a>
                 </li>
                 <li>
-                  <a>Settings</a>
+                  <Button onClick={() => openModal({ type: 'settings' })} text='settings' />
                 </li>
                 <li>
                   <a>Logout</a>
@@ -121,10 +138,12 @@ const Layout = ({
   authProgress,
   discordAuthed,
   walletAuthed,
+  discordUser,
 }: {
   authProgress: any;
   discordAuthed: boolean;
   walletAuthed: boolean;
+  discordUser: any;
 }) => {
   const { newSession } = useWallet();
 
@@ -136,7 +155,7 @@ const Layout = ({
 
   return (
     <>
-      <Menu discordAuthed={discordAuthed} walletAuthed={walletAuthed} />
+      <Menu discordAuthed={discordAuthed} walletAuthed={walletAuthed} discordUser={discordUser} />
       <Outlet />
     </>
   );
@@ -145,6 +164,7 @@ const Layout = ({
 export default function App() {
   let routeError = useRouteError();
   const {
+    discordUser,
     authProgress,
     requiresDiscord,
     requiresWallet,
@@ -195,6 +215,7 @@ export default function App() {
         >
           <ModalProvider>
             <Layout
+              discordUser={discordUser}
               authProgress={authProgress}
               discordAuthed={requiresDiscord}
               walletAuthed={requiresWallet}
