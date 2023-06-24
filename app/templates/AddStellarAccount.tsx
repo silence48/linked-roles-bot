@@ -63,6 +63,13 @@ const Rabet = ({ initClient }: any) => {
   return <Loader />;
 };
 
+const XBull = ({ initClient }: any) => {
+  React.useEffect(() => {
+    initClient("x_bull");
+  }, []);
+  return <Loader />;
+}
+
 const options: { name: string; icon: IconKeys }[] = [
   {
     name: "Albedo",
@@ -77,13 +84,17 @@ const options: { name: string; icon: IconKeys }[] = [
     icon: "Freighter",
   },
   {
+    name: 'X-Bull',
+    icon: 'X_bull'
+  },
+  {
     name: "Wallet Connect",
     icon: "WalletConnect",
   },
 ];
 
 type ImportAccountProps = { network: 'TESTNET' | 'PUBLIC' };
-type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
+type Provider = "albedo" | "rabet" | "freighter" | "X-Bull" | "wallet_connect";
 type Client = any | null;
 
 const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
@@ -144,6 +155,8 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
         return <Freighter initClient={initClient} />;
       case "Albedo":
         return <Albedo initClient={initClient} />;
+      case "X-Bull":
+        return <XBull initClient={initClient} />;
       case "Wallet Connect":
         return <WalletConnect url={url} initClient={initClient} />;
       default:

@@ -236,7 +236,7 @@ const XBull = ({}: any) => {
   React.useEffect(() => {
     initClient("x_bull");
   }, []);
-  //return <Loader />;
+  return <Loader />;
 }
 
 const options: { name: string; icon: IconKeys }[] = [
