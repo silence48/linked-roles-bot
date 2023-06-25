@@ -20,7 +20,7 @@ const WalletConnect = ({ initClient, url }: any) => {
       <div className="mb-[20px]">
         <IconHeading text="Wallet Connect" icon="WalletConnect" />
         <div className="text-p3-medium">
-          Connect using the Lobster app on your phone and scan the QR code.
+          Connect using a compatible Wallet Connect app on your phone and scan the QR code.
         </div>
       </div>
       <div className="flex justify-center">

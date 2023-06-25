@@ -5,7 +5,6 @@ import { FiTrash2 } from "react-icons/fi";
 
 export const RemoveStellarAccount = ({ public_key }: any) => {
   const [hover, setHover] = useState(false);
-
   return (
     <div>
       <div>Are you sure you want to remove the following account? {public_key}</div>
