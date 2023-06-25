@@ -4,6 +4,7 @@ import { Loader, IconHeading, QRCode, Challenge, Button } from "~/components";
 import { isBrowser } from "~/utils/misc.client";
 import { useFetcher } from "@remix-run/react";
 import { type IconKeys } from "~/components/Icon";
+import type { Provider } from "~/types";
 
 const WalletConnect = ({ initClient, url }: any) => {
   React.useEffect(() => {
@@ -94,12 +95,12 @@ const options: { name: string; icon: IconKeys }[] = [
 ];
 
 type ImportAccountProps = { network: 'TESTNET' | 'PUBLIC' };
-type Provider = "albedo" | "rabet" | "freighter" | "X-Bull" | "wallet_connect";
+//type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
 type Client = any | null;
 
 const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
   const [publicKey, setPublicKey] = React.useState<string | null>(null);
-  const [provider, setProvider] = React.useState<Provider | null>(null);
+  const [provider, setProvider] = React.useState<Provider>(null);
   const [view, setView] = React.useState("");
   const [client, setClient] = React.useState<Client>(null);
   const [url, setUrl] = React.useState<string | null>(null);

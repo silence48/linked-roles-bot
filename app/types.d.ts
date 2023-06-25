@@ -1,5 +1,8 @@
 import type { AssetType, MemoType } from "stellar-base";
 
+export type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
+export type Network = "TESTNET" | "PUBLIC";
+
 /* tslint:disable-next-line:no-namespace */
 export namespace Horizon {
   export interface ResponseLink {

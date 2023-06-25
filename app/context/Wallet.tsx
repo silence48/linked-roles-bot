@@ -7,6 +7,7 @@ import { isBrowser } from "~/utils/misc.client";
 import { Challenge } from "~/components/Challenge";
 import { type IconKeys } from "~/components/Icon";
 import { IconHeading } from "~/components/IconHeading";
+import type { Provider, Network } from "~/types";
 
 type Status = "connected" | "disconnected" | "challenge";
 export type WalletProviderProps = {
@@ -14,13 +15,13 @@ export type WalletProviderProps = {
   walletAuthed: boolean;
   provider: Provider;
   publicKey: string;
-  network: "PUBLIC" | "TESTNET";
+  network: Network;
 };
-type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
+
 type Client = any | null;
 
 export type WalletContextType = {
-  provider: Provider | null;
+  provider: Provider
   url: string | null;
   publicKey: string | null;
   status: Status;

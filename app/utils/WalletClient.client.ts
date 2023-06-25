@@ -4,9 +4,7 @@ import {
   signTransaction as signTx,
 } from "@stellar/freighter-api";
 import { SignClient } from "@walletconnect/sign-client";
-
-type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
-type Network = "TESTNET" | "PUBLIC";
+import type { Provider, Network } from "~/types";
 
 enum WalletConnectChains {
   PUBLIC = "stellar:pubnet",
@@ -26,7 +24,8 @@ class WalletClient {
   approval: any;
   uri: any;
   horizon_url: string | null;
-  chain: "stellar:testnet" | "stellar:pubnet" | null;
+  //chain: "stellar:testnet" | "stellar:pubnet" | null;
+  chain: WalletConnectChains | null;
 
   constructor(provider: Provider, network: Network) {
     this.provider = provider;
@@ -177,7 +176,6 @@ class WalletClient {
        publicKey = await w.xBullSDK.getPublicKey();
       });
     }
-    return publicKey
   }
 
   private async getRabetKey() {
