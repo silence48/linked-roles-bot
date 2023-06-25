@@ -77,7 +77,7 @@ export const Modal: React.FC<ModalProps> = ({
               leaveTo="opacity-0"
             >
               {/* Background Color */}
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-md" />
             </Transition.Child>
             {/* This element is to trick the browser into centering the modal contents. */}
             <span
