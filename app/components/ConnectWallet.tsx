@@ -1,26 +1,7 @@
 import React from 'react';
-import { Layout } from '~/components/Layout';
+import { Layout } from './Layout';
 
 type ConnectWalletProps = {};
-
-const options = [
-  {
-    name: 'Wallet Connect',
-    icon: 'walletConnect',
-  },
-  {
-    name: 'Albedo',
-    icon: 'albedo',
-  },
-  {
-    name: 'Rabet',
-    icon: 'rabet',
-  },
-  {
-    name: 'Freighter',
-    icon: 'freighter',
-  },
-];
 
 export const ConnectWallet: React.FC<ConnectWalletProps> = ({}) => {
 

@@ -1,12 +1,8 @@
 import { redirect, json } from "@remix-run/cloudflare";
-import type { SessionData, SessionStorage } from "@remix-run/cloudflare";
-interface Storage {
-  getSession: (cookie?: string | null) => Promise<any>;
-  commitSession: (session: any) => Promise<string>;
-  destroySession: (session: any) => Promise<string>;
-}
+import { type SessionStorage as Storage} from '@remix-run/cloudflare'
+import type { Provider } from "~/types";
 
-interface SessionI {
+export interface SessionI {
   id?: string;
   discord_user_id?: string;
   user?: any;
@@ -15,8 +11,8 @@ interface SessionI {
   metadata?: any;
   isClaimed?: boolean;
   account?: string | null;
+  provider?: Provider;
   proofs?: string[];
-  provider?: "albedo" | "rabet" | "freighter" | "wallet_connect" | null;
 }
 
 interface UserSessionResponseI {
@@ -26,7 +22,7 @@ interface UserSessionResponseI {
 }
 
 export async function createUserSession(
-  sessionStorage: SessionStorage<SessionData, SessionData>,
+  sessionStorage: Storage,
   sessionData: SessionI,
   response?: UserSessionResponseI
 ) {
@@ -54,12 +50,11 @@ export async function createUserSession(
   }
 }
 
-async function getUserSession(request: Request, sessionStorage: SessionStorage) {
-  const cookie = request.headers.get("Cookie");
-  return sessionStorage.getSession(cookie);
+async function getUserSession(request: Request, sessionStorage: Storage) {
+  return sessionStorage.getSession(request.headers.get("Cookie"));
 }
 
-export async function getUser(request: Request, sessionStorage: SessionStorage) {
+export async function getUser(request: Request, sessionStorage: Storage) {
   const session = await getUserSession(request, sessionStorage);
   return session.get("data");
 }
@@ -68,13 +63,12 @@ type Require = 'discord_auth' | 'wallet_auth'
 
 export async function getUserAuthProgress(
   request: Request,
-  sessionStorage: SessionStorage
+  sessionStorage: Storage
 ) {
   const { provider, discord_user_id, account } = await getUser(
     request,
     sessionStorage
   ) ?? {};
-  console.log({ provider, discord_user_id, account }, 'session-server')
   let authProgress: { requires: Require[]; view: string } = {
     requires: [],
     view: "",
@@ -98,29 +92,9 @@ export async function getUserAuthProgress(
   return authProgress;
 }
 
-export async function isDiscordAuthed(
-  request: Request,
-  sessionStorage: SessionStorage
-){
-  const { discord_user_id } = await getUser(
-    request,
-    sessionStorage
-  ) ?? {};
- 
-    console.log(discord_user_id, 'discord_user_id in isdiscordauthed')
-  //this should get an access token from the refresh token using the discordapi?
-  let discordAuthed = false;
-
-  if (discord_user_id) {
-    discordAuthed = true
-  }
-  // Return the authProgress object
-  return discordAuthed;
-}
-
 export async function updateUserSession(
   request: Request,
-  sessionStorage: SessionStorage,
+  sessionStorage: Storage,
   sessionData: SessionI,
   { redirectTo, message = undefined, body = undefined }: UserSessionResponseI
 ) {
@@ -150,7 +124,7 @@ export async function updateUserSession(
   }
 }
 
-export async function logout(request: Request, sessionStorage: SessionStorage) {
+export async function logout(request: Request, sessionStorage: Storage) {
   let session = await getUserSession(request, sessionStorage);
   return redirect(`/`, {
     headers: {

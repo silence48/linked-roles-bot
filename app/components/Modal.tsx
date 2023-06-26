@@ -1,21 +1,10 @@
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment } from 'react';
 import clsx from 'clsx';
+import type { ModalProps } from '~/types';
 // import { XIcon, ArrowsExpandIcon } from '@heroicons/react/outline';
 
-type ModalProps = {
-  children: React.ReactNode;
-  initialState: boolean;
-  padding: 'none' | 'small' | 'medium' | 'large';
-  size: 'small' | 'medium' | 'large' | 'fit';
-  align?: 'center' | 'left' | 'right';
-  showBar: boolean;
-  overlay?: boolean;
-  overflow?: boolean;
-  closable?: boolean;
-  closeModal(): void;
-  theme: string;
-};
+
 
 export const Modal: React.FC<ModalProps> = ({
   children,
@@ -24,7 +13,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'small',
   align = 'center',
   overlay = false,
-  showBar = true,
+  showBar = false,
   overflow = false,
   closeModal,
   closable = true,
@@ -52,7 +41,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   const barStyle = clsx(
     !expanded && 'rounded-tl-[16px] rounded-tr-[16px]',
-    'bg-neutral-800 w-full h-8 flex p-2'
+    'bg-neutral-100 w-full h-8 flex p-2'
   );
 
   return (
@@ -63,7 +52,11 @@ export const Modal: React.FC<ModalProps> = ({
           auto-reopen="true"
           className="fixed inset-0 z-10 overflow-y-auto"
           initialFocus={cancelButtonRef}
-          onClose={closable ? closeModal : () => closable}
+          onClose={(value: boolean) => {
+            if (closable && closeModal) {
+              closeModal();
+            }
+          }}
         >
           <div className={`block items-end justify-end min-h-screen ${align === 'center' ? 'text-center' : 'text-right'}`}>
             {/* Background Animation */}
@@ -77,7 +70,7 @@ export const Modal: React.FC<ModalProps> = ({
               leaveTo="opacity-0"
             >
               {/* Background Color */}
-              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75" />
+              <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 backdrop-blur-md" />
             </Transition.Child>
             {/* This element is to trick the browser into centering the modal contents. */}
             <span
@@ -96,7 +89,7 @@ export const Modal: React.FC<ModalProps> = ({
             >
               {/* Modal Style */}
               <Dialog.Panel className={modalStyle}>
-              <div className={`bg-[#2c2a57] ${!expanded ? 'rounded-[16px]': 'h-full'} ${!!overflow ? 'overflow-hidden' : ''}`}>
+                <div className={`bg-[#2c2a57] ${!expanded ? 'rounded-[16px]': 'h-full'} ${!!overflow ? 'overflow-hidden' : ''}`}>
                   {/* Modal Options */}
                   {showBar && (
                     <div className={barStyle}>

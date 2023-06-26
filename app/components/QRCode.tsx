@@ -1,4 +1,4 @@
-import { isEqual } from './helpers';
+import { isEqual } from './helpers'
 import qrGenerator from 'qrcode-generator';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
@@ -41,7 +41,6 @@ interface ICoordinates {
     col: number;
 }
 
-
 class QRCode extends React.Component<IProps, {}> {
 
     private canvas: React.RefObject<HTMLCanvasElement>;
@@ -69,23 +68,22 @@ class QRCode extends React.Component<IProps, {}> {
             c = str.charCodeAt(i);
             if ((c >= 0x0001) && (c <= 0x007F)) {
                 out += str.charAt(i);
-            }
-            else if (c > 0x07FF) {
+            } else if (c > 0x07FF) {
                 out += String.fromCharCode(0xE0 | ((c >> 12) & 0x0F));
                 out += String.fromCharCode(0x80 | ((c >> 6) & 0x3F));
                 out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
-            }
-            else {
+            } else {
                 out += String.fromCharCode(0xC0 | ((c >> 6) & 0x1F));
                 out += String.fromCharCode(0x80 | ((c >> 0) & 0x3F));
             }
         }
         return out;
     }
+
     /**
      * Draw a rounded square in the canvas
      */
-    drawRoundedSquare(
+    private drawRoundedSquare(
         lineWidth: number,
         x: number,
         y: number,
@@ -97,42 +95,51 @@ class QRCode extends React.Component<IProps, {}> {
         ctx.lineWidth = lineWidth;
         ctx.fillStyle = color;
         ctx.strokeStyle = color;
+            
         // Adjust coordinates so that the outside of the stroke is aligned to the edges
         y += lineWidth / 2;
         x += lineWidth / 2;
         size -= lineWidth;
+
         if (!Array.isArray(radii)) {
             radii = [radii, radii, radii, radii];
         }
+
         // Radius should not be greater than half the size or less than zero
         radii = radii.map((r) => {
             r = Math.min(r, size / 2);
             return (r < 0) ? 0 : r;
         });
+
         const rTopLeft = radii[0] || 0;
         const rTopRight = radii[1] || 0;
         const rBottomRight = radii[2] || 0;
         const rBottomLeft = radii[3] || 0;
+
         ctx.beginPath();
+
         ctx.moveTo(x + rTopLeft, y);
+
         ctx.lineTo(x + size - rTopRight, y);
-        if (rTopRight)
-            ctx.quadraticCurveTo(x + size, y, x + size, y + rTopRight);
+        if (rTopRight) ctx.quadraticCurveTo(x + size, y, x + size, y + rTopRight);
+
         ctx.lineTo(x + size, y + size - rBottomRight);
-        if (rBottomRight)
-            ctx.quadraticCurveTo(x + size, y + size, x + size - rBottomRight, y + size);
+        if (rBottomRight) ctx.quadraticCurveTo(x + size, y + size, x + size - rBottomRight, y + size);
+
         ctx.lineTo(x + rBottomLeft, y + size);
-        if (rBottomLeft)
-            ctx.quadraticCurveTo(x, y + size, x, y + size - rBottomLeft);
+        if (rBottomLeft) ctx.quadraticCurveTo(x, y + size, x, y + size - rBottomLeft);
+
         ctx.lineTo(x, y + rTopLeft);
-        if (rTopLeft)
-            ctx.quadraticCurveTo(x, y, x + rTopLeft, y);
+        if (rTopLeft) ctx.quadraticCurveTo(x, y, x + rTopLeft, y);
+
         ctx.closePath();
+
         ctx.stroke();
         if (fill) {
             ctx.fill();
         }
     }
+
     /**
      * Draw a single positional pattern eye.
      */
@@ -145,41 +152,42 @@ class QRCode extends React.Component<IProps, {}> {
         color: EyeColor,
         radii: CornerRadii = [0, 0, 0, 0]) {
         const lineWidth = Math.ceil(cellSize);
+
         let radiiOuter;
         let radiiInner;
         if (typeof radii !== 'number' && !Array.isArray(radii)) {
             radiiOuter = radii.outer || 0;
             radiiInner = radii.inner || 0;
-        }
-        else {
+        } else {
             radiiOuter = radii as CornerRadii;
             radiiInner = radiiOuter;
         }
+
         let colorOuter;
         let colorInner;
         if (typeof color !== 'string') {
             colorOuter = color.outer;
             colorInner = color.inner;
-        }
-        else {
+        } else {
             colorOuter = color;
             colorInner = color;
         }
+
         let y = (row * cellSize) + offset;
         let x = (col * cellSize) + offset;
         let size = cellSize * 7;
-        if (!Array.isArray(radiiOuter)) return;
 
+        if (!Array.isArray(radiiOuter)) return;
         // Outer box
         this.drawRoundedSquare(lineWidth, x, y, size, colorOuter, radiiOuter, false, ctx);
         if (!Array.isArray(radiiInner)) return;
-
         // Inner box
         size = cellSize * 3;
         y += cellSize * 2;
         x += cellSize * 2;
         this.drawRoundedSquare(lineWidth, x, y, size, colorInner, radiiInner, true, ctx);
     };
+
     /**
      * Is this dot inside a positional pattern zone.
      */
@@ -195,37 +203,60 @@ class QRCode extends React.Component<IProps, {}> {
     }
 
     private isCoordinateInImage(col: number, row: number, dWidthLogo: number, dHeightLogo: number, dxLogo: number, dyLogo: number, cellSize: number, logoImage: string) {
-          if (logoImage) {
+        if (logoImage) {
             const numberOfCellsMargin = 2;
             const firstRowOfLogo = this.transformPixelLengthIntoNumberOfCells(dxLogo, cellSize);
             const firstColumnOfLogo = this.transformPixelLengthIntoNumberOfCells(dyLogo, cellSize);
             const logoWidthInCells = this.transformPixelLengthIntoNumberOfCells(dWidthLogo, cellSize) - 1;
             const logoHeightInCells = this.transformPixelLengthIntoNumberOfCells(dHeightLogo, cellSize) - 1;
+
             return row >= firstRowOfLogo - numberOfCellsMargin && row <= firstRowOfLogo + logoWidthInCells + numberOfCellsMargin // check rows
-                && col >= firstColumnOfLogo - numberOfCellsMargin && col <= firstColumnOfLogo + logoHeightInCells + numberOfCellsMargin; // check cols
-        }
-        else {
+                && col >= firstColumnOfLogo - numberOfCellsMargin && col <= firstColumnOfLogo + logoHeightInCells + numberOfCellsMargin // check cols
+        } else {
             return false;
         }
     }
+
     constructor(props: IProps) {
         super(props);
         this.canvas = React.createRef();
     }
+
     shouldComponentUpdate(nextProps: IProps) {
         return !isEqual(this.props, nextProps);
     }
+
     componentDidMount() {
         this.update();
     }
+
     componentDidUpdate() {
         this.update();
     }
+
     update() {
-        const { value, ecLevel, enableCORS, size, quietZone, bgColor, fgColor, logoImage, logoWidth, logoHeight, logoOpacity, removeQrCodeBehindLogo, qrStyle, eyeRadius, eyeColor } = this.props;
+        const {
+            value,
+            ecLevel,
+            enableCORS,
+            size,
+            quietZone,
+            bgColor,
+            fgColor,
+            logoImage,
+            logoWidth,
+            logoHeight,
+            logoOpacity,
+            removeQrCodeBehindLogo,
+            qrStyle,
+            eyeRadius,
+            eyeColor
+        } = this.props;
+
         const qrCode = qrGenerator(0, ecLevel);
         qrCode.addData(QRCode.utf16to8(value));
         qrCode.make();
+
         const canvas: HTMLCanvasElement = ReactDOM.findDOMNode(this.canvas.current) as HTMLCanvasElement;
         const ctx: CanvasRenderingContext2D | null = canvas.getContext('2d');
         if (!ctx) return;
@@ -235,18 +266,23 @@ class QRCode extends React.Component<IProps, {}> {
         const scale = (window.devicePixelRatio || 1);
         canvas.height = canvas.width = canvasSize * scale;
         ctx.scale(scale, scale);
+
         ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvasSize, canvasSize);
+
         const offset = +quietZone;
+
         const dWidthLogo = logoWidth || size * 0.2;
         const dHeightLogo = logoHeight || dWidthLogo;
         const dxLogo = ((size - dWidthLogo) / 2);
         const dyLogo = ((size - dHeightLogo) / 2);
+
         const positioningZones: ICoordinates[] = [
             { row: 0, col: 0 },
             { row: 0, col: length - 7 },
             { row: length - 7, col: 0 },
         ];
+        
         ctx.strokeStyle = fgColor;
         if (qrStyle === 'dots') {
             ctx.fillStyle = fgColor;
@@ -267,8 +303,7 @@ class QRCode extends React.Component<IProps, {}> {
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (let row = 0; row < length; row++) {
                 for (let col = 0; col < length; col++) {
                     if (qrCode.isDark(row, col) && !this.isInPositioninZone(row, col, positioningZones) && !(removeQrCodeBehindLogo && logoImage && this.isCoordinateInImage(row, col, dWidthLogo, dHeightLogo, dxLogo, dyLogo, cellSize, logoImage))) {
@@ -280,30 +315,33 @@ class QRCode extends React.Component<IProps, {}> {
                 }
             }
         }
+
         // Draw positioning patterns
         for (let i = 0; i < 3; i++) {
             const { row, col } = positioningZones[i];
+
             let radii = eyeRadius;
-            let color;
+            let color
+
             if (Array.isArray(radii)) {
                 radii = radii[i];
             }
             if (typeof radii == 'number') {
                 radii = [radii, radii, radii, radii];
             }
+
             if (!eyeColor) { // if not specified, eye color is the same as foreground, 
                 color = fgColor;
-            }
-            else {
+            } else {
                 if (Array.isArray(eyeColor)) { // if array, we pass the single color
                     color = eyeColor[i];
-                }
-                else {
+                } else {
                     color = eyeColor as EyeColor;
                 }
             }
             this.drawPositioningPattern(ctx, cellSize, offset, row, col, color, radii as CornerRadii);
         }
+
         if (logoImage) {
             const image = new Image();
             if (enableCORS) {
@@ -318,6 +356,7 @@ class QRCode extends React.Component<IProps, {}> {
             image.src = logoImage;
         }
     }
+
     render() {
         const size = +this.props.size + (2 * +this.props.quietZone);
         return React.createElement('canvas', {
@@ -329,18 +368,5 @@ class QRCode extends React.Component<IProps, {}> {
         });
     }
 }
-QRCode.defaultProps = {
-    value: 'https://reactjs.org/',
-    ecLevel: 'M',
-    enableCORS: false,
-    size: 150,
-    quietZone: 10,
-    bgColor: '#FFFFFF',
-    fgColor: '#000000',
-    logoOpacity: 1,
-    removeQrCodeBehindLogo: false,
-    qrStyle: 'squares',
-    eyeRadius: [0, 0, 0]
-};
 
-export { QRCode };
+export { QRCode }

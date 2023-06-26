@@ -17,3 +17,6 @@ utils/register_discord_metadata.ts
 utils/register_discord_metadata.mjs
 old
 linked-roles-bot
+/.yarn
+package-lock.json
+.prettierrc

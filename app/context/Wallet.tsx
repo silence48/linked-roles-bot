@@ -1,10 +1,13 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button, Loader, Icon, Modal, QRCode } from '~/components';
+import { Button, Loader, Icon, Modal, QRCode } from "~/components";
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
-
 import { isBrowser } from "~/utils/misc.client";
+import { Challenge } from "~/components/Challenge";
+import { type IconKeys } from "~/components/Icon";
+import { IconHeading } from "~/components/IconHeading";
+import type { Provider, Network } from "~/types";
 
 type Status = "connected" | "disconnected" | "challenge";
 export type WalletProviderProps = {
@@ -12,13 +15,13 @@ export type WalletProviderProps = {
   walletAuthed: boolean;
   provider: Provider;
   publicKey: string;
-  network: "PUBLIC" | "TESTNET";
+  network: Network;
 };
-type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
+
 type Client = any | null;
 
 export type WalletContextType = {
-  provider: Provider | null;
+  provider: Provider
   url: string | null;
   publicKey: string | null;
   status: Status;
@@ -229,7 +232,15 @@ const Rabet = ({}: any) => {
   return <Loader />;
 };
 
-const options = [
+const XBull = ({}: any) => {
+  const { initClient } = useWallet();
+  React.useEffect(() => {
+    initClient("x_bull");
+  }, []);
+  return <Loader />;
+}
+
+const options: { name: string; icon: IconKeys }[] = [
   {
     name: "Albedo",
     icon: "Albedo",
@@ -241,6 +252,10 @@ const options = [
   {
     name: "Freighter",
     icon: "Freighter",
+  },
+  {
+    name: "X-Bull",
+    icon: "X_bull",
   },
   {
     name: "Wallet Connect",
@@ -258,6 +273,8 @@ const walletAssert = (view: any) => {
       return <Freighter />;
     case "Albedo":
       return <Albedo />;
+    case "X-Bull":
+      return <XBull />;
     case "Wallet Connect":
       return <WalletConnect />;
     default:
@@ -265,96 +282,23 @@ const walletAssert = (view: any) => {
   }
 };
 
-// Move to DS Headings.
-const IconHeading = ({ text, icon }: any) => {
-  return (
-    <div className="flex flex-row">
-      <Icon name={icon} size="large" />
-      <div className="text-h4-bold">{text}</div>
-    </div>
-  );
-};
-
-export const Challenge: React.FC<{
-  signChallenge: (xdr: string) => void;
-  challenge: string | null;
-  publicKey: string | null;
-  provider: string | null;
-}> = ({ signChallenge, challenge, publicKey, provider }) => {
-  return (
-    <>
-      <div className="text-h3-semi-bold">Challenge</div>
-      <div className="text-p3-medium">
-        Complete the following challenge to finish your authentification.
-      </div>
-      <div className="text-p2-medium">Public Key</div>
-      <div
-        className="text-caption-bold truncate text-neutral-700 bg-neutral-400 rounded-md"
-        style={{ padding: "20px", marginTop: "8px" }}
-      >
-        <p className="truncate">{publicKey}</p>
-      </div>
-      <div className="text-p2-medium">Challenge XDR</div>
-      <div
-        className="text-caption-bold truncate text-neutral-700 bg-neutral-400 rounded-md"
-        style={{ padding: "20px", marginTop: "8px" }}
-      >
-        <p className="truncate">{challenge}</p>
-      </div>
-      <div className="mt-[20px]">
-        {challenge && (
-          <Button
-            customCss="w-full"
-            icon={provider?.charAt(0).toUpperCase() + provider?.slice(1)}
-            text="Sign Challenge"
-            onClick={() => signChallenge(challenge)}
-          />
-        )}
-      </div>
-    </>
-  );
-};
-
-const Footer: React.FC = ({}) => {
-  return (
-    <div>
-      <div className="text-caption-medium text-center">
-        <span>By continuing you accept our </span>
-        <span className="text-caption-underlined text-primary-700">
-          term of conditioons
-        </span>
-        <span> and our </span>
-        <span className="text-caption-underlined text-primary-700">
-          privacy policy
-        </span>
-      </div>
-    </div>
-  );
-};
-
-
-
-export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
-  const { publicKey, signChallenge, status, provider } = useWallet();
+const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
+  const { publicKey, signChallenge, status } = useWallet();
   const [view, setView] = React.useState("");
   const fetcher = useFetcher();
-  const [lastFetchedKey, setLastFetchedKey] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-   /* if (
-      publicKey !== null 
-      && fetcher.state === "idle" 
-      && fetcher.data == null
+    if (
+      publicKey !== null &&
+      fetcher.state === "idle" &&
+      fetcher.data == null
     ) {
       fetcher.load(`/challenge/${publicKey}`);
     }
-  }, [fetcher, publicKey]);*/
-  if (publicKey !== null && publicKey !== lastFetchedKey && fetcher.state === "idle") {
-    fetcher.load(`/challenge/${publicKey}`);
-    setLastFetchedKey(publicKey);
-  }
-}, [fetcher, publicKey, lastFetchedKey]);
+  }, [fetcher, publicKey]);
+
   const { challenge } = fetcher.data ?? {};
+
   return (
     <div className="flex flex-col">
       <div className="flex flex-row w-full">
@@ -364,7 +308,6 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
               signChallenge={signChallenge}
               challenge={challenge}
               publicKey={publicKey}
-              provider={provider}
             />
           )}
           {status === "disconnected" && view === "" && (
@@ -379,7 +322,7 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                     return (
                       <div key={key}>
                         <Button
-                          customCss="btn btn-primary w-full"
+                          customCss="w-full"
                           variant="basic"
                           icon={item.icon}
                           text={item.name}
@@ -390,7 +333,6 @@ export const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
                   })}
                 </div>
               </div>
-              <Footer />
             </>
           )}
           {status === "disconnected" && view !== "" && (

@@ -733,12 +733,6 @@ export const badgeDetails = [
   },
 ];
 
-[{
-  tier1: [
-    {discord_user_id: "blah", whateverelse: "blah"},
-    {discord_user_id: "blah", whateverelse: "blah"},
-  ]
-}]
 
 export const seriesFourIssuers = badgeDetails
   .filter(( asset ) => {

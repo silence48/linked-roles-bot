@@ -36,17 +36,16 @@ export async function handleResponse(response: Response): Promise<any> {
 }
 
 export async function fetchRegisteredAccounts(request: Request, context: any) {
-  const {StellarAccount } = await import("~/models");
+  const {StellarAccount } = await import("linked-roles-core");
   const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   const { discord_user_id } = await getUser(request, context.sessionStorage);
-  if (discord_user_id === null){return null;}
   const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
   return stellarAccounts;
 }
 
 export async function getAccessToken(account: string, request: Request, context: any) {
-  const {StellarAccount } = await import("~/models");
+  const {StellarAccount } = await import("linked-roles-core");
   // const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   // const { discord_user_id } = await getUser(request, context.sessionStorage);
@@ -55,7 +54,7 @@ export async function getAccessToken(account: string, request: Request, context:
 }
 
 export async function generateProofs(request: Request, context: any, accounts: string[]) {
-  const { Discord } = await import("~/models");
+  const { Discord } = await import("linked-roles-core");
   const { getUser } = await import("~/utils/session.server");
   const {TransactionBuilder, Networks} = await import("stellar-base");
   const jwt = await import("@tsndr/cloudflare-worker-jwt")
@@ -317,8 +316,8 @@ export async function getOriginalClaimants(
   assetid: any,
   subrequests: any,
 ) {
-const {Balance, Claimable } = await import('../models');
-const { BalanceForm, ClaimableForm } = await import('../forms');
+const {Balance, Claimable } = await import('linked-roles-core');
+const { BalanceForm, ClaimableForm } = await import('linked-roles-core');
   let accountOperations: OperationsArray<any> = [];
   const { DB } = context.env;
 
@@ -491,8 +490,8 @@ export async function getOriginalPayees(
   subrequests: any,
 ) {
 
-  const {Balance } = await import('../models');
-const { BalanceForm } = await import('../forms');
+  const {Balance } = await import('linked-roles-core');
+const { BalanceForm } = await import('linked-roles-core');
   const { DB } = context.env;
   const stmt = DB.prepare(`
   SELECT * 
