@@ -40,7 +40,6 @@ export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   const { discord_user_id } = await getUser(request, context.sessionStorage);
-  if (discord_user_id === null){return null;}
   const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
   return stellarAccounts;
 }
