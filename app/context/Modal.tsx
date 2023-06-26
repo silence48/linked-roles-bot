@@ -7,31 +7,37 @@ import { TxSuccess } from "~/templates/TxSuccess";
 import { AddStellarAccount } from "~/templates/AddStellarAccount";
 import { RemoveStellarAccount } from "~/templates/RemoveStellarAccount";
 import { Settings } from '~/components/Settings';
-type ModalProviderProps = { children: ReactElement };
-type ModalContextType = {
-  isOpen: boolean;
-  openModal: (action: {
-    type: string;
-    content?: any;
-    padding?: "large" | "medium" | "small" | "none";
-    size?: "large" | "medium" | "small" | "fit";
-    showBar?: boolean;
-    onClose?: () => void;
-  }) => void;
-  afterClose: () => void;
-  closeModal: () => void;
-};
+import type { ModalProps } from "~/types";
 
-enum ModalTypeE {
+export enum ModalTypeE {
   DISCORD_LOGIN = "discord_login",
   TX_SUCCESS = "tx_success",
   BADGE_VIEWER = "badge_viewer",
   ADD_ACCOUNT = "add_account",
   REMOVE_ACCOUNT = "remove_account",
   SETTINGS = "settings",
+  NONE = "",
 }
 
-const modalAssert = (action: { type: string; content: any }) => {
+type ModalAction = {
+    type: ModalTypeE;
+    content?: any;
+    onClose?: () => void;
+  } & Omit<ModalProps, 'children' | 'initialState' | 'closeModal' | 'closable' | 'overlay' | 'theme' >;
+  
+
+type ModalProviderProps = { children: ReactElement };
+
+
+type ModalContextType = {
+  isOpen: boolean;
+  openModal: (action: ModalAction) => void;
+  afterClose?: () => void;
+  closeModal: () => void;
+};
+
+
+const modalAssert = (action: { type: ModalTypeE; content?: any }) => {
   switch (action.type) {
     case ModalTypeE.TX_SUCCESS:
       return <TxSuccess content={action.content} />;
@@ -51,33 +57,30 @@ const modalAssert = (action: { type: string; content: any }) => {
 };
 
 export const ModalContext = React.createContext<ModalContextType>(
-  {} as ModalContextType
+  {
+    isOpen: false,
+    openModal: () => {}, // init empty functions
+    afterClose: () => {}, 
+    closeModal: () => {}, 
+  }
 );
 
 export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
   children,
 }) => {
   const { theme } = useTheme();
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [state, setState] = React.useState({
-    type: "",
+  const [isOpen, setIsOpen] = React.useState<boolean>(false);
+  const [state, setState] = React.useState<ModalAction>({
+    type: ModalTypeE.NONE,
     content: {},
-    onClose: () => {},
     padding: "large",
     size: "medium",
     showBar: true,
     overflow: false,
+    onClose: () => {},
   });
 
-  const openModal = (action: {
-    type: string;
-    content?: any;
-    padding?: any;
-    size?: "large" | "medium" | "small" | "fit";
-    showBar?: any;
-    overflow?: any;
-    onClose?: any;
-  }) => {
+  const openModal = (action: ModalAction) => {
     setIsOpen(true);
     setState({
       type: action.type,
@@ -96,7 +99,9 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
 
   const afterClose = () => {
     const { onClose } = state;
-    onClose();
+    if (onClose) {
+      onClose();
+    }
   };
 
   return (
@@ -120,5 +125,9 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
 };
 
 export const useModal = (): ModalContextType => {
-  return React.useContext(ModalContext);
+  const context = React.useContext(ModalContext);
+  if (!context) {
+    throw new Error('useModal must be used within a ModalProvider');
+  }
+  return context;
 };

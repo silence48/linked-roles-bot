@@ -14,32 +14,3 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { data } = (await AccountBuilder.find({ discord_user_id, DB })) ?? {};
   return json({ account, provider, data, network: STELLAR_NETWORK });
 };
-/*
-export default function Settings() {
-  const { account, provider, data, network } = useLoaderData();
-  const { openModal } = useModal();
-  console.log('data', data);
-  return (
-    <Layout customCss="bg-neutral-600 p-[40px] rounded-md">
-      <div>Settings</div>
-      Main account:
-      <div className="w-[500px] truncate">{account}</div>
-      <Button onClick={() => openModal({ type: 'add_account', content: network })} text="Add Account" />
-      {data.accounts.map((acc: any, key: string) => {
-        return (
-          <div key={key} className="flex flex-row">
-            <div className="w-[500px] truncate">{acc.public_key}</div>
-            {acc.public_key !== account && (
-              <Button
-                size="tiny"
-                text="Remove"
-                onClick={() => openModal({ type: 'remove_account', content: acc.public_key })}
-              />
-            )}
-          </div>
-        );
-      })}
-    </Layout>
-  );
-}
-*/

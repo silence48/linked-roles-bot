@@ -24,7 +24,6 @@ class WalletClient {
   approval: any;
   uri: any;
   horizon_url: string | null;
-  //chain: "stellar:testnet" | "stellar:pubnet" | null;
   chain: WalletConnectChains | null;
 
   constructor(provider: Provider, network: Network) {
@@ -176,6 +175,7 @@ class WalletClient {
        publicKey = await w.xBullSDK.getPublicKey();
       });
     }
+    return publicKey;
   }
 
   private async getRabetKey() {

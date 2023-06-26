@@ -22,6 +22,7 @@ import { getUserAuthProgress, getUser } from "~/utils/session.server";
 import tailwind from "~/styles/main.css";
 import { Discord } from 'linked-roles-core';
 import { ModalProvider, WalletProvider } from "~/context";
+import { ModalTypeE } from "~/context/Modal";
 
 export const meta: V2_MetaFunction = () => [{ title: "CommuniDAO" }];
 
@@ -95,7 +96,7 @@ const Menu = ({ walletAuthed, discordAuthed, discordUser }: any) => {
           {discordAuthed ? (
             <button
               className="btn btn-primary normal-case text-xl"
-              onClick={() => openModal({ type: "discord_login" })}
+              onClick={() => openModal({ type: ModalTypeE.DISCORD_LOGIN })}
             >
               Login
             </button>
@@ -120,7 +121,7 @@ const Menu = ({ walletAuthed, discordAuthed, discordUser }: any) => {
                   </a>
                 </li>
                 <li>
-                  <Button onClick={() => openModal({ type: 'settings' })} text='settings' />
+                  <Button onClick={() => openModal({ type: ModalTypeE.SETTINGS })} text='settings' />
                 </li>
                 <li>
                   <a>Logout</a>

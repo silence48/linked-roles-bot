@@ -2,16 +2,11 @@ import  * as React from 'react';
 import { useFetcher  } from "@remix-run/react";
 import {Layout, Button } from '~/components';
 import { useModal } from '~/context'
-
+import { ModalTypeE } from '~/context/Modal'
 
 export const Settings = () => {
     const fetcher = useFetcher();
-    // const fdata = fetcher.load('/settings');
-    // const { account, provider, data, network } = fdata
-    //const { account, provider, data, network } = useLoaderData();
   const { openModal } = useModal();
-  // console.log('data', data);
-
   React.useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data == null) {
       console.log("FETCHING")
@@ -26,7 +21,7 @@ export const Settings = () => {
       <div>Settings</div>
       Main account:
       <div className="w-[500px] truncate">{account}</div>
-      <Button onClick={() => openModal({ type: 'add_account', content: network })} text="Add Account" />
+      <Button onClick={() => openModal({ type: ModalTypeE.ADD_ACCOUNT, content: network })} text="Add Account" />
       {data && data.accounts.map((acc: any, key: string) => {
         return (
           <div key={key} className="flex flex-row">
@@ -35,7 +30,7 @@ export const Settings = () => {
               <Button
                 size="tiny"
                 text="Remove"
-                onClick={() => openModal({ type: 'remove_account', content: acc.public_key })}
+                onClick={() => openModal({ type: ModalTypeE.REMOVE_ACCOUNT, content: acc.public_key })}
               />
             )}
           </div>

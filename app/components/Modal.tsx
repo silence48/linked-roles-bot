@@ -1,21 +1,10 @@
 import { Dialog, Transition } from '@headlessui/react';
 import React, { Fragment } from 'react';
 import clsx from 'clsx';
+import type { ModalProps } from '~/types';
 // import { XIcon, ArrowsExpandIcon } from '@heroicons/react/outline';
 
-type ModalProps = {
-  children: React.ReactNode;
-  initialState: boolean;
-  padding: 'none' | 'small' | 'medium' | 'large';
-  size: 'small' | 'medium' | 'large' | 'fit';
-  align?: 'center' | 'left' | 'right';
-  showBar: boolean;
-  overlay?: boolean;
-  overflow?: boolean;
-  closable?: boolean;
-  closeModal(): void;
-  theme: string;
-};
+
 
 export const Modal: React.FC<ModalProps> = ({
   children,
@@ -63,7 +52,11 @@ export const Modal: React.FC<ModalProps> = ({
           auto-reopen="true"
           className="fixed inset-0 z-10 overflow-y-auto"
           initialFocus={cancelButtonRef}
-          onClose={closable ? closeModal : () => closable}
+          onClose={(value: boolean) => {
+            if (closable && closeModal) {
+              closeModal();
+            }
+          }}
         >
           <div className={`block items-end justify-end min-h-screen ${align === 'center' ? 'text-center' : 'text-right'}`}>
             {/* Background Animation */}

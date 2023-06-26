@@ -6,7 +6,7 @@ import { useModal } from "~/context";
 import { Layout, Button } from "~/components";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { useFetcher, useLoaderData } from "@remix-run/react";
-
+import { ModalTypeE } from "~/context/Modal";
 
 export const loader = async ({ request, context }: LoaderArgs) => {
 
@@ -84,7 +84,7 @@ export default function Claim() {
     const wc = new WalletClient(provider, "PUBLIC");
     const { horizonResult }: any = await wc.signTransaction(xdr, true);
     if (horizonResult.successful) {
-      openModal({ type: 'tx_success', content: horizonResult, padding: 'large' })
+      openModal({ type: ModalTypeE.TX_SUCCESS, content: horizonResult, padding: 'large' })
 
       if (fetcher.state === "idle" && fetcher.data == null) {
         fetcher.load(`/check_roles`);
