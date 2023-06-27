@@ -53,7 +53,10 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { STELLAR_NETWORK } = env;
   const authProgress =
     (await getUserAuthProgress(request, sessionStorage)) ?? {};
-  const { provider, account, discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
+
+  let userSesData = await getUser(request, sessionStorage);
+  console.log(userSesData, 'userSesData in root')
+  const { provider, account, discord_user_id } = (userSesData) ?? {};
   if (authProgress === null) return null;
   const requiresDiscord = checkRequirement(authProgress, "discord_auth");
   const requiresWallet = checkRequirement(authProgress, "wallet_auth");

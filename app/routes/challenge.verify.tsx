@@ -43,6 +43,7 @@ export async function action({ request, context }: ActionArgs) {
 
   if (addAccount) {
     const account = await AccountBuilder.find({ discord_user_id, DB });
+    console.log(account, 'account in challenge verify, addaccount')
     await account.addStellarAccount({ public_key: builtTx.source });
     return new Response(JSON.stringify('Stellar account added'), {
       status: 200,

@@ -13,7 +13,7 @@ export const Settings = () => {
       fetcher.load(`/settings`);
     }
   }, [fetcher]);
-
+  console.log(fetcher.data)
   const { account, provider, data, network } = fetcher.data ?? {}
 
   return (
