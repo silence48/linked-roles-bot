@@ -19,9 +19,9 @@ export class Discord {
   }
    
   static async getOAuthTokens(
+    request: any,
     code: string,
-    env: any,
-    request: any
+    env: any
   ) {
     const url = 'https://discord.com/api/v10/oauth2/token';
     const requestUrl = new URL(request.url);

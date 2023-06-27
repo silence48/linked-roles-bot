@@ -14,7 +14,7 @@ export async function action({ request, context, params }: ActionArgs) {
   let code = form.get('code') as string;
   let clientState = form.get('clientState') as string;
 
-  const discordTokens: any = await Discord.getOAuthTokens(code, context.env, request);
+  const discordTokens: any = await Discord.getOAuthTokens(request, code, context.env);
   // 2. Uses the Discord Access Token to fetch the user profile
   const discordData: any = await Discord.getUserData(discordTokens);
   const discord_user_id = discordData.user.id;
