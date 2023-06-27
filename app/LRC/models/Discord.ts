@@ -2,11 +2,15 @@
 import { User } from '.';
 
 export class Discord {
-  static async getOAuthUrl(env: any) {
+  static async getOAuthUrl(request: any, env: any) {
     const state = crypto.randomUUID();
     const url = new URL('https://discord.com/api/oauth2/authorize');
+
+    const requestUrl = new URL(request.url);
+    const redirect_uri = `${requestUrl.origin}/auth/discord/callback`;
+    
     url.searchParams.set('client_id', env.DISCORD_CLIENT_ID);
-    url.searchParams.set('redirect_uri', env.DISCORD_REDIRECT_URI);
+    url.searchParams.set('redirect_uri', redirect_uri);
     url.searchParams.set('response_type', 'code');
     url.searchParams.set('state', state);
     url.searchParams.set('scope', 'role_connections.write identify');
@@ -16,15 +20,19 @@ export class Discord {
    
   static async getOAuthTokens(
     code: string,
-    env: any
+    env: any,
+    request: any
   ) {
     const url = 'https://discord.com/api/v10/oauth2/token';
+    const requestUrl = new URL(request.url);
+    const redirect_uri = `${requestUrl.origin}/auth/discord/callback`;
+    
     const data = new URLSearchParams({
       client_id: env.DISCORD_CLIENT_ID,
       client_secret: env.DISCORD_CLIENT_SECRET,
       grant_type: 'authorization_code',
       code,
-      redirect_uri: env.DISCORD_REDIRECT_URI,
+      redirect_uri: redirect_uri,
     });
   
     const response = await fetch(url, { method: 'POST', body: data, headers: { 'Content-Type': 'application/x-www-form-urlencoded' } })
