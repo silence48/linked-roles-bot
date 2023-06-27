@@ -50,7 +50,7 @@ export async function verifyTxSignedBy(transaction, accountID) {
   }
  }
 
-export async function getrefreshtoken(transaction, request, context){
+export async function getRefreshToken(transaction, request, context){
   //import jwt from '@tsndr/cloudflare-worker-jwt'
   const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   console.log('trying to make a refresh token')
@@ -81,7 +81,7 @@ export async function getrefreshtoken(transaction, request, context){
 }
 
 
-export async function getaccesstoken(refreshtoken, request, context){
+export async function getAccessToken(refreshtoken, request, context){
    const {Networks, TransactionBuilder } = await import('stellar-base');
   const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   
@@ -119,7 +119,7 @@ export async function getaccesstoken(refreshtoken, request, context){
 
 //this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
-  const { User } = await import ('../models');
+  const { User } = await import ('linked-roles-core/lib/models/user');
   const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
@@ -130,7 +130,7 @@ export async function verifyAndRenewAccess(accesstoken, context){
     if (lastaccesstoken == accesstoken){
       if (payload.exp < Date.now()){
         const refreshtoken = user.stellar_refresh_token
-        const newaccesstoken = await getaccesstoken(refreshtoken, request, context)
+        const newaccesstoken = await getAccessToken(refreshtoken, request, context)
         const { payload } = jwt.decode(refreshtoken)
         user[0].stellar_expires_at = (payload.exp).toString()
         user[0].stellar_access_token = newaccesstoken
