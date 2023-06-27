@@ -13,6 +13,11 @@ export async function action({ request, context }: ActionArgs) {
   const body = await request.formData();
   const url = new URL(request.url);
   const signedEnvelope = body.get('signed_envelope_xdr');
+  console.log(`from challenge.verify - action - signedEnvelope ${signedEnvelope}`);
+
+  console.log('in the verify, the signed envelope.')
+  console.log(signedEnvelope)
+
   const params = getUrlParams(url);
   const { provider, addAccount }: any = params ?? {};
   const cookies = request.headers.get('Cookie') ?? null;
@@ -22,7 +27,7 @@ export async function action({ request, context }: ActionArgs) {
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
 
   let builtTx = new (TransactionBuilder.fromXDR as any)(signedEnvelope, NETWORK_PASSPHRASE);
-
+console.log(builtTx)
   //verify the state.
   const decoder = new TextDecoder();
   let authedstate = decoder.decode(builtTx.operations[0].value);
@@ -39,6 +44,7 @@ export async function action({ request, context }: ActionArgs) {
 
   if (addAccount) {
     const account = await AccountBuilder.find({ discord_user_id, DB });
+    console.log('addaccount, account', account);
     await account.addStellarAccount({ public_key: builtTx.source });
     return new Response(JSON.stringify('Stellar account added'), {
       status: 200,

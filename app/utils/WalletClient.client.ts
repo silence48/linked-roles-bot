@@ -233,16 +233,16 @@ class WalletClient {
   }
   private setWalletConnectChain() {
     this.chain =
-    this.network === "TESTNET"
-      ? WalletConnectChains.TESTNET
-      : WalletConnectChains.PUBLIC;
+      this.network === "TESTNET"
+        ? WalletConnectChains.TESTNET
+        : WalletConnectChains.PUBLIC;
   }
 
   private setHorizonUrl() {
     this.horizon_url =
-    this.network === "TESTNET"
-      ? "horizon-testnet.stellar.org"
-      : "horizon.stellar.org";
+      this.network === "TESTNET"
+        ? "horizon-testnet.stellar.org"
+        : "horizon.stellar.org";
   }
   
 
