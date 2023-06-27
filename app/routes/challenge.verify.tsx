@@ -2,8 +2,12 @@ import { TransactionBuilder, Networks } from 'stellar-base';
 import { json, type ActionArgs } from '@remix-run/cloudflare';
 import { parse } from 'cookie';
 import { updateUserSession, getUser } from '~/utils/session.server';
-import { AccountBuilder, User } from 'linked-roles-core';
+//import { AccountBuilder, User } from 'linked-roles-core';
 // import jwt from "@tsndr/cloudflare-worker-jwt";
+import jwt from "@tsndr/cloudflare-worker-jwt";
+import { AccountBuilder } from '~/LRC/builders/AccountBuilder';
+import { User } from '~/LRC/models/User';
+
 import { getUrlParams } from '~/utils/getUrlParams';
 import { getRefreshToken, getAccessToken } from '~/utils/auth.server';
 

@@ -1,7 +1,8 @@
 import * as React from "react";
 import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare";
 //import { getUser } from "~/utils/session.server";
-//import { User } from "~/models";
+import { User } from "~/LRC/models/User";
+
 import { useModal } from "~/context";
 import { Layout, Button } from "~/components";
 import { WalletClient } from "~/utils/WalletClient.client";
@@ -13,10 +14,10 @@ export const loader = async ({ request, context }: LoaderArgs) => {
   const { getUser } = await import("~/utils/session.server");
   const { checkRoles } = await import("~/utils/checkRoles.server");
   const { generateDefaultClaimTransaction } = await import("~/utils/stellarUtils.server");
-  const { User } = await import("linked-roles-core");
+  //const { User } = await import("linked-roles-core");
 
   //const {verifyAndRenewAccess} = await import("~/utils/auth.server");
-  const {jwt} = await import("@tsndr/cloudflare-worker-jwt");  
+  const jwt = await import("@tsndr/cloudflare-worker-jwt");  
 
 
   const { sessionStorage } = context as any;

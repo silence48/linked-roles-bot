@@ -1,67 +1,5 @@
 export const badgeDetails = [
-  {
-    code: 'SQ0601',
-    issuer: 'GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO',
-    filename:
-      'SQ0601-GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0501',
-    issuer: 'GA4O6I5J2BPHHQT3RNCOFVXUSUVILNUAQU4UZAHDAMSYFENR3QII4QDP',
-    filename:
-      'SQ0501-GA4O6I5J2BPHHQT3RNCOFVXUSUVILNUAQU4UZAHDAMSYFENR3QII4QDP.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0502',
-    issuer: 'GCMOPDUBGJZ6IZSD4WRCGAC3VUFHQNRZEPHM2UB2V3QWVAJ7NDGHOOG7',
-    filename:
-      'SQ0502-GCMOPDUBGJZ6IZSD4WRCGAC3VUFHQNRZEPHM2UB2V3QWVAJ7NDGHOOG7.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0503',
-    issuer: 'GATRDOIZ24ZOQR2VILU4ZED3NTMZCWSW3KI47QXT7LFZIGTIXFBTYCAA',
-    filename:
-      'SQ0503-GATRDOIZ24ZOQR2VILU4ZED3NTMZCWSW3KI47QXT7LFZIGTIXFBTYCAA.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0504',
-    issuer: 'GCS4T4Z3E6WIRYGLW7BHKDZU2EAQBVB3PPE7UMG24OCXAFNLELIHKMJ3',
-    filename:
-      'SQ0504-GCS4T4Z3E6WIRYGLW7BHKDZU2EAQBVB3PPE7UMG24OCXAFNLELIHKMJ3.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0505',
-    issuer: 'GBTN5KHEQC52MQLUYJDURUN2TSAPYOTSJPYXNXYRJ2GWQIM3MBB6EF6W',
-    filename:
-      'SQ0505-GBTN5KHEQC52MQLUYJDURUN2TSAPYOTSJPYXNXYRJ2GWQIM3MBB6EF6W.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
-  {
-    code: 'SQ0506',
-    issuer: 'GAIUESMWDEDXVODVZXXDPFC3FEUKRBUIRYDFGIAMH6EUWRKFQNL5LJB7',
-    filename:
-      'SQ0506-GAIUESMWDEDXVODVZXXDPFC3FEUKRBUIRYDFGIAMH6EUWRKFQNL5LJB7.png',
-    description: 'DESCRIPTION',
-    owned: false,
-    soroban: true,
-  },
+
   {
     code: 'SQL0001',
     issuer: 'GDQMNGUDOSMCCN6MD52DPXX4ACECXVODFK2NQQGFXYLGXJFZ2LEEIY35',
@@ -730,6 +668,69 @@ export const badgeDetails = [
     description: 'Meridian 2021 docsprint badge',
     owned: false,
     side: true,
+  },
+  {
+    code: 'SQ0601',
+    issuer: 'GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO',
+    filename:
+      'SQ0601-GBM43D3V7UFKD6KDH3FVERBIMKPIFEZO7STTEEHGWPEBJQJ5YDEX2LVO.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0501',
+    issuer: 'GA4O6I5J2BPHHQT3RNCOFVXUSUVILNUAQU4UZAHDAMSYFENR3QII4QDP',
+    filename:
+      'SQ0501-GA4O6I5J2BPHHQT3RNCOFVXUSUVILNUAQU4UZAHDAMSYFENR3QII4QDP.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0502',
+    issuer: 'GCMOPDUBGJZ6IZSD4WRCGAC3VUFHQNRZEPHM2UB2V3QWVAJ7NDGHOOG7',
+    filename:
+      'SQ0502-GCMOPDUBGJZ6IZSD4WRCGAC3VUFHQNRZEPHM2UB2V3QWVAJ7NDGHOOG7.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0503',
+    issuer: 'GATRDOIZ24ZOQR2VILU4ZED3NTMZCWSW3KI47QXT7LFZIGTIXFBTYCAA',
+    filename:
+      'SQ0503-GATRDOIZ24ZOQR2VILU4ZED3NTMZCWSW3KI47QXT7LFZIGTIXFBTYCAA.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0504',
+    issuer: 'GCS4T4Z3E6WIRYGLW7BHKDZU2EAQBVB3PPE7UMG24OCXAFNLELIHKMJ3',
+    filename:
+      'SQ0504-GCS4T4Z3E6WIRYGLW7BHKDZU2EAQBVB3PPE7UMG24OCXAFNLELIHKMJ3.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0505',
+    issuer: 'GBTN5KHEQC52MQLUYJDURUN2TSAPYOTSJPYXNXYRJ2GWQIM3MBB6EF6W',
+    filename:
+      'SQ0505-GBTN5KHEQC52MQLUYJDURUN2TSAPYOTSJPYXNXYRJ2GWQIM3MBB6EF6W.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
+  },
+  {
+    code: 'SQ0506',
+    issuer: 'GAIUESMWDEDXVODVZXXDPFC3FEUKRBUIRYDFGIAMH6EUWRKFQNL5LJB7',
+    filename:
+      'SQ0506-GAIUESMWDEDXVODVZXXDPFC3FEUKRBUIRYDFGIAMH6EUWRKFQNL5LJB7.png',
+    description: 'DESCRIPTION',
+    owned: false,
+    soroban: true,
   },
 ];
 

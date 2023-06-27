@@ -2,7 +2,8 @@ import { type ActionFunction, redirect } from "@remix-run/cloudflare";
 
 // Define your action function
 export const action: ActionFunction = async ({ request, context }) => {
-  const { StellarAccount } = await import("linked-roles-core");
+  //const { StellarAccount } = await import("linked-roles-core");
+  const { StellarAccount } = await import ('~/LRC/models/StellarAccount');
   // const { fetchRegisteredAccounts } = await import("../utils/sqproof");
   // const { sessionStorage } = context as any;
   // const accounts = await fetchRegisteredAccounts(request, context);

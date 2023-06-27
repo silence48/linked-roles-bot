@@ -1,9 +1,13 @@
 import { type ActionArgs } from '@remix-run/cloudflare';
-import { AccountBuilder } from 'linked-roles-core';
+import { AccountBuilder } from '~/LRC/builders/AccountBuilder';
+import { Discord} from '~/LRC/models/Discord';
+import { User } from '~/LRC/models/User';
 
 export async function action({ request, context, params }: ActionArgs) {
   const { createUserSession } = await import('~/utils/session.server');
-  const { Discord, User } = await import('linked-roles-core');
+  
+  //const { Discord, User } = await import('linked-roles-core');
+  
   const { env, sessionStorage } = context as any;
   const { DB } = env;
   const form = await request.formData();
