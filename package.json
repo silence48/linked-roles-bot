@@ -27,7 +27,6 @@
     "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
-    "linked-roles-core": "latest",
     "model-one": "^0.0.7",
     "postcss-preset-env": "^8.5.0",
     "qrcode-generator": "^1.4.4",
