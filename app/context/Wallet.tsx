@@ -124,7 +124,15 @@ export const WalletProvider: FunctionComponent<WalletProviderProps> = ({
   React.useEffect(() => {
     if (fetcher.state === "idle" && fetcher.data !== undefined) {
       const { body } = fetcher.data;
+      console.log('body from the useeffect in wallet');
+      console.log(body);
+      console.log('fetcherdata from the useeffect in wallet');
+      console.log(fetcher.data);
       const { account, provider } = body;
+      console.log('account from the useeffect in wallet');
+      console.log(account);
+      console.log(provider);
+      console.log(account, provider);
       if (account === publicKey && provider === provider) {
         setStatus("connected");
         setIsOpen(false);
