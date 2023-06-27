@@ -4,7 +4,9 @@ import {
   signTransaction as signTx,
 } from "@stellar/freighter-api";
 import { SignClient } from "@walletconnect/sign-client";
-import type { Provider, Network } from "~/types";
+
+type Provider = "albedo" | "rabet" | "freighter" | "wallet_connect";
+type Network = "TESTNET" | "PUBLIC";
 
 enum WalletConnectChains {
   PUBLIC = "stellar:pubnet",
@@ -24,7 +26,7 @@ class WalletClient {
   approval: any;
   uri: any;
   horizon_url: string | null;
-  chain: WalletConnectChains | null;
+  chain: "stellar:testnet" | "stellar:pubnet" | null;
 
   constructor(provider: Provider, network: Network) {
     this.provider = provider;
@@ -48,8 +50,6 @@ class WalletClient {
         publicKey = await this.getRabetKey();
       } else if (provider === "freighter") {
         publicKey = await this.getFreighterKey();
-      } else if (provider === "x_bull") {
-        publicKey = await this.getXBullKey();
       } else if (provider === "wallet_connect") {
         publicKey = await this.getWalletConnectKey();
       }
@@ -72,8 +72,6 @@ class WalletClient {
         return await this.signRabet(xdr, submit);
       } else if (provider === "freighter") {
         return await this.signFreighter(xdr, submit);
-      } else if (provider === "x_bull") {
-        return await this.signXBull(xdr, submit);
       } else if (provider === "wallet_connect") {
         return await this.signWalletConnect(xdr, submit);
       }
@@ -143,40 +141,14 @@ class WalletClient {
     }
   }
 
-  private async signXBull(xdr: string, submit: boolean) {
-    const { network } = this;
-    const w: any = window;
-    const publicKey = await w.xBullSDK.getPublicKey();
-    if (w.xBullSDK) {
-      const signed_envelope_xdr = await w.xBullSDK.signXDR(xdr, network, publicKey);
-      if (submit) {
-        const response = await this.submitTx(signed_envelope_xdr);
-        return { horizonResult: response };
-      } else {
-        return { xdr, signed_envelope_xdr };
-      }
-    }
-    // should there be error handling here?
-  }
+  private async signXBull() {}
 
   private async getAlbedoKey() {
     const { pubkey } = (await albedo.publicKey({})) ?? {};
     return pubkey;
   }
 
-  private async getXBullKey() {
-    const w: any = window;
-    let publicKey = "";
-    if (w.xBullSDK) {
-      await w.xBullSDK.connect({
-        canRequestPublicKey: true,
-        canRequestSign: true
-      }).then(async () => {
-       publicKey = await w.xBullSDK.getPublicKey();
-      });
-    }
-    return publicKey;
-  }
+  private async getXBullKey() {}
 
   private async getRabetKey() {
     const w: any = window;

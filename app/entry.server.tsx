@@ -4,10 +4,7 @@ import { RemixServer } from "@remix-run/react";
 
 import { renderToReadableStream } from "react-dom/server";
 
-import { Buffer } from "buffer-polyfill";
 
-// Polyfill Buffer on the server
-globalThis.Buffer = Buffer as unknown as BufferConstructor;
 export default async function handleRequest(
   request: Request,
   responseStatusCode: number,

@@ -1,20 +1,9 @@
-
-import {
-  Keypair,
-  TransactionBuilder,
-  Networks
-} from 'stellar-base';
-import { User } from 'linked-roles-core';
-import jwt from '@tsndr/cloudflare-worker-jwt'
-
-
-export async function gatherTxSigners(transaction: any, signers: any) {
+export async function gatherTxSigners(transaction, signers) {
+  const { Keypair } = await import('stellar-base');
   const hashedSignatureBase = transaction.hash();
-  console.log("gatherTxSigners: hashedSignatureBase",hashedSignatureBase)
-  console.log("gatherTxSigners: signers",signers)
-
   const signersFound = new Set();
   for (const signer of signers) {
+    console.log(signers[signer])
     if (transaction.signatures.length === 0) {
       break;
     }
@@ -39,13 +28,13 @@ export async function gatherTxSigners(transaction: any, signers: any) {
   return Array.from(signersFound);
 }
 
-export async function verifyTxSignedBy(transaction: any, accountID: any) {
+export async function verifyTxSignedBy(transaction, accountID) {
   try{
    //todo: check thresholds and compile eligible account signers, instead of just checking if source signed.
-  //  const authInfo = getAccountAuthorization(transaction.source)
- 
+   const authInfo = getAccountAuthorization(transaction.source)
+    console.log('verify tx signed by', transaction, accountID)
    const signedby = await gatherTxSigners(transaction, [accountID]) 
-   console.log("verifyTxSignedBy signedby", signedby)
+   console.log(signedby, 'signed by')
    let comparelist = [accountID]
    for (let n in comparelist){
      for (let i in signedby){
@@ -61,12 +50,16 @@ export async function verifyTxSignedBy(transaction: any, accountID: any) {
   }
  }
 
-export async function getRefreshToken(transaction: any, request: any, context: any){
-  const { authsigningkey } = context.env;
+export async function getrefreshtoken(transaction, request, context){
+  //import jwt from '@tsndr/cloudflare-worker-jwt'
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
+  console.log('trying to make a refresh token')
+ // console.log(transaction)
   const decoder = new TextDecoder();
   const userid = decoder.decode(transaction.operations[1].value)
+  console.log(`making a refresh token for userid: ${userid}` )
   const jti = decoder.decode(transaction.operations[0].value)
-  console.log('await verifyTxSignedBy(transaction,transaction.source)', await verifyTxSignedBy(transaction,transaction.source))
+  console.log(jti, 'JTI')
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
     const ourURL = new URL(request.url).origin //https://127.0.0.1/ https://stellar-discord-bot.workers.dev/
     let token = await jwt.sign(
@@ -78,7 +71,7 @@ export async function getRefreshToken(transaction: any, request: any, context: a
         "iat": Date.now(), //the issued at timestamp
         "exp": transaction.timeBounds.maxTime, // the expiration timestamp
         "xdr": transaction.toXDR()
-      }, authsigningkey
+      }, context.env.authsigningkey
     ) 
     console.log(token, 'we got the refresh token')
     return token
@@ -88,18 +81,21 @@ export async function getRefreshToken(transaction: any, request: any, context: a
 }
 
 
-export async function getAccessToken(refreshtoken: any, request: any, context: any){
-  const { NETWORK_PASSPHRASE } = context.env
+export async function getaccesstoken(refreshtoken, request, context){
+   const {Networks, TransactionBuilder } = await import('stellar-base');
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
+  
+  
   let validity = jwt.verify(refreshtoken, context.env.authsigningkey)
   if (!validity){
     throw('the token is not valid')
   }
   const { payload } = jwt.decode(refreshtoken) // decode the refresh token
-  // let passphrase = NETWORK_PASSPHRASE
+  let passphrase = Networks.PUBLIC
   console.log('trying to get an access token')
-  const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, NETWORK_PASSPHRASE)
+  const ntransaction = new (TransactionBuilder.fromXDR as any)(payload.xdr, passphrase)
   //let transaction = payload.xdr
- // console.log(ntransaction)
+  console.log('ntx', ntransaction)
   const decoder = new TextDecoder();
   console.log(ntransaction.operations[0].value)
   const userid =   decoder.decode(ntransaction.operations[1].value)
@@ -120,18 +116,21 @@ export async function getAccessToken(refreshtoken: any, request: any, context: a
   return accesstoken
 };
 
-export async function verifyAndRenewAccess(accesstoken: any, context: any){
+
+//this isn't being used i don't think right now?
+export async function verifyAndRenewAccess(accesstoken, context){
+  const { User } = await import ('../models');
+  const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
     const { DB } = context.env as any
     const { payload } = jwt.decode(accesstoken)
-    if (payload.exp === undefined) return
     const user = await User.findBy('discord_user_id', payload.userid, DB)
     const { lastaccesstoken } = user.stellar_access_token
     if (lastaccesstoken == accesstoken){
       if (payload.exp < Date.now()){
         const refreshtoken = user.stellar_refresh_token
-        const newaccesstoken = await getAccessToken(refreshtoken, request, context)
+        const newaccesstoken = await getaccesstoken(refreshtoken, request, context)
         const { payload } = jwt.decode(refreshtoken)
         user[0].stellar_expires_at = (payload.exp).toString()
         user[0].stellar_access_token = newaccesstoken
@@ -161,7 +160,9 @@ interface accountAuth{
   threasholds: threasholds
 }
 
-export async function getAccountAuthorization(pubkey: string, horizonURL: string): Promise<accountAuth> {
+export async function getAccountAuthorization(pubkey): Promise<accountAuth> {
+  console.log('getting account auth', pubkey)
+  const horizonURL = "https://horizon.stellar.org";
   const url = horizonURL + "/accounts/" + pubkey;
   const init = {
     headers: {
@@ -169,8 +170,10 @@ export async function getAccountAuthorization(pubkey: string, horizonURL: string
     },
   };
   const response = await fetch(url, init);
+
   const json: any = await response.json()
-  console.log(json.thresholds)
-  console.log(json.signers)
+  //console.log('json', json)
+  console.log('json.thresholds', json.thresholds)
+  console.log('json.signers', json.signers)
   return {signers: json.signers, threasholds: json.thresholds}
 }

@@ -1,109 +1,148 @@
-import { TransactionBuilder, Networks } from 'stellar-base';
-import { json, type ActionArgs } from '@remix-run/cloudflare';
-import { parse } from 'cookie';
-import { updateUserSession, getUser } from '~/utils/session.server';
-import { AccountBuilder, User } from 'linked-roles-core';
-// import jwt from "@tsndr/cloudflare-worker-jwt";
-import { getUrlParams } from '~/utils/getUrlParams';
-import { getRefreshToken, getAccessToken } from '~/utils/auth.server';
+import { type ActionArgs } from "@remix-run/cloudflare";
 
-export async function action({ request, context }: ActionArgs) {
-  const { sessionStorage, env } = context as any;
-  const { DB, STELLAR_NETWORK, NETWORK_PASSPHRASE } = env;
+export async function action({ request, context, params }: ActionArgs) {
+  const jwt = await import("@tsndr/cloudflare-worker-jwt");
+  const { User, StellarAccount } = await import("~/models");
+  const { updateUserSession, getUser } = await import("~/utils/session.server");
+  const { parse } = await import("cookie");
+  const { TransactionBuilder, Networks } = await import("stellar-base");
+  const { getrefreshtoken, getaccesstoken } = await import("~/utils/auth.server");
+  const { AccountForm } = await import("~/forms");
+
+  const { sessionStorage } = context as any;
   const body = await request.formData();
+  const signedEnvelope = body.get("signed_envelope_xdr");
+  console.log(`from challenge.verify - action - signedEnvelope ${signedEnvelope}`);
   const url = new URL(request.url);
-  const signedEnvelope = body.get('signed_envelope_xdr');
-  const params = getUrlParams(url);
-  const { provider, addAccount }: any = params ?? {};
-  const cookies = request.headers.get('Cookie') ?? null;
+  const provider = url.searchParams.get("provider") as any;
+  const cookies = request.headers.get("Cookie") ?? null;
   if (!cookies) return null;
   const cookieHeader = parse(cookies);
   const { clientState } = cookieHeader;
   const { discord_user_id } = (await getUser(request, sessionStorage)) ?? {};
+console.log(`in challenge verify ${discord_user_id}`)
+  let areq = {
+    Transaction: signedEnvelope,
+    NETWORK_PASSPHRASE: Networks.PUBLIC,
+    discord_user_id: discord_user_id
+  };
+  const { Transaction, NETWORK_PASSPHRASE } = areq;
+  let passphrase: Networks = Networks.PUBLIC;
+  if (NETWORK_PASSPHRASE) {
+    passphrase = NETWORK_PASSPHRASE;
+  }
 
-  let builtTx = new (TransactionBuilder.fromXDR as any)(signedEnvelope, NETWORK_PASSPHRASE);
 
+  const { DB } = context.env as any;
+  let transaction = new (TransactionBuilder.fromXDR as any)(Transaction, passphrase);
   //verify the state.
   const decoder = new TextDecoder();
-  let authedstate = decoder.decode(builtTx.operations[0].value);
-
+  let authedstate = decoder.decode(transaction.operations[0].value);
+  console.log(`from challenge.verify - action - authedstate ${authedstate} - clientState ${clientState}`);
+  console.log(`the auth request is ${JSON.stringify(areq)}`);
   if (clientState !== authedstate) {
-    let errmsg = JSON.stringify('State verification failed.');
+    let errmsg = JSON.stringify("State verification failed.");
     return new Response(errmsg, {
       status: 403,
       headers: {
-        'content-type': 'application/json;charset=UTF-8'
-      }
+        "content-type": "application/json;charset=UTF-8",
+      },
     });
   }
 
-  if (addAccount) {
-    const account = await AccountBuilder.find({ discord_user_id, DB });
-    await account.addStellarAccount({ public_key: builtTx.source });
-    return new Response(JSON.stringify('Stellar account added'), {
-      status: 200,
-      headers: {
-        'content-type': 'application/json'
-      }
-    });
-  }
+  const refreshtoken = await getrefreshtoken(transaction, request, context);
 
-  const refreshtoken = await getRefreshToken(builtTx, request, context);
   if (refreshtoken != false) {
-    const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length;
-    // console.log(`from challenge.verify - action - userExists ${userExists}`);
-    const accesstoken = await getAccessToken(refreshtoken, request, context);
+    const userExists = (await User.findBy("discord_user_id", discord_user_id, DB)).length;
+    console.log(`from challenge.verify - action - userExists ${userExists}`)
+    const accesstoken = await getaccesstoken(refreshtoken, request, context);
     if (accesstoken) {
-      // const { payload } = jwt.decode(refreshtoken);
-      // If user does not exist, create itx
+      const { payload } = jwt.decode(refreshtoken)
+      console.log('chk2 in auth.ts function')
+      console.log(`the user table object is ${JSON.stringify(await User.findBy('discord_user_id', discord_user_id, DB))}`)
+
       if (!userExists) {
-        const errmsg = JSON.stringify('User does not exist.');
+        const errmsg = JSON.stringify("User does not exist.");
         return new Response(errmsg, {
           status: 403,
           headers: {
-            'content-type': 'application/json;charset=UTF-8'
-          }
+            "content-type": "application/json;charset=UTF-8",
+          },
         });
       } else {
-        // const user = await User.findBy('discord_user_id', discord_user_id, DB);
-        // user[0].stellar_access_token = accesstoken;
-        // user[0].stellar_refresh_token = refreshtoken;
-        // user[0].stellar_expires_at = (payload.exp).toString();
-        // user[0].public_key = builtTx.source;
+        const user = await User.findBy("discord_user_id", discord_user_id, DB);
+        console.log(user)
+        const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
+        const userOwnedAccounts = stellarAccounts.length;
+        console.log(`the ${userOwnedAccounts} accounts are ${JSON.stringify(stellarAccounts)}`)
+        let publickey = transaction.source;
+        console.log(`the publickey is ${publickey}`)
+        let accountRecord = await StellarAccount.findBy("public_key", publickey, DB);
+        console.log(`the accountRecord is ${JSON.stringify(accountRecord)}`)
+        // check if the account has already been registered to a different user.
+        if ((accountRecord.length != 0) && (accountRecord[0].discord_user_id != discord_user_id)) {
+          console.log('the discord userid didnt match', accountRecord[0].discord_user_id, discord_user_id)
+          //take other action like ban the user.
+          const errmsg = JSON.stringify("Account is owned by a different discord user!");
+          return new Response(errmsg, {
+            status: 403,
+            headers: {
+              "content-type": "application/json;charset=UTF-8",
+            },
+          });
+        };
+       // console.log('the discord userid matched', accountRecord[0].discord_user_id, discord_user_id)
+        // then update or create the registration.
+        console.log('userowned')
+        console.log(stellarAccounts[0])
+        if (accountRecord.length != 0) {
+          console.log(accountRecord[0])
+          accountRecord[0].access_token = accesstoken;
+          accountRecord[0].refresh_token = refreshtoken;
+          console.log(await StellarAccount.update(accountRecord[0], DB));
+        } else {
+          const accountForm = new AccountForm(
+            new StellarAccount({
+              discord_user_id: discord_user_id,
+              public_key: publickey,
+              access_token: accesstoken,
+              refresh_token: refreshtoken,
+            })
+          );
+          console.log(`the accountForm is ${JSON.stringify(accountForm)}`)
 
-        const account = await AccountBuilder.find({ discord_user_id, DB });
-        await account.addStellarAccount({ public_key: builtTx.source });
-      }
-
-      // add provider and check for unsupported providers
-      if (!provider) return;
-      return updateUserSession(
-        request,
-        sessionStorage,
-        { token: accesstoken, provider, account: builtTx.source },
-        {
-          message: 'Challenge verified',
-          body: { account: builtTx.source, provider }
+          console.log(await StellarAccount.create(accountForm, DB));
         }
-      );
-    }
-  } else {
-    let errortext = JSON.stringify({
-      error: 'The provided transaction is not valid'
-    });
-    return new Response(errortext, {
-      status: 401,
-      headers: {
-        'content-type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+
+        let responsetext = JSON.stringify({ token: accesstoken });
+
+        // add provider
+        if (!provider) return;
+        return updateUserSession(
+          request,
+          sessionStorage,
+          { isAuthed: true, token: accesstoken, provider },
+          { redirectTo: "/" }
+        );
       }
-    });
+    } else {
+      let errortext = JSON.stringify({
+        error: "The provided transaction is not valid",
+      });
+      return new Response(errortext, {
+        status: 401,
+        headers: {
+          "content-type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+    }
+
+    //let authedstate = transaction.operations[0].value
+    // Verify auth
+
+    // Generate JWT
+
+    // Store as a Token
   }
-
-  //let authedstate = transaction.operations[0].value
-  // Verify auth
-
-  // Generate JWT
-
-  // Store as a Token
 }

@@ -1,28 +1,5 @@
 import type { AssetType, MemoType } from "stellar-base";
 
-//UI related types:
-//modal types:
-export type ModalPaddingType = 'none' | 'small' | 'medium' | 'large';
-export type ModalSizeType = 'small' | 'medium' | 'large' | 'fit';
-export type ModalAlignType = 'center' | 'left' | 'right'; 
-export type ModalProps = {
-  children: React.ReactNode;
-  initialState: boolean;
-  padding?: ModalPaddingType;
-  size?: ModalSizeType;
-  align?: ModalAlignType;
-  showBar?: boolean;
-  overlay?: boolean;
-  overflow?: boolean;
-  closable?: boolean;
-  closeModal?: () => void;
-  theme?: string;
-};
-
-//stellar related types:
-export type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect" | null;
-export type Network = "TESTNET" | "PUBLIC";
-
 /* tslint:disable-next-line:no-namespace */
 export namespace Horizon {
   export interface ResponseLink {

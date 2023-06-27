@@ -158,10 +158,10 @@ export const Button: React.FunctionComponent<ButtonProps> = ({
     if (onClick) onClick();
   };
 
-  // const runSound = () => {
-  //   const audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3')
-  //   audio.play();
-  // }
+  const runSound = () => {
+    const audio = new Audio('https://interactive-examples.mdn.mozilla.net/media/cc0-audio/t-rex-roar.mp3')
+    audio.play();
+  }
 
   if (type === 'menu')
     return (

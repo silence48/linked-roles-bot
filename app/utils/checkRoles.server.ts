@@ -2,7 +2,7 @@
 import type { Horizon } from '~/types';
 
 export async function checkRoles(context: any, publickey: string, discord_user_id: string) {
-  const { Discord } = await import("linked-roles-core");
+  const { Discord } = await import("~/models");
   
   let server = context.env.horizonURL;
   const account: Horizon.AccountResponse = await (

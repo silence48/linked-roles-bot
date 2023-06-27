@@ -1,93 +1,82 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { useTheme } from "./Theme";
 import { Modal as ModalComponent } from "~/components/Modal";
-import { DiscordLogin } from "~/components/DiscordLogin";
-import { BadgeViewer } from "~/components/BadgeViewer";
+import { DiscordLogin } from '~/components/DiscordLogin';
+import { StellarAccounts } from '~/components/StellarAccounts';
+//import { BadgeViewer } from '~/components/BadgeViewer';
 import { TxSuccess } from "~/templates/TxSuccess";
-import { AddStellarAccount } from "~/templates/AddStellarAccount";
-import { RemoveStellarAccount } from "~/templates/RemoveStellarAccount";
-import { Settings } from '~/components/Settings';
-import type { ModalProps } from "~/types";
-
-export enum ModalTypeE {
-  DISCORD_LOGIN = "discord_login",
-  TX_SUCCESS = "tx_success",
-  BADGE_VIEWER = "badge_viewer",
-  ADD_ACCOUNT = "add_account",
-  REMOVE_ACCOUNT = "remove_account",
-  SETTINGS = "settings",
-  NONE = "",
-}
-
-type ModalAction = {
-    type: ModalTypeE;
-    content?: any;
-    onClose?: () => void;
-  } & Omit<ModalProps, 'children' | 'initialState' | 'closeModal' | 'closable' | 'overlay' | 'theme' >;
-  
-
 type ModalProviderProps = { children: ReactElement };
-
-
 type ModalContextType = {
   isOpen: boolean;
-  openModal: (action: ModalAction) => void;
-  afterClose?: () => void;
+  openModal: (action: {
+    type: string;
+    content?: any;
+    padding?: "large" | "medium" | "small" | "none";
+    size?: "large" | "medium" | "small" | "fit";
+    showBar?: boolean;
+    onClose?: () => void;
+  }) => void;
+  afterClose: () => void;
   closeModal: () => void;
 };
 
+enum ModalTypeE {
+  DISCORD_LOGIN = "discord_login",
+  TX_SUCCESS = "tx_success",
+  STELLAR_ACCOUNTS = "stellar_accounts",
+  ACCOUNT_HANDLER = "account_handler",
+}
 
-const modalAssert = (action: { type: ModalTypeE; content?: any }) => {
+const modalAssert = (action: { type: string; content: any }) => {
   switch (action.type) {
     case ModalTypeE.TX_SUCCESS:
       return <TxSuccess content={action.content} />;
     case ModalTypeE.DISCORD_LOGIN:
       return <DiscordLogin />;
-    case ModalTypeE.BADGE_VIEWER:
-      return <BadgeViewer />;
-    case ModalTypeE.ADD_ACCOUNT:
-      return <AddStellarAccount network={action.content} />;
-    case ModalTypeE.REMOVE_ACCOUNT:
-      return <RemoveStellarAccount public_key={action.content} />;
-    case ModalTypeE.SETTINGS:
-      return <Settings />;
+    case ModalTypeE.STELLAR_ACCOUNTS:
+      //console.log(action.content.userAccounts, 'action.content.userAccounts in modal')
+        return <StellarAccounts uAccounts={action.content.userAccounts}/>;
     default:
       return <></>;
   }
 };
 
 export const ModalContext = React.createContext<ModalContextType>(
-  {
-    isOpen: false,
-    openModal: () => {}, // init empty functions
-    afterClose: () => {}, 
-    closeModal: () => {}, 
-  }
+  {} as ModalContextType
 );
 
 export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
   children,
 }) => {
   const { theme } = useTheme();
-  const [isOpen, setIsOpen] = React.useState<boolean>(false);
-  const [state, setState] = React.useState<ModalAction>({
-    type: ModalTypeE.NONE,
+
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [state, setState] = React.useState({
+    type: "",
     content: {},
+    onClose: () => {},
     padding: "large",
     size: "medium",
     showBar: true,
     overflow: false,
-    onClose: () => {},
   });
 
-  const openModal = (action: ModalAction) => {
+  const openModal = (action: {
+    type: string;
+    content?: any;
+    padding?: any;
+    size?: "large" | "medium" | "small" | "fit" ;
+    showBar?: any;
+    overflow?: any;
+    onClose?: any;
+  }) => {
     setIsOpen(true);
     setState({
       type: action.type,
       content: action.content,
       onClose: action.onClose,
       padding: action.padding,
-      size: action.size === undefined ? "medium" : action.size,
+      size: action.size === undefined ? 'medium' : action.size,
       showBar: action.showBar,
       overflow: action.overflow,
     });
@@ -99,9 +88,7 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
 
   const afterClose = () => {
     const { onClose } = state;
-    if (onClose) {
-      onClose();
-    }
+    onClose();
   };
 
   return (
@@ -125,9 +112,5 @@ export const ModalProvider: FunctionComponent<ModalProviderProps> = ({
 };
 
 export const useModal = (): ModalContextType => {
-  const context = React.useContext(ModalContext);
-  if (!context) {
-    throw new Error('useModal must be used within a ModalProvider');
-  }
-  return context;
+  return React.useContext(ModalContext);
 };

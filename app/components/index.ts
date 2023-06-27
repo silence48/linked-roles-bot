@@ -6,5 +6,3 @@ export { Icon } from './Icon';
 export { Layout } from './Layout';
 export { Button } from './Button';
 export { ConnectWallet } from './ConnectWallet';
-export { IconHeading } from './IconHeading';
-export { Challenge } from './Challenge';
