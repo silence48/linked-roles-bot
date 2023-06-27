@@ -27,14 +27,14 @@
     "clsx": "^1.2.1",
     "cross-env": "^7.0.3",
     "joi": "^17.8.3",
-    "linked-roles-core": "latest",
+    "linked-roles-core": "silence48/linked-roles-core#debug",
     "model-one": "^0.0.7",
     "postcss-preset-env": "^8.5.0",
     "qrcode-generator": "^1.4.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.8.0",
-    "stellar-base": "8.2.2"
+    "stellar-base": "9.0.0-beta.3"
   },
   "devDependencies": {
     "@albedo-link/intent": "latest",
