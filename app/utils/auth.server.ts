@@ -119,7 +119,7 @@ export async function getAccessToken(refreshtoken, request, context){
 
 //this isn't being used i don't think right now?
 export async function verifyAndRenewAccess(accesstoken, context){
-  const { User } = await import ('linked-roles-core/lib/models/user');
+  const { User } = await import ('linked-roles-core');
   const jwt = await import ('@tsndr/cloudflare-worker-jwt')
   let validity = jwt.verify(accesstoken, context.env.authsigningkey)
   if (await validity){
