@@ -8,8 +8,6 @@ export interface UserDataI {
   discord_access_token?: string;
   discord_refresh_token?: string;
   discord_expires_at?: string;
-  // stellar_expires_at?: string
-  //  public_key?: string
 }
 export interface UserI extends Model {
   data: UserDataI;

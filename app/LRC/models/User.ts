@@ -1,6 +1,6 @@
-import { Model, Schema } from 'model-one'
+import { Model, Schema } from 'model-one';
 import type { SchemaConfigI } from 'model-one';
-import type { UserI, UserDataI } from '../interfaces/types'
+import type { UserI, UserDataI } from '../interfaces/types';
 
 const userSchema: SchemaConfigI = new Schema({
   table_name: 'users',
@@ -9,15 +9,19 @@ const userSchema: SchemaConfigI = new Schema({
     { name: 'discord_user_id', type: 'string' },
     { name: 'discord_access_token', type: 'string' },
     { name: 'discord_refresh_token', type: 'string' },
-    { name: 'discord_expires_at', type: 'string' },
-  ],
-})
+    { name: 'discord_expires_at', type: 'string' }
+  ]
+});
 
 export class User extends Model implements UserI {
-  data: UserDataI
+  data: UserDataI;
 
   constructor(props: UserDataI) {
-    super(userSchema, props)
-    this.data = props
+    super(userSchema, props);
+    this.data = props;
+  }
+
+  async discordExists(discord_user_id: string, DB: any) {
+    const userExists = await User.findOne('discord_user_id', discord_user_id, DB);
   }
 }
