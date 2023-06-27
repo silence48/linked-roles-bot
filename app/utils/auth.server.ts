@@ -1,5 +1,9 @@
 export async function gatherTxSigners(transaction, signers) {
   const { Keypair } = await import('stellar-base');
+  console.log('in gather tx signers')
+  console.log(transaction)
+  console.log(signers)
+  
   const hashedSignatureBase = transaction.hash();
   const signersFound = new Set();
   for (const signer of signers) {
@@ -60,6 +64,10 @@ export async function getRefreshToken(transaction, request, context){
   console.log(`making a refresh token for userid: ${userid}` )
   const jti = decoder.decode(transaction.operations[0].value)
   console.log(jti, 'JTI')
+  console.log(transaction)
+  console.log(transaction.source)
+  console.log(JSON.stringify(transaction))
+
   if ( await verifyTxSignedBy(transaction,transaction.source) == true){
     const ourURL = new URL(request.url).origin //https://127.0.0.1/ https://stellar-discord-bot.workers.dev/
     let token = await jwt.sign(

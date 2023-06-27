@@ -55,12 +55,13 @@ console.log(builtTx)
   }
 
   const refreshtoken = await getRefreshToken(builtTx, request, context);
+  console.log(refreshtoken, 'refresh token')
   if (refreshtoken != false) {
     const userExists = (await User.findBy('discord_user_id', discord_user_id, DB)).length;
-    // console.log(`from challenge.verify - action - userExists ${userExists}`);
+     console.log(`from challenge.verify - action - userExists ${userExists}`);
     const accesstoken = await getAccessToken(refreshtoken, request, context);
     if (accesstoken) {
-      // const { payload } = jwt.decode(refreshtoken);
+       const { payload } = jwt.decode(refreshtoken);
       // If user does not exist, create itx
       if (!userExists) {
         const errmsg = JSON.stringify('User does not exist.');
