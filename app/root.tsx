@@ -20,8 +20,7 @@ import { useModal, useWallet } from "~/context";
 import { json } from "@remix-run/cloudflare";
 import { getUserAuthProgress, getUser } from "~/utils/session.server";
 import tailwind from "~/styles/main.css";
-//import { Discord } from 'linked-roles-core';
-import { Discord } from '~/LRC/models/Discord'
+import { Discord } from 'linked-roles-core';
 import { ModalProvider, WalletProvider } from "~/context";
 import { ModalTypeE } from "~/context/Modal";
 

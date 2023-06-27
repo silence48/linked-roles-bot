@@ -143,7 +143,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
     ) {
       payload.submit(
         { signed_envelope_xdr },
-        { method: "post", action: `/challenge/verify?provider=${provider}&addAccount=true` }
+        { method: "post", action: `/challenge/verify?provider=${provider}` }
       );
     }
   };

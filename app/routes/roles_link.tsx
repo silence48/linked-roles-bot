@@ -7,8 +7,7 @@ export let loader: LoaderFunction = async ({
     request,
     context,
   }) => {
-    //const { Discord } = await import("linked-roles-core");
-    const { Discord } = await import ('~/LRC/models/Discord');
+    const { Discord } = await import ('linked-roles-core');
     
     const discord = await Discord.getOAuthUrl(request, context.env);
     const { url, state } = discord

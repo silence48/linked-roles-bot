@@ -2,8 +2,7 @@ import {json, type LoaderArgs } from '@remix-run/cloudflare';
 import { useLoaderData } from '@remix-run/react';
 import { Layout } from '~/components/Layout';
 
-//import { AccountBuilder } from 'linked-roles-core';
-import { AccountBuilder } from '~/LRC/builders/AccountBuilder';
+import { AccountBuilder } from 'linked-roles-core';
 
 import { useModal } from '~/context/Modal';
 import { Button } from '~/components/Button';

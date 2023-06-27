@@ -1,7 +1,7 @@
 import * as React from "react";
 import { json, redirect, type LoaderArgs } from "@remix-run/cloudflare";
 //import { getUser } from "~/utils/session.server";
-import { User } from "~/LRC/models/User";
+import { User } from "linked-roles-core";
 
 import { useModal } from "~/context";
 import { Layout, Button } from "~/components";
