@@ -41,7 +41,9 @@ export async function fetchRegisteredAccounts(request: Request, context: any) {
   const { getUser } = await import("~/utils/session.server");
   const { DB } = context.env as any;
   const { discord_user_id } = await getUser(request, context.sessionStorage);
+  console.log(discord_user_id, 'discord_user_id in fetch reg accounts')
   const stellarAccounts = await StellarAccount.findBy("discord_user_id", discord_user_id, DB);
+  console.log(stellarAccounts)
   return stellarAccounts;
 }
 

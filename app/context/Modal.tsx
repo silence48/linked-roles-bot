@@ -16,6 +16,9 @@ export enum ModalTypeE {
   ADD_ACCOUNT = "add_account",
   REMOVE_ACCOUNT = "remove_account",
   SETTINGS = "settings",
+  PROFILE = "profile",
+  CONFIRMATION = "confirmation",
+  DELETE_ACCOUNT = "delete_account",
   NONE = "",
 }
 
