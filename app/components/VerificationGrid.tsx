@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card } from '~/components/Card'
+import type { UserBadgeDetail } from "~/types";
 
 /**
  * This component creates a Grid of "cards" that will each contain the
@@ -8,13 +9,13 @@ import { Card } from '~/components/Card'
  */
 //export default function Grid(props) {
 export const VerificationGrid = (props: any) => {
+    
     const badges = props.badges
-
     // Create an array of badges (<Card />s) given an array of badges.
-    function createBadgesArr(badges: { code: string; }[]) {
+    function createBadgesArr(badges: UserBadgeDetail[]) {
         let badgesArr = []
         let badgeGroup = []
-        badges.forEach((badge: { code: string; }, i: number, arr: any[]) => {
+        badges.forEach((badge: UserBadgeDetail, i: number, arr: any[]) => {
             // Let's get our bearing of where we are in the array
             let series = badge.code.slice(0, -2)
             let lastBadge = i >= 1 ? arr[i - 1] : null
@@ -23,7 +24,6 @@ export const VerificationGrid = (props: any) => {
                 // If we're starting a new series, push the previous group to the array and start a new one
                 if (badgeGroup.length > 0) {
                     badgesArr.push(
-
                         <div key={`group${i}`} className="flex justify-center mb-3">
                             <div className="flex flex-wrap justify-center">
                             {badgeGroup}
@@ -72,9 +72,8 @@ export const VerificationGrid = (props: any) => {
                     // Put a header for the series that is different from the last
                     badgesArr.push(<div key={`header${i}Row`} className="row-auto mt-3 text-center text-center"><h3 key={`header${i}`}>Series {badge.code.substr(2, 2)} Badges</h3></div>)
                 }
-                badgeGroup.push(<Card key={i} badge={badge} description={props.descriptions} />);
             }
-            badgeGroup.push(<Card key={i} badge={badge} description={props.descriptions} />);
+            badgeGroup.push(<Card key={`${badge.code}-${badge.issuer}-${i}`} badge={badge} description={props.descriptions} />);
         })
         // Push the last group to the array
         if (badgeGroup.length > 0) {
