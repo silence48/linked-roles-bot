@@ -1,3 +1,110 @@
+import React, { FunctionComponent, ReactElement, useState } from "react";
+import { useTheme } from "./Theme";
+import { useFetcher } from "@remix-run/react";
+import { Modal } from "~/components";
+import { useWalletClient } from "~/hooks/useWalletClient";
+import { WalletAssert } from "~/components/Wallets";
+import type { Provider, Network } from "~/types";
+
+type Status = "connected" | "disconnected" | "challenge";
+export type WalletProviderProps = {
+  children: ReactElement;
+  walletAuthed: boolean;
+  provider: Provider;
+  publicKey: string;
+  network: Network;
+};
+
+export type WalletContextType = {
+  provider: Provider
+  url: string | null;
+  publicKey: string | null;
+  status: Status;
+  newSession: () => void;
+  signTransaction: (xdr: string, submit: boolean) => void;
+  signChallenge: (xdr: string) => void;
+  initClient: (provider: Provider) => Promise<{ publicKey: string; status: string }>;
+};
+
+export const WalletContext = React.createContext<WalletContextType>(
+  {} as WalletContextType
+);
+
+export const WalletProvider: FunctionComponent<WalletProviderProps> = ({
+  children,
+  walletAuthed,
+  publicKey: publicKeyProp,
+  provider: providerProp,
+  network,
+}) => {
+  const { theme } = useTheme();
+  const [isOpen, setIsOpen] = React.useState(false);
+  const [status, setStatus] = useState<Status>(walletAuthed ? "connected" : "disconnected");
+  const fetcher = useFetcher();
+
+  const {
+    provider,
+    publicKey,
+    url,
+    initClient,
+    signTransaction,
+    signChallenge,
+  } = useWalletClient(providerProp, network);
+
+  const closeModal = () => {
+    setIsOpen(false);
+  };
+
+  const newSession = () => {
+    setIsOpen(true);
+  };
+
+  React.useEffect(() => {
+    if (fetcher.state === "idle" && fetcher.data !== undefined) {
+      const { body } = fetcher.data;
+      const { account, provider } = body;
+      if (account === publicKey && provider === provider) {
+        setStatus("connected");
+        setIsOpen(false);
+      }
+    }
+  }, [fetcher]);
+
+  return (
+    <WalletContext.Provider
+      value={{
+        provider,
+        newSession,
+        initClient,
+        url,
+        status,
+        publicKey,
+        signChallenge,
+        signTransaction,
+      }}
+    >
+      {children}
+      <Modal
+        initialState={isOpen}
+        closeModal={closeModal}
+        theme={theme}
+        padding="large"
+        size="small"
+        showBar={false}
+        overflow={false}
+      >
+        <WalletAssert view={provider} initClient={initClient} url={url} />
+      </Modal>
+    </WalletContext.Provider>
+  );
+};
+
+export const useWallet = (): WalletContextType => {
+  return React.useContext(WalletContext);
+};
+
+/*
+
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { Button, Loader, Icon, Modal, QRCode } from "~/components";
@@ -353,3 +460,4 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
     </div>
   );
 };
+*/

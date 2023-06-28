@@ -4,25 +4,7 @@ import { fetchRegisteredAccounts } from "~/utils/sqproof";
 
 import { useLoaderData } from "@remix-run/react";
 import { VerificationGrid } from "~/components/VerificationGrid";
-type UserBadgeDetail = {
-    code: string;
-    issuer: string;
-    filename: string;
-    description: string;
-    title?: string;
-    owned: boolean;
-    learn?: boolean;
-    side?: boolean;
-    legacy?: boolean;
-    monochrome?: boolean;
-    soroban?: boolean;
-    owner_details?: {
-      date_acquired: string;
-      tx_id: string;
-      id: string;
-      public_key: string;
-    };
-  };
+import type { UserBadgeDetail } from "~/types";
   
 export let loader = async ({ request, context }: LoaderArgs) => {
     const { badgeDetails, seriesFourIssuers } = await import(

@@ -1,5 +1,24 @@
 import type { AssetType, MemoType } from "stellar-base";
 
+export type UserBadgeDetail = {
+  code: string;
+  issuer: string;
+  filename: string;
+  description: string;
+  title?: string;
+  owned: boolean;
+  learn?: boolean;
+  side?: boolean;
+  legacy?: boolean;
+  monochrome?: boolean;
+  soroban?: boolean;
+  owner_details?: {
+    date_acquired: string;
+    tx_id: string;
+    id: string;
+    public_key: string;
+  };
+};
 //UI related types:
 //modal types:
 export type ModalPaddingType = 'none' | 'small' | 'medium' | 'large';

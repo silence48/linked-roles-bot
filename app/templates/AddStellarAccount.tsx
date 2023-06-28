@@ -1,3 +1,4 @@
+
 import * as React from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
 import { Loader, IconHeading, QRCode, Challenge, Button } from "~/components";
@@ -5,7 +6,9 @@ import { isBrowser } from "~/utils/misc.client";
 import { useFetcher } from "@remix-run/react";
 import { type IconKeys } from "~/components/Icon";
 import type { Provider, Network } from "~/types";
+import { WalletConnect } from "~/components/Wallets";
 
+/*
 const WalletConnect = ({ initClient, url }: any) => {
   React.useEffect(() => {
     if (isBrowser) {
@@ -42,7 +45,7 @@ const WalletConnect = ({ initClient, url }: any) => {
     </div>
   );
 };
-
+*/
 const Albedo = ({ initClient }: any) => {
   React.useEffect(() => {
     initClient("albedo");

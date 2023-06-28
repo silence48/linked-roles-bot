@@ -9,6 +9,10 @@ export const WalletConnect = ({ initClient, url }) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    console.log("URL", url);
+  }, [url]);
+  
   return !url ? (
     <Loader />
   ) : (
@@ -90,4 +94,3 @@ export const WalletAssert = ({ view, initClient, url }) => {
         return null;
     }
   };
-  
