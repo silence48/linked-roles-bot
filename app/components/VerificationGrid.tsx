@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card } from '~/components/Card'
 import type { UserBadgeDetail } from "~/types";
+import { useFetcher  } from "@remix-run/react";
 
 /**
  * This component creates a Grid of "cards" that will each contain the
@@ -9,13 +10,22 @@ import type { UserBadgeDetail } from "~/types";
  */
 //export default function Grid(props) {
 export const VerificationGrid = (props: any) => {
-    
-    const badges = props.badges
+    const badgeFetcher = useFetcher();
+    React.useEffect(() => {
+        if (badgeFetcher.state === "idle" && badgeFetcher.data == null) {
+            console.log("FETCHING")
+            badgeFetcher.load(`/verifyRoles`);
+        }
+    }, [badgeFetcher]);
+    if (!badgeFetcher.data) {
+        return <div>Loading...</div>; // Replace with your preferred loading state
+      }
+    const {userOwnedBadges} = badgeFetcher.data
     // Create an array of badges (<Card />s) given an array of badges.
-    function createBadgesArr(badges: UserBadgeDetail[]) {
+    function createBadgesArr(userOwnedBadges: UserBadgeDetail[]) {
         let badgesArr = []
         let badgeGroup = []
-        badges.forEach((badge: UserBadgeDetail, i: number, arr: any[]) => {
+        userOwnedBadges.forEach((badge: UserBadgeDetail, i: number, arr: any[]) => {
             // Let's get our bearing of where we are in the array
             let series = badge.code.slice(0, -2)
             let lastBadge = i >= 1 ? arr[i - 1] : null
@@ -90,7 +100,7 @@ export const VerificationGrid = (props: any) => {
 
     return (
         <div key="badgesGrid" className="justify-center  justify-items-center mb-8">
-            {createBadgesArr(badges)}
+            {createBadgesArr(userOwnedBadges)}
         </div>
     )
 }

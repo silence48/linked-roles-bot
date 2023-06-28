@@ -2,30 +2,10 @@
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import { fetchRegisteredAccounts } from "~/utils/sqproof";
 
-import { useLoaderData } from "@remix-run/react";
-import { VerificationGrid } from "~/components/VerificationGrid";
 import type { UserBadgeDetail } from "~/types";
-type UserBadgeDetail = {
-    code: string;
-    issuer: string;
-    filename: string;
-    description: string;
-    title?: string;
-    owned: boolean;
-    learn?: boolean;
-    side?: boolean;
-    legacy?: boolean;
-    monochrome?: boolean;
-    soroban?: boolean;
-    owner_details?: {
-      date_acquired: string;
-      tx_id: string;
-      id: string;
-      public_key: string;
-    };
-  };
+
 export let loader = async ({ request, context }: LoaderArgs) => {
-    const { badgeDetails, seriesFourIssuers } = await import(
+    const { badgeDetails } = await import(
         "../utils/badge-details"
       );
       const { DB } = context.env;
@@ -67,14 +47,4 @@ userOwnedBadges.forEach(badge => {
   console.log(userOwnedBadges);
 
       return json({ userOwnedBadges });
-}
-
-export default function Index() {
-    const { userOwnedBadges } = useLoaderData();
-return (
-    <>
-   <VerificationGrid />
-    {/* <Card badge={badgeDetails[0]} />*/}
-    </>
-);
 }

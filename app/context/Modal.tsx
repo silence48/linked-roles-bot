@@ -8,6 +8,7 @@ import { AddStellarAccount } from "~/templates/AddStellarAccount";
 import { RemoveStellarAccount } from "~/templates/RemoveStellarAccount";
 import { Settings } from '~/components/Settings';
 import type { ModalProps } from "~/types";
+import { VerificationGrid } from "~/components/VerificationGrid";
 
 export enum ModalTypeE {
   DISCORD_LOGIN = "discord_login",
@@ -54,6 +55,8 @@ const modalAssert = (action: { type: ModalTypeE; content?: any }) => {
       return <RemoveStellarAccount public_key={action.content} />;
     case ModalTypeE.SETTINGS:
       return <Settings />;
+    case ModalTypeE.CONFIRMATION:
+      return <VerificationGrid />;
     default:
       return <></>;
   }

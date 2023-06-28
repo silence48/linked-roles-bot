@@ -7,7 +7,7 @@ import { useFetcher } from "@remix-run/react";
 import { type IconKeys } from "~/components/Icon";
 import type { Provider, Network } from "~/types";
 import { WalletConnect } from "~/components/Wallets";
-
+import {ModalTypeE, useModal} from '~/context/Modal';
 /*
 const WalletConnect = ({ initClient, url }: any) => {
   React.useEffect(() => {
@@ -107,7 +107,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
   const [view, setView] = React.useState("");
   const [client, setClient] = React.useState<Client>(null);
   const [url, setUrl] = React.useState<string | null>(null);
-
+  const { openModal } = useModal();
   const fetcher = useFetcher();
   const payload = useFetcher();
 
@@ -177,6 +177,12 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
       fetcher.load(`/challenge/${publicKey}`);
     }
   }, [fetcher, publicKey]);
+
+  React.useEffect(() => {
+    if (payload.state === "idle" && payload.data) {
+      openModal({ type: ModalTypeE.CONFIRMATION, size:"fit"})
+    }
+  }, [payload]);
 
   const { challenge } = fetcher.data ?? {};
 

@@ -1,5 +1,7 @@
 import type { AssetType, MemoType } from "stellar-base";
-
+export interface InitClient {
+  (provider: Provider): Promise<{ publicKey: string, status: string }>;
+}
 export type UserBadgeDetail = {
   code: string;
   issuer: string;
