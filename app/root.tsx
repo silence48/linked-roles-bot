@@ -116,17 +116,14 @@ const Menu = ({ walletAuthed, discordAuthed, discordUser }: any) => {
                 )}
               </label>
               <ul tabIndex={0} className="mt-3 p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52" style={{ zIndex: 9999 }}>
-                <li>
-                  <a className="justify-between">
-                    Profile
-                    <span className="badge">New</span>
-                  </a>
+              <li>
+                  <Button onClick={() => openModal({ type: ModalTypeE.CONFIRMATION, size: "fit" })} text='Profile' />
                 </li>
                 <li>
-                  <Button onClick={() => openModal({ type: ModalTypeE.SETTINGS })} text='settings' />
+                  <Button onClick={() => openModal({ type: ModalTypeE.SETTINGS })} text='Settings' />
                 </li>
                 <li>
-                  <a>Logout</a>
+                 <Button type="link" to="/logout" text='Log Out'  component={Link} />
                 </li>
               </ul>
             </div>
