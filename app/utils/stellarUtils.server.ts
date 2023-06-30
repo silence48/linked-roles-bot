@@ -63,7 +63,6 @@ export async function generateAuthChallenge(
   clientState: string
 ) {
   const {TransactionBuilder, Operation, Account, Networks, BASE_FEE} = await import('stellar-base');
-  console.log('serverkeysecret in generateauth', serverkey.secret(), serverkey.secret().length)
   const encryptedid = await encrypt(discordID, serverkey.secret());
 
   let tempAccount = new Account(pubkey, "-1");
