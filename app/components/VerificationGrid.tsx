@@ -20,7 +20,7 @@ export const VerificationGrid = (props: any) => {
     if (!badgeFetcher.data) {
         return <div>Loading...</div>; // Replace with your preferred loading state
       }
-    const {userOwnedBadges} = badgeFetcher.data
+    const {userOwnedBadges, sorobanCount, classicCount } = badgeFetcher.data
     // Create an array of badges (<Card />s) given an array of badges.
     function createBadgesArr(userOwnedBadges: UserBadgeDetail[]) {
         let badgesArr = []
@@ -99,8 +99,15 @@ export const VerificationGrid = (props: any) => {
     };
 
     return (
+        <>
+        <div key="roles" className="justify-center  justify-items-center mb-8">
+            <p key="rolesHead" className="text-2xl text-center">Roles</p>
+            <p key="rolesText" className="text-2xl text-center">You earned {sorobanCount} Soroban quests and {classicCount} classic quests</p>
+            <p key="claimText" className="text-2xl text-center">You can now claim your roles in the Discord Server</p>
+        </div>
         <div key="badgesGrid" className="justify-center  justify-items-center mb-8">
             {createBadgesArr(userOwnedBadges)}
         </div>
+        </>
     )
 }

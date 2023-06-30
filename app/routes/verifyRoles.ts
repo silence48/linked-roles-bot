@@ -61,5 +61,5 @@ userOwnedBadges.forEach(badge => {
   console.log(pushed, "PUSHED")
   //console.log(userOwnedBadges);
 
-      return json({ userOwnedBadges });
+      return json({ userOwnedBadges, sorobanCount, classicCount });
 }

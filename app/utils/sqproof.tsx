@@ -64,9 +64,6 @@ export async function generateProofs(request: Request, context: any, accounts: s
   const {TransactionBuilder, Networks} = await import("stellar-base");
   const jwt = await import("@tsndr/cloudflare-worker-jwt")
 
-  //const TransactionBuilder = stellarbase.TransactionBuilder;
-
-
   const { sessionStorage } = context as any;
   const user = await getUser(request, sessionStorage);
   const { discord_user_id } = user ?? false;
