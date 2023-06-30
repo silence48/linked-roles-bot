@@ -5,137 +5,22 @@ import { Loader, IconHeading, QRCode, Challenge, Button } from "~/components";
 import { isBrowser } from "~/utils/misc.client";
 import { useFetcher } from "@remix-run/react";
 import { type IconKeys } from "~/components/Icon";
-import type { Provider, Network } from "~/types";
-import { WalletConnect } from "~/components/Wallets";
+import type { Provider, Network, WalletView, WalletViewOrStatus } from "~/types";
+import { walletOptions, WalletAssert } from "~/components/Wallets";
 import {ModalTypeE, useModal} from '~/context/Modal';
-/*
-const WalletConnect = ({ initClient, url }: any) => {
-  React.useEffect(() => {
-    if (isBrowser) {
-      initClient("wallet_connect");
-    }
-  }, []);
-
-
-  return !url ? (
-    <Loader />
-  ) : (
-    <div className="flex flex-col">
-      <div className="mb-[20px]">
-        <IconHeading text="Wallet Connect" icon="WalletConnect" />
-        <div className="text-p3-medium">
-          Connect using a compatible Wallet Connect app on your phone and scan the QR code.
-        </div>
-      </div>
-      <div className="flex justify-center">
-        <QRCode
-          value={url}
-          logoImage="https://imagedelivery.net/uDbEDRBQqhBXrrfuCRrATQ/eee714c7-b85b-42cf-23f7-d986b99c1b00/public"
-          logoHeight={48}
-          logoWidth={48}
-          eyeRadius={8}
-          size={256}
-          bgColor="#C8D1E6"
-          fgColor="#03050B"
-          eyeColor="#03050B"
-          removeQrCodeBehindLogo={true}
-          qrStyle="dots"
-        />
-      </div>
-    </div>
-  );
-};
-*/
-const Albedo = ({ initClient }: any) => {
-  React.useEffect(() => {
-    initClient("albedo");
-  }, []);
-  return <Loader />;
-};
-
-const Freighter = ({ initClient }: any) => {
-  React.useEffect(() => {
-    initClient("freighter");
-  }, []);
-  return <Loader />;
-};
-
-const Rabet = ({ initClient }: any) => {
-  React.useEffect(() => {
-    initClient("rabet");
-  }, []);
-  return <Loader />;
-};
-
-const XBull = ({ initClient }: any) => {
-  React.useEffect(() => {
-    initClient("x_bull");
-  }, []);
-  return <Loader />;
-}
-
-const options: { name: string; icon: IconKeys }[] = [
-  {
-    name: "Albedo",
-    icon: "Albedo",
-  },
-  {
-    name: "Rabet",
-    icon: "Rabet",
-  },
-  {
-    name: "Freighter",
-    icon: "Freighter",
-  },
-  {
-    name: 'X-Bull',
-    icon: 'X_bull'
-  },
-  {
-    name: "Wallet Connect",
-    icon: "WalletConnect",
-  },
-];
+import { useChallenge, useInitClient } from '~/hooks/WalletHooks';
 
 type ImportAccountProps = { network: Network };
-//type Provider = "albedo" | "rabet" | "freighter" | "x_bull" | "wallet_connect";
-type Client = any | null;
 
 const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
-  const [publicKey, setPublicKey] = React.useState<string | null>(null);
-  const [provider, setProvider] = React.useState<Provider>(null);
-  const [view, setView] = React.useState("");
-  const [client, setClient] = React.useState<Client>(null);
-  const [url, setUrl] = React.useState<string | null>(null);
+
   const { openModal } = useModal();
   const fetcher = useFetcher();
   const payload = useFetcher();
+  const [lastFetchedKey, setLastFetchedKey] = React.useState<string | null>(null);
 
-  const initClient = (provider: Provider) => {
-    if (provider === null) return;
-    setProvider(provider);
-
-    const wc = new WalletClient(provider, network);
-    setClient(wc);
-    if (provider === "wallet_connect") {
-      wc.initWalletConnect().then(({ uri }: any) => {
-        setUrl(uri);
-        wc.getPublicKey().then(async ({ publicKey, code, message }: any) => {
-          if (code === 200) {
-            setView("challenge");
-            setPublicKey(publicKey);
-          }
-        });
-      });
-    } else {
-      wc.getPublicKey().then(async ({ publicKey, code, message }: any) => {
-        if (code === 200) {
-          setView("challenge");
-          setPublicKey(publicKey);
-        }
-      });
-    }
-  };
+  const [view, setView] = React.useState<WalletViewOrStatus | null>("");
+  const { provider, client, url, publicKey, initClient } = useInitClient(network, setView);
 
   const signChallenge = async (xdr: string) => {
     const { signed_envelope_xdr } = await client.signTransaction(xdr, false);
@@ -151,40 +36,22 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
     }
   };
 
-  const walletAssert = (view: any) => {
-    switch (view) {
-      case "Rabet":
-        return <Rabet initClient={initClient} />;
-      case "Freighter":
-        return <Freighter initClient={initClient} />;
-      case "Albedo":
-        return <Albedo initClient={initClient} />;
-      case "X-Bull":
-        return <XBull initClient={initClient} />;
-      case "Wallet Connect":
-        return <WalletConnect url={url} initClient={initClient} />;
-      default:
-        return <></>;
-    }
-  };
-
   React.useEffect(() => {
-    if (
-      publicKey !== null &&
-      fetcher.state === "idle" &&
-      fetcher.data == null
-    ) {
+    if (publicKey !== null && publicKey !== lastFetchedKey) {
       fetcher.load(`/challenge/${publicKey}`);
+      setLastFetchedKey(publicKey);
     }
   }, [fetcher, publicKey]);
 
-  React.useEffect(() => {
+const { challenge } = fetcher.data ?? {};
+
+React.useEffect(() => {
     if (payload.state === "idle" && payload.data) {
       openModal({ type: ModalTypeE.CONFIRMATION, size:"fit"})
     }
   }, [payload]);
 
-  const { challenge } = fetcher.data ?? {};
+ 
 
   return (
     <div className="flex flex-col">
@@ -205,7 +72,7 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
               </div>
               <div className="my-8">
                 <div className="flex flex-col space-y-4">
-                  {options.map((item, key) => {
+                  {walletOptions.map((item, key) => {
                     return (
                       <div key={key}>
                         <Button
@@ -224,7 +91,9 @@ const ImportAccount: React.FC<ImportAccountProps> = ({ network }) => {
           )}
           {view !== "" && (
             <div>
-              <div>{walletAssert(view)}</div>
+              <div>
+                <WalletAssert view={view} initClient={initClient} url={url}/>
+                </div>
               <div>
                 <Button
                   text="Cancel"

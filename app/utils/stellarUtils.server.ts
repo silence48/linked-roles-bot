@@ -1,5 +1,60 @@
 import type { Horizon } from 'horizon-api';
 import type { Keypair } from 'stellar-base';
+const { TextEncoder, TextDecoder } = require('util');
+
+async function deriveKey(secret) {
+  const encoder = new TextEncoder();
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    "PBKDF2",
+    false,
+    ["deriveBits", "deriveKey"]
+  );
+  return crypto.subtle.deriveKey(
+    {
+      "name": "PBKDF2",
+      "salt": encoder.encode("a-unique-salt"), // Use a constant salt (not recommended) or store a random salt for each encryption -- update this later not important right now.
+      "iterations": 100000,
+      "hash": "SHA-256"
+    },
+    keyMaterial,
+    { "name": "AES-GCM", "length": 256},
+    true,
+    [ "encrypt", "decrypt" ]
+  );
+}
+
+async function encrypt(text, secret) {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(text);
+  const key = await deriveKey(secret);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const encrypted = await crypto.subtle.encrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    data
+  );
+  const combined = new Uint8Array(iv.length + encrypted.byteLength);
+  combined.set(iv);
+  combined.set(new Uint8Array(encrypted), iv.length);
+  return btoa(String.fromCharCode.apply(null, combined));
+}
+
+async function decrypt(encrypted, secret) {
+  const decoder = new TextDecoder();
+  const key = await deriveKey(secret);
+  const data = Uint8Array.from(atob(encrypted), c => c.charCodeAt(0));
+  const iv = data.slice(0, 12);
+  const encryptedData = data.slice(12);
+  const decrypted = await crypto.subtle.decrypt(
+    { name: 'AES-GCM', iv: iv },
+    key,
+    encryptedData
+  );
+  return decoder.decode(decrypted);
+}
+
 export async function generateAuthChallenge(
   serverkey: Keypair,
   pubkey: string,
@@ -8,6 +63,9 @@ export async function generateAuthChallenge(
   clientState: string
 ) {
   const {TransactionBuilder, Operation, Account, Networks, BASE_FEE} = await import('stellar-base');
+  console.log('serverkeysecret in generateauth', serverkey.secret(), serverkey.secret().length)
+  const encryptedid = await encrypt(discordID, serverkey.secret());
+
   let tempAccount = new Account(pubkey, "-1");
   let transaction = new TransactionBuilder(tempAccount, {
     fee: BASE_FEE,
@@ -24,8 +82,8 @@ export async function generateAuthChallenge(
     )
     .addOperation(
       Operation.manageData({
-        name: "DiscordID",
-        value: discordID,
+        name: "User",
+        value: encryptedid,
         source: pubkey,
       })
     )

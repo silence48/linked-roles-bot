@@ -13,7 +13,7 @@ export const Modal: React.FC<ModalProps> = ({
   size = 'small',
   align = 'center',
   overlay = false,
-  showBar = false,
+  showBar = true,
   overflow = false,
   closeModal,
   closable = true,

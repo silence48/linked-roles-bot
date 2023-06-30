@@ -27,7 +27,7 @@ const userBalancesPromises = userpubkeys.map(async (publicKey) => {
 const userBalances = await Promise.all(userBalancesPromises);
 const userBalancesResults = userBalances.flatMap(balance => balance.results);
 
-console.log(userBalancesResults);
+//console.log(userBalancesResults);
 const userOwnedBadges: UserBadgeDetail[] = badgeDetails.filter(badge => 
     userBalancesResults.some(balance => 
       balance.asset_id === badge.code && balance.issuer_id === badge.issuer
@@ -44,7 +44,7 @@ userOwnedBadges.forEach(badge => {
     };
   });
   
-  console.log(userOwnedBadges);
+  //console.log(userOwnedBadges);
 
       return json({ userOwnedBadges });
 }

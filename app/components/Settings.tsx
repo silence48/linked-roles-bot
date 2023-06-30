@@ -18,11 +18,11 @@ export const Settings = () => {
 
     return (
         <Layout customCss="bg-neutral-600 p-[40px] rounded-md">
-            <div>Settings</div>
-            {data && data.accounts.length > 1 && <div>Main account:</div>}
-            <div className="w-[500px] truncate">{account}</div>
+            <div className="text-[40px] text-center">Settings</div>
+            
             <Button onClick={() => openModal({ type: ModalTypeE.ADD_ACCOUNT, content: network })} text="Add Account" />
             {data && data.accounts.map((acc: any, key: string) => {
+              console.log(acc)
                 return (
                     <div key={key} className="flex flex-row">
                         <div className="w-[500px] truncate">{acc.public_key}</div>

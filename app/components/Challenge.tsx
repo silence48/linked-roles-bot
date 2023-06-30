@@ -25,7 +25,7 @@ export const Challenge: React.FC<{
           className="text-caption-bold truncate text-neutral-700 bg-neutral-400 rounded-md"
           style={{ padding: "20px", marginTop: "8px" }}
         >
-          <p className="truncate">{challenge}</p>
+          <p >{challenge}</p>
         </div>
         <div className="mt-[20px]">
           {challenge && (

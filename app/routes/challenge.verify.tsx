@@ -74,6 +74,7 @@ export async function action({ request, context }: ActionArgs) {
       if (!accountBuilder.data.user) {
         throw new Error('User does not exist.');
       } else {
+        console.log('setting up account ', refreshtoken, accesstoken, builtTx.source)
         await accountBuilder.addStellarAccount({ public_key: builtTx.source, access_token: accesstoken, refresh_token: refreshtoken });
       }
 

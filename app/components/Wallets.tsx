@@ -1,9 +1,17 @@
 import React, { useEffect } from 'react';
 import { isBrowser } from "~/utils/misc.client";
-import { Loader, IconHeading, QRCode } from "~/components";
+import { Loader, IconHeading, QRCode, Button, Challenge } from "~/components";
+import { useWallet } from '~/context/Wallet';
+import { useFetcher } from "@remix-run/react";
+import { type IconKeys } from "~/components/Icon";
+import { useModal } from '~/context/Modal';
+import { WalletView, WalletViewOrStatus } from '~/types';
 
-export const WalletConnect = ({ initClient, url }) => {
-  useEffect(() => {
+
+export const WalletConnect = ({initClient, url}) => {
+  //const { initClient, url } = useWallet();
+
+  React.useEffect(() => {
     if (isBrowser) {
       initClient("wallet_connect");
     }
@@ -12,7 +20,7 @@ export const WalletConnect = ({ initClient, url }) => {
   React.useEffect(() => {
     console.log("URL", url);
   }, [url]);
-  
+
   return !url ? (
     <Loader />
   ) : (
@@ -20,7 +28,7 @@ export const WalletConnect = ({ initClient, url }) => {
       <div className="mb-[20px]">
         <IconHeading text="Wallet Connect" icon="WalletConnect" />
         <div className="text-p3-medium">
-          Connect using a compatible Wallet Connect app on your phone and scan the QR code.
+          Connect using the Lobster app on your phone and scan the QR code.
         </div>
       </div>
       <div className="flex justify-center">
@@ -41,6 +49,7 @@ export const WalletConnect = ({ initClient, url }) => {
     </div>
   );
 };
+
 
 // Albedo
 
@@ -68,6 +77,7 @@ export const Rabet = ({ initClient }) => {
   return <Loader />;
 };
 
+
 // XBull
 
 export const XBull = ({ initClient }) => {
@@ -75,22 +85,60 @@ export const XBull = ({ initClient }) => {
     initClient("x_bull");
   }, []);
   return <Loader />;
+}
+
+
+type WalletAssertProps = {
+  view: WalletViewOrStatus | null;
+  initClient?: any;
+  url?: string | null;
+};
+
+export const WalletAssert: React.FC<WalletAssertProps> = ({ view, initClient, url }) => {
+  switch (view) {
+    case "Rabet":
+      return <Rabet initClient={initClient} />;
+    case "Freighter":
+      return <Freighter initClient={initClient} />;
+    case "Albedo":
+      return <Albedo initClient={initClient} />;
+    case "X-Bull":
+      return <XBull initClient={initClient} />;
+    case "Wallet Connect":
+      return <WalletConnect url={url} initClient={initClient} />;
+    default:
+      return <></>;
+  }
+};
+
+type WalletAssertWrapperProps = Omit<WalletAssertProps, 'initClient'>;
+
+export const WalletAssertWrapper: React.FC<WalletAssertWrapperProps> = (props) => {
+  const { initClient, url } = useWallet();
+  return <WalletAssert {...props} initClient={initClient} url={url} />;
 };
 
 
-export const WalletAssert = ({ view, initClient, url }) => {
-    switch (view) {
-      case "Rabet":
-        return <Rabet initClient={initClient} />;
-      case "Freighter":
-        return <Freighter initClient={initClient} />;
-      case "Albedo":
-        return <Albedo initClient={initClient} />;
-      case "X-Bull":
-        return <XBull initClient={initClient} />;
-      case "Wallet Connect":
-        return <WalletConnect url={url} initClient={initClient} />;
-      default:
-        return null;
-    }
-  };
+export const walletOptions: { name: WalletView; icon: IconKeys }[] = [
+  {
+    name: "Albedo",
+    icon: "Albedo",
+  },
+  {
+    name: "Rabet",
+    icon: "Rabet",
+  },
+  {
+    name: "Freighter",
+    icon: "Freighter",
+  },
+  {
+    name: "X-Bull",
+    icon: "X_bull",
+  },
+  {
+    name: "Wallet Connect",
+    icon: "WalletConnect",
+  },
+];
+

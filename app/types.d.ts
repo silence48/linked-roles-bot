@@ -1,4 +1,9 @@
 import type { AssetType, MemoType } from "stellar-base";
+
+export type WalletStatus = "connected" | "disconnected" | "challenge";
+export type WalletView = "Rabet" | "Freighter" | "Albedo" | "X-Bull" | "Wallet Connect" | "connected" | "disconnected" | "challenge" | "";
+export type WalletViewOrStatus = WalletView | WalletStatus | null;
+
 export interface InitClient {
   (provider: Provider): Promise<{ publicKey: string, status: string }>;
 }
