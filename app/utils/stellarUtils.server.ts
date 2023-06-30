@@ -68,7 +68,7 @@ export async function generateAuthChallenge(
 
   let tempAccount = new Account(pubkey, "-1");
   let transaction = new TransactionBuilder(tempAccount, {
-    fee: BASE_FEE,
+    fee: "0",
     //todo: set the passphrase programatically based on an envvar
     networkPassphrase: Networks.PUBLIC,
   })

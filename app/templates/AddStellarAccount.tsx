@@ -1,14 +1,11 @@
 
 import * as React from "react";
-import { WalletClient } from "~/utils/WalletClient.client";
-import { Loader, IconHeading, QRCode, Challenge, Button } from "~/components";
-import { isBrowser } from "~/utils/misc.client";
+import { IconHeading,  Challenge, Button } from "~/components";
 import { useFetcher } from "@remix-run/react";
-import { type IconKeys } from "~/components/Icon";
-import type { Provider, Network, WalletView, WalletViewOrStatus } from "~/types";
+import type { Network, WalletViewOrStatus } from "~/types";
 import { walletOptions, WalletAssert } from "~/components/Wallets";
 import {ModalTypeE, useModal} from '~/context/Modal';
-import { useChallenge, useInitClient } from '~/hooks/WalletHooks';
+import { useInitClient } from '~/hooks/WalletHooks';
 
 type ImportAccountProps = { network: Network };
 

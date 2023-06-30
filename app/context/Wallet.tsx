@@ -1,13 +1,12 @@
 import React, { type ReactElement, type FunctionComponent } from "react";
 import { WalletClient } from "~/utils/WalletClient.client";
-import { Button, Loader, Icon, Modal, QRCode } from "~/components";
+import { Button, Modal } from "~/components";
 import { useTheme } from "./Theme";
 import { useFetcher } from "@remix-run/react";
 import { Challenge } from "~/components/Challenge";
-//import { type IconKeys } from "~/components/Icon";
 import { IconHeading } from "~/components/IconHeading";
 import type { Provider, Network, WalletViewOrStatus, WalletStatus } from "~/types";
-import { useChallenge, useInitClient } from '~/hooks/WalletHooks';
+import { useInitClient } from '~/hooks/WalletHooks';
 import { walletOptions, WalletAssertWrapper } from "~/components/Wallets";
 
 export type WalletProviderProps = {
@@ -17,8 +16,6 @@ export type WalletProviderProps = {
   publicKey: string;
   network: Network;
 };
-
-type Client = any | null;
 
 export type WalletContextType = {
   provider: Provider
@@ -137,7 +134,7 @@ type ImportAccountProps = {};
 const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   const { publicKey, signChallenge, status } = useWallet();
   const [view, setView] = React.useState<WalletViewOrStatus | null>("");  
-  /*
+  
   const fetcher = useFetcher();
 
   React.useEffect(() => {
@@ -151,8 +148,6 @@ const ImportAccount: React.FC<ImportAccountProps> = ({}) => {
   }, [fetcher, publicKey]);
 
   const { challenge } = fetcher.data ?? {};
-*/
-  const challenge = useChallenge(publicKey)
 
   return (
     <div className="flex flex-col">
