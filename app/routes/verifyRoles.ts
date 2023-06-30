@@ -5,6 +5,11 @@ import { fetchRegisteredAccounts } from "~/utils/sqproof";
 import type { UserBadgeDetail } from "~/types";
 
 export let loader = async ({ request, context }: LoaderArgs) => {
+  const { getUser } = await import("~/utils/session.server");
+
+  const { Discord } = await import("linked-roles-core");
+  const { discord_user_id } = await getUser(request, context.sessionStorage);
+
     const { badgeDetails } = await import(
         "../utils/badge-details"
       );
@@ -43,7 +48,17 @@ userOwnedBadges.forEach(badge => {
       public_key: balance.account_id
     };
   });
-  
+  const soroban = userOwnedBadges.filter((item) => item.soroban === true);
+  const sorobanCount = soroban.length;
+  const classicCount = userOwnedBadges.length - sorobanCount;
+  const metadata = {
+    sorobanquest: sorobanCount,
+    stellarquest: classicCount
+  };
+
+  console.log(metadata, 'metadata')
+  const pushed = await Discord.pushMetadata(discord_user_id, metadata, context.env);
+  console.log(pushed, "PUSHED")
   //console.log(userOwnedBadges);
 
       return json({ userOwnedBadges });
