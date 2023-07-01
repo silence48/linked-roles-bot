@@ -148,3 +148,44 @@ export async function getSequenceNumber(context, pubkey){
   let account = await getAccountObject(context, pubkey);
   return account.sequence;
 }
+  /* NOT BEING USED
+export async function getSCFrole(discorduserid, discordtoken) {
+
+  const url = 'https://scf-voting.stellarcommunity.workers.dev/verified-members';
+
+  console.log(discorduserid, discordtoken)
+  const response = await fetch(url, {
+    method: 'GET', // or 'POST'
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `bearer ${discordtoken}`
+    }
+});
+
+if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+}
+
+const data = await response.json();
+console.log(data)
+
+
+const data = await import('./scftiers.json');
+console.log(data)
+
+let tier = 0
+try {
+  const member = data.members.find(member => member.id === discorduserid);
+  if (member) {
+    tier = member.tier;
+    console.log(`Tier for member ${discorduserid} is ${member.tier}`);
+  } else {
+    console.log(`No member found with id ${discorduserid}`);
+  }
+} catch (error) {
+  console.error(error);
+}
+return tier;
+}
+
+*/

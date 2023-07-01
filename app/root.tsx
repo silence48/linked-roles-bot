@@ -22,6 +22,7 @@ import { getUserAuthProgress, getUser } from "~/utils/session.server";
 import tailwind from "~/styles/main.css";
 import { ModalProvider, WalletProvider } from "~/context";
 import { ModalTypeE } from "~/context/Modal";
+import { User } from 'linked-roles-core';
 
 export const meta: V2_MetaFunction = () => [{ title: "CommuniDAO" }];
 

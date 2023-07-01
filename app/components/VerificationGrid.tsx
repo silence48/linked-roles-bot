@@ -20,7 +20,14 @@ export const VerificationGrid = (props: any) => {
     if (!badgeFetcher.data) {
         return <div>Loading...</div>; // Replace with your preferred loading state
       }
-    const {userOwnedBadges, sorobanCount, classicCount } = badgeFetcher.data
+    const {userOwnedBadges, sorobanCount, classicCount, tier } = badgeFetcher.data
+    enum Tiers {
+        Pilot = 3,
+        Navigator = 2,
+        Captain = 1
+      }
+    let tierName = Tiers[tier as keyof typeof Tiers]; // This will be "Navigator" if tier is 2
+    console.log(tierName)
     // Create an array of badges (<Card />s) given an array of badges.
     function createBadgesArr(userOwnedBadges: UserBadgeDetail[]) {
         let badgesArr = []
@@ -104,6 +111,7 @@ export const VerificationGrid = (props: any) => {
             <p key="rolesHead" className="text-2xl text-center">Roles</p>
             <p key="rolesText" className="text-2xl text-center">You earned {sorobanCount} Soroban quests and {classicCount} classic quests</p>
             <p key="claimText" className="text-2xl text-center">You can now claim your roles in the Discord Server</p>
+            {tier != 0 && <p key="tierText" className="text-2xl text-center">You are a tier {tier} member, you may also claim the {tierName} role</p>}
         </div>
         <div key="badgesGrid" className="justify-center  justify-items-center mb-8">
             {createBadgesArr(userOwnedBadges)}
