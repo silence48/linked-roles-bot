@@ -33,7 +33,7 @@ const body = [
   "key":"scftier",
   "name":"Stellar Community Fund Tier",
   "description":"This role is for what tier you are.",
-  "type":2
+  "type":3
 },
 ];
 
