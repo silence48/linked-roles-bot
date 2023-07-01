@@ -4,11 +4,6 @@ import { fetchRegisteredAccounts } from "~/utils/sqproof";
 
 import type { UserBadgeDetail } from "~/types";
 
-interface Env {
-  DB: D1Database;
-  ROLEDATA: KVNamespace;
-}
-
 export let loader = async ({ request, context }: LoaderArgs) => {
   const { getUser } = await import("~/utils/session.server");
   const { Discord } = await import("linked-roles-core");
@@ -17,6 +12,8 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   const { discord_user_id } = await getUser(request, context.sessionStorage);
 
   const { env } = context as any;
+  const { DB } = context.env as any;
+  
   const SCFTIERKV: KVNamespace = env.ROLEDATA;
   const scfmembers = await SCFTIERKV.get("SCFTIERS", "json")
   
@@ -31,7 +28,7 @@ export let loader = async ({ request, context }: LoaderArgs) => {
     }
 
   
-  const DB: D1Database = env.DB;
+
   const stmt = DB.prepare(`
       SELECT * 
       FROM balances 
