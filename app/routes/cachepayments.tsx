@@ -1,4 +1,4 @@
-// routes/cacheaccount.tsx
+// routes/cachepayments.tsx
 
 import { json, type LoaderArgs } from "@remix-run/cloudflare";
 import { useLoaderData } from "@remix-run/react";
@@ -12,13 +12,6 @@ export let loader = async ({ request, context }: LoaderArgs) => {
   const { getOriginalClaimants, getOriginalPayees } = await import(
     "../utils/sqproof"
   );
-  /*
-  const dynamicImport = async (env, context, issuer, code, subrequests) => {
-    const sqproof = await import("../utils/sqproof");
-    const getOriginalClaimants = sqproof.getOriginalClaimants;
-    return getOriginalClaimants(env,context, issuer, code, subrequests); // if it's a function
-  }
-*/
 
   const { sessionStorage } = context as any;
   const session = await sessionStorage.getSession(
@@ -56,11 +49,11 @@ export let loader = async ({ request, context }: LoaderArgs) => {
       break;
     }
   }
-
-  //for (const badge in badgeDetails) {
-  //await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code);
-  //}
-
+/*
+  for (const badge in badgeDetails) {
+    await getOriginalPayees("production", context, badgeDetails[badge].issuer, badgeDetails[badge].code, subrequests);
+  }
+*/
   return json({ badgeDetails });
 };
 
