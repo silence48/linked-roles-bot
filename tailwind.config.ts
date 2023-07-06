@@ -9,6 +9,9 @@ export default {
   "components/**/*.{ts,tsx}"],
   
   plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["dark"],
+  },
 } satisfies Config
 
 

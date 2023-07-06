@@ -21,7 +21,9 @@ import tailwind from '~/styles/main.css'
 
 export const meta: V2_MetaFunction  = () => ([
   {title: "CommuniDAO"},
+  { name: 'color-scheme', content: 'light only'}
 ]);
+
 
 export const links: LinksFunction = () => ([
   { rel: "stylesheet", href: tailwind },
@@ -174,7 +176,7 @@ export default function App() {
   }
 
   return (
-    <html lang="en" className="light">
+    <html lang="en" data-theme="dark">
       <head>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js" integrity="sha512-jEnuDt6jfecCjthQAJ+ed0MTVA++5ZKmlUcmDGBv2vUI/REn6FuIdixLNnQT+vKusE2hhTk2is3cFvv5wA+Sgg==" crossOrigin="anonymous" referrerPolicy="no-referrer"></script>
       
