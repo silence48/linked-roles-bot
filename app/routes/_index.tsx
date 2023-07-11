@@ -64,7 +64,8 @@ export default function Index() {
   const [isModalVisible, setIsModalVisible] = useState(false);
 
   return (
-    <div className="flex flex-wrap justify-center bg-gray-800 p-4 w-full">
+    <div className="w-[1024px] mx-auto">
+    <div className="flex flex-wrap justify-center bg-gray-800 p-4">
       
 
       {badgeDetails.map((badge, index) => (
@@ -173,6 +174,7 @@ export default function Index() {
           </dialog>
         </>
       )}
+    </div>
     </div>
   );
 }
