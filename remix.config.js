@@ -1,3 +1,5 @@
+
+// console.log('await polyfillPath("fs")', await polyfillPath("fs"))
 /** @type {import('@remix-run/dev').AppConfig} */
 module.exports = {
   devServerBroadcastDelay: 1000,
@@ -12,12 +14,24 @@ module.exports = {
   serverPlatform: "neutral",
   tailwind: true,
   postcss: true,
-  future: {
-    unstable_dev: true,
-    v2_headers: true,
-    v2_errorBoundary: true,
-    v2_meta: true,
-    v2_normalizeFormMethod: true,
-    v2_routeConvention: true,
+  browserNodeBuiltinsPolyfill: {
+    modules: {
+      buffer: true,
+      events: true,
+      fs: true
+    },
+  },
+  serverNodeBuiltinsPolyfill: {
+    modules: {
+      buffer: true,
+      events: true,
+      fs: true,
+      os: true,
+      path: true,
+      crypto: true
+    },
+  },
+  globals: {
+    Buffer: true,
   },
 };
