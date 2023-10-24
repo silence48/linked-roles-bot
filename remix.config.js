@@ -18,14 +18,13 @@ module.exports = {
     modules: {
       buffer: true,
       events: true,
-      fs: true
     },
   },
   serverNodeBuiltinsPolyfill: {
     modules: {
       buffer: true,
       events: true,
-      fs: true,
+      fs: "empty",
       os: true,
       path: true,
       crypto: true
